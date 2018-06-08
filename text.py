@@ -39,9 +39,9 @@ class Container:
         self.parent = parent
 
         # Text
-        self.font = Font('/home/bordun/.local/share/fonts/leaguegothic-regular-webfont.ttf', font_size=128, codepoints="ABCDEFGHIJKLMNOPQRSTUVWXYZ ?$.", background_color='#ff000000')
+        self.font = pi3d.Font('sans.ttf', font_size=128, codepoints="ABCDEFGHIJKLMNOPQRSTUVWXYZ ?$.", background_color='#ff000000')
         self.textmanager = pi3d.PointText(self.font, parent.CAMERA, max_chars=300, point_size=256)
-        self.text = TextBlock(0, 0, 0.01, 0.0, 200, text_format=' ',
+        self.text = pi3d.TextBlock(0, 0, 0.01, 0.0, 200, text_format='CUL',
           size=0.99, spacing="C", space=1.5, colour=(1.0, 1.0, 1.0, 1.0))
         self.textmanager.add_text_block(self.text)
 
