@@ -19,9 +19,6 @@ import os
 import sys
 import getopt
 
-from font import Font
-from TextBlock import TextBlock
-
 from six.moves import queue
 
 # LOGGER = pi3d.Log.logger(__name__)
