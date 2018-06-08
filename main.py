@@ -19,8 +19,6 @@ import os
 import sys
 import getopt
 
-from font import Font
-
 from six.moves import queue
 
 # LOGGER = pi3d.Log.logger(__name__)
@@ -149,7 +147,7 @@ class Slide(pi3d.Sprite):
 
     def set_angle(self, ax, ay, az):
         # set angle (absolute)
-        ''' 
+        '''
         set_angle sets the rotation of the slide and keeps track of it. It's an absolute angle, not a rotation one.
         '''
         self.ax = ax
@@ -194,13 +192,6 @@ class Container:
 #        self.slides[self.focus].visible = True
 
 
-        # Text
-        self.font = Font('/home/bordun/.local/share/fonts/leaguegothic-regular-webfont.ttf', font_size=256, codepoints="ABCDEFGHIJKLMNOPQRSTUVWXYZ ?$.", background_color='#ff000000')
-        self.textmanager = pi3d.PointText(self.font, parent.CAMERA, max_chars=300, point_size=512)
-        self.text = pi3d.TextBlock(0, 0, 0.01, 0.0, 200, text_format=' ',
-          size=0.99, spacing="C", space=1.5, colour=(1.0, 1.0, 1.0, 1.0))
-        self.textmanager.add_text_block(self.text)
-
     def draw(self):
         # slides have to be drawn back to front for transparency to work.
         # the 'focused' slide by definition at z=0.1, with deeper z
@@ -212,8 +203,6 @@ class Container:
                 if self.slides[ix].mask_on:
                     self.slides[ix].mask.draw()
                 self.slides[ix].draw()
-        self.textmanager.draw()
-
 
 class PytaVSL(object):
     '''
@@ -237,7 +226,7 @@ class PytaVSL(object):
         self.fileQ = queue.Queue()
 
         # Containers
-        self.ctnr = Container(parent=self, nSli=100)
+        self.ctnr = Container(parent=self, nSli=10)
 
 
 
@@ -268,7 +257,7 @@ class PytaVSL(object):
                 if yrat < xrat:
                     xrat = yrat
                 wi, hi = tex.ix * xrat, tex.iy * xrat
-                slide.set_scale(wi, hi, 1.0) 
+                slide.set_scale(wi, hi, 1.0)
 
             slide.set_draw_details(self.shader,[tex])
             self.fileQ.task_done()
@@ -290,9 +279,9 @@ class PytaVSL(object):
 		    for i in range(1, self.ctnr.nSli):
 			self.ctnr.slides[i].visible = False
 		else:
-		    self.ctnr.slides[args[0]].visible = False     
+		    self.ctnr.slides[args[0]].visible = False
         else:
-            LOGGER.error("OSC ARGS ERROR: Slide number out of range")        
+            LOGGER.error("OSC ARGS ERROR: Slide number out of range")
 
     @liblo.make_method('/pyta/slide/mask_on', 'ii')
     def slide_mask_on_cb(self, path, args):
@@ -306,9 +295,9 @@ class PytaVSL(object):
                 slide.mask.rotateToZ(slide.az)
                 slide.mask_on = True
             else:
-                self.ctnr.slides[args[0]].mask_on = False     
+                self.ctnr.slides[args[0]].mask_on = False
         else:
-            LOGGER.error("OSC ARGS ERROR: Slide number out of range")        
+            LOGGER.error("OSC ARGS ERROR: Slide number out of range")
 
     @liblo.make_method('/pyta/slide/alpha', 'if')
     def slide_alpha_cb(self, path, args):
@@ -347,7 +336,7 @@ class PytaVSL(object):
             elif path == "/pyta/slide/translate_y":
                 self.ctnr.slides[args[0]].set_translation(0.0, args[1], 0.0)
             elif path == "/pyta/slide/translate_z":
-                self.ctnr.slides[args[0]].set_translation(0.0, 0.0, args[1])   
+                self.ctnr.slides[args[0]].set_translation(0.0, 0.0, args[1])
         else:
             LOGGER.error("OSC ARGS ERROR: Slide number out of range")
 
@@ -437,21 +426,21 @@ class PytaVSL(object):
         liblo.send(dest, prefix + 'angle', slide.ax, slide.ay, slide.az)
         liblo.send(dest, prefix + 'visible', slide.visible)
         liblo.send(dest, prefix + 'alpha', slide.alpha())
-    
+
     @liblo.make_method('/pyta/slide/save_state', 'is')
     def slide_save_state(self, path, args):
 	slide = self.ctnr.slides[args[0]]
 	prefix = '/pyta/slide/'
         filename = 's' + str(args[0]) + '.' + args[1] + '.state'
 	LOGGER.info('Write in progress in ' + filename)
- 
+
         statef = open(filename, 'w')
-        statef.write("slide " + str(args[0]) + "\n") 
-        statef.write("file " + str(self.ctnr.items[args[0]][0]) + "\n") 
+        statef.write("slide " + str(args[0]) + "\n")
+        statef.write("file " + str(self.ctnr.items[args[0]][0]) + "\n")
         statef.write("position " + str(slide.x()) + " " + str(slide.y()) + " " + str(slide.z()) + "\n")
-        statef.write("scale " + str(slide.sx) + " " + str(slide.sy) + " " + str(slide.sy) + "\n")  
-        statef.write("angle " + str(slide.ax) + " " + str(slide.ay) + " " + str(slide.az) + "\n") 
-        statef.write("alpha " + str(slide.alpha()) + "\n") 
+        statef.write("scale " + str(slide.sx) + " " + str(slide.sy) + " " + str(slide.sy) + "\n")
+        statef.write("angle " + str(slide.ax) + " " + str(slide.ay) + " " + str(slide.az) + "\n")
+        statef.write("alpha " + str(slide.alpha()) + "\n")
         statef.close()
 
     @liblo.make_method('/pyta/slide/load_state', 's')
@@ -486,12 +475,6 @@ class PytaVSL(object):
         else:
             LOGGER.error("ERROR: " + args[0] + ": no such file or directory")
 
-
-
-    @liblo.make_method('/pyta/text', 's')
-    def text(self, path, args):
-        self.ctnr.text.set_text(text_format=args[0])
-
 ########## MAIN APP ##########
 
 for arg in sys.argv:
@@ -515,7 +498,7 @@ while pyta.DISPLAY.loop_running():
     pyta.ctnr.draw()
 
     k = mykeys.read()
-    
+
     if k> -1:
         first = False
         if k == 27: #ESC
@@ -527,4 +510,3 @@ while pyta.DISPLAY.loop_running():
         #             ctnr.join()
 
 pyta.destroy()
-
