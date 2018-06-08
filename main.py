@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# encoding: utf-8
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -18,9 +19,12 @@ import os
 import sys
 import getopt
 
+from font import Font
+
 from six.moves import queue
 
-LOGGER = pi3d.Log.logger(__name__)
+# LOGGER = pi3d.Log.logger(__name__)
+LOGGER = pi3d.Log()
 LOGGER.info("Log using this expression.")
 
 
@@ -184,9 +188,18 @@ class Container:
             self.slides[i].mask.set_shader(self.parent.matsh)
             self.slides[i].mask.set_material((1.0, 0.0, 0.0))
             self.slides[i].mask.positionZ(0.81-(i/10))
+        # self.text.position(100,0, 0.01)
 
         self.focus = 0 # holds the index of the focused image
 #        self.slides[self.focus].visible = True
+
+
+        # Text
+        self.font = Font('/home/bordun/.local/share/fonts/leaguegothic-regular-webfont.ttf', font_size=256, codepoints="ABCDEFGHIJKLMNOPQRSTUVWXYZ ?$.", background_color='#ff000000')
+        self.textmanager = pi3d.PointText(self.font, parent.CAMERA, max_chars=300, point_size=512)
+        self.text = pi3d.TextBlock(0, 0, 0.01, 0.0, 200, text_format=' ',
+          size=0.99, spacing="C", space=1.5, colour=(1.0, 1.0, 1.0, 1.0))
+        self.textmanager.add_text_block(self.text)
 
     def draw(self):
         # slides have to be drawn back to front for transparency to work.
@@ -199,8 +212,8 @@ class Container:
                 if self.slides[ix].mask_on:
                     self.slides[ix].mask.draw()
                 self.slides[ix].draw()
+        self.textmanager.draw()
 
-           
 
 class PytaVSL(object):
     '''
@@ -475,6 +488,9 @@ class PytaVSL(object):
 
 
 
+    @liblo.make_method('/pyta/text', 's')
+    def text(self, path, args):
+        self.ctnr.text.set_text(text_format=args[0])
 
 ########## MAIN APP ##########
 
