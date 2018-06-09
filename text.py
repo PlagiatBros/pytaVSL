@@ -104,7 +104,7 @@ class Text:
             y = y - self.parent.DISPLAY.height / 2. + FONT_SIZE * self.size * 2
 
         self.text = pi3d.String(font=self.font, string=self.string, size=self.size,
-                      camera=self.parent.CAMERA, x=x, y=y, z=1.0, is_3d=False, justify=self.h_align)
+                      camera=self.parent.CAMERA, x=x, y=y, z=0.01, is_3d=False, justify=self.h_align)
         self.text.set_shader(self.shader)
 
     def draw(self):
