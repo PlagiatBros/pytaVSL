@@ -112,7 +112,7 @@ class Font(Texture):
       raise Exception(msg)
 
     ascent, descent = imgfont.getmetrics()
-    print(ascent, descent)
+
     if spacing is None:
       spacing = shadow_radius
     self.height = ascent + descent + spacing # allow extra pixels if shadow or for certain fonts
@@ -180,7 +180,7 @@ class Font(Texture):
       table_entry = [
         chwidth,
         chheight,
-        [[x + tw, y - th], [x, y - th], [x, y], [x + tw, y]], # UV texture coordinates
+        [[x + tw, y - th], [x , y - th], [x, y], [x + tw, y]], # UV texture coordinates
         [[chwidth, 0, 0], [0, 0, 0], [0, -self.height, 0], [chwidth, -self.height, 0]], # xyz vertex coordinates of corners
         float(curX) / self.ix,
         float(curY) / self.iy

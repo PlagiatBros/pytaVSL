@@ -45,11 +45,11 @@ class Text:
 
         self.shader = pi3d.Shader("uv_flat")
 
-        self.string = 'XXX'
+        self.string = ''
         self.color = (1.0, 1.0, 1.0)
         self.size = 1
         self.h_align = 'C'
-        self.v_align = 'B'
+        self.v_align = 'C'
 
         self.x = 0
         self.y = 0
@@ -71,7 +71,6 @@ class Text:
     def set_align(self, h, v):
         h = h[0].upper()
         v = v[0].upper()
-        print(h,v)
         if h in ['C', 'L', 'R']:
             self.set_h_align(h)
         if v in ['C', 'T', 'B']:
