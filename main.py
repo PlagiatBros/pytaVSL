@@ -19,6 +19,8 @@ import os
 import sys
 import getopt
 
+from text import Text
+
 from six.moves import queue
 
 # LOGGER = pi3d.Log.logger(__name__)
@@ -227,6 +229,11 @@ class PytaVSL(object):
 
         # Containers
         self.ctnr = Container(parent=self, nSli=10)
+
+        # Texts
+        self.text = {}
+        for i in range(1):
+            self.text[i] = Text(self)
 
 
 
@@ -462,8 +469,6 @@ class PytaVSL(object):
         slide.set_alpha(al)
 
 
-
-
     @liblo.make_method('/pyta/add_file', 's')
     def add_file_cb(self, path, args):
         if os.path.exists(args[0]):
@@ -474,6 +479,27 @@ class PytaVSL(object):
                 LOGGER.info("  + " + self.iFiles[i])
         else:
             LOGGER.error("ERROR: " + args[0] + ": no such file or directory")
+
+
+    @liblo.make_method('/pyta/text', 'is')
+    def set_text_string(self, path, args):
+        self.text[args[0]].set_text(args[1])
+
+    @liblo.make_method('/pyta/text/size', 'if')
+    def set_text_size(self, path, args):
+        self.text[args[0]].set_size(args[1])
+
+    @liblo.make_method('/pyta/text/align', 'iss')
+    def set_text_align(self, path, args):
+        self.text[args[0]].set_align(args[1], args[2])
+
+    @liblo.make_method('/pyta/text/rgb', 'iiii')
+    def set_text_color_int(self, path, args):
+        self.text[args[0]].set_color((args[1]/255.,args[2]/255.,args[3]/255.))
+
+    @liblo.make_method('/pyta/text/rgb', 'ifff')
+    def set_text_color_float(self, path, args):
+        sself.text[args[0]].set_color((args[1],args[2],args[3]))
 
 ########## MAIN APP ##########
 
@@ -496,6 +522,9 @@ pyta.CAMERA.was_moved = False # to save a tiny bit of work each loop
 
 while pyta.DISPLAY.loop_running():
     pyta.ctnr.draw()
+
+    for i in pyta.text:
+        pyta.text[i].draw()
 
     k = mykeys.read()
 

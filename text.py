@@ -18,99 +18,104 @@ import os.path
 import os
 import sys
 import getopt
+import math
 
 from six.moves import queue
+from font import Font
 
 # LOGGER = pi3d.Log.logger(__name__)
 LOGGER = pi3d.Log()
 LOGGER.info("Log using this expression.")
 
+FONT_SIZE = 220
+FONTS = {
+    "sans": Font('sans.ttf', background_color=(0,0,0,0), font_size=FONT_SIZE),
+    "mono": Font('sans.ttf', background_color=(0,0,0,0), font_size=FONT_SIZE)
+}
 
-class Container:
-    '''
-    Container might contains several slides which inherits from its position, angle, scale...
-    # TODO : container might be moved
-    # TODO : several containers in one pytaVSL instance
-    '''
-    def __init__(self, parent):
+
+class Text:
+    def __init__(self, parent, font="sans"):
+
         self.parent = parent
 
-        # Text
-        self.font = pi3d.Font('sans.ttf', font_size=128, codepoints="ABCDEFGHIJKLMNOPQRSTUVWXYZ ?$.", background_color='#ff000000')
-        self.textmanager = pi3d.PointText(self.font, parent.CAMERA, max_chars=300, point_size=256)
-        self.text = pi3d.TextBlock(0, 0, 0.01, 0.0, 200, text_format='CUL',
-          size=0.99, spacing="C", space=1.5, colour=(1.0, 1.0, 1.0, 1.0))
-        self.textmanager.add_text_block(self.text)
+        self.font = FONTS[font]
+        self.font.blend=True
+        self.font.mipmap=True
+
+        self.shader = pi3d.Shader("uv_flat")
+
+        self.string = 'XXX'
+        self.color = (1.0, 1.0, 1.0)
+        self.size = 1
+        self.h_align = 'C'
+        self.v_align = 'B'
+
+        self.x = 0
+        self.y = 0
+
+        self.need_regen = False
+        self.regen()
+
+    def set_text(self, string):
+        self.string = string
+        if len(self.string) == len(self.text.string):
+            self.text.quick_change(self.string)
+        else:
+            self.need_regen = True
+
+    def set_color(self, color):
+        self.color = color
+        self.need_regen = True
+
+    def set_align(self, h, v):
+        h = h[0].upper()
+        v = v[0].upper()
+        print(h,v)
+        if h in ['C', 'L', 'R']:
+            self.set_h_align(h)
+        if v in ['C', 'T', 'B']:
+            self.set_v_align(v)
+
+    def set_v_align(self, align):
+        self.v_align = align
+        self.need_regen = True
+
+    def set_h_align(self, align):
+        self.h_align = align
+        self.need_regen = True
+
+    def set_size(self, size):
+        self.size = min(max(float(size),0.),1.)
+        self.need_regen = True
+
+    def regen(self):
+
+        x = self.x
+        y = self.y
+
+        if self.h_align == 'L':
+            x -= self.parent.DISPLAY.width / 2.
+        elif self.h_align == 'R':
+            x += self.parent.DISPLAY.width / 2.
+
+        if self.v_align == 'T':
+            y = y + self.parent.DISPLAY.height / 2. - FONT_SIZE * self.size * 2
+        elif self.v_align == 'B':
+            y = y - self.parent.DISPLAY.height / 2. + FONT_SIZE * self.size * 2
+
+        self.text = pi3d.String(font=self.font, string=self.string, size=self.size,
+                      camera=self.parent.CAMERA, x=x, y=y, z=1.0, is_3d=False, justify=self.h_align)
+        self.text.set_shader(self.shader)
 
     def draw(self):
-        self.textmanager.draw()
+        # pipshow mode for testing
+        # r = random.random()
+        # self.string = str(r) if r > 0.5 else ''
+        # self.changed = True
+        if self.need_regen:
+            self.need_regen = False
+            self.regen()
 
-
-class PytaText(object):
-    '''
-    PytaVSL contains the screen, the camera, the light, and the slides containers. It's also an OSC server which contains the method to control all of its children.
-    '''
-    def __init__(self, port=56418):
-        # setup OSC
-        self.port = port
-
-        # setup OpenGL
-        self.DISPLAY = pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0), frames_per_second=25)
-        self.shader = pi3d.Shader("uv_light")
-        self.matsh = pi3d.Shader("mat_light")
-        self.CAMERA = pi3d.Camera(is_3d=True)
-        self.light = pi3d.Light(lightpos=(1, 1, -3))
-        self.light.ambient((1, 1, 1))
-
-        # Containers
-        self.ctnr = Container(parent=self)
-
-
-
-    def on_start(self):
-        if self.port is not None:
-            self.server = liblo.ServerThread(self.port)
-            self.server.register_methods(self)
-            self.server.start()
-            LOGGER.info("Listening on OSC port: " + str(self.port))
-
-    def on_exit(self):
-        if self.port is not None:
-            self.server.stop()
-            del self.server
-
-
-    def destroy(self):
-        self.DISPLAY.destroy()
-
-
-    @liblo.make_method('/pyta/text', 's')
-    def text(self, path, args):
-        self.ctnr.text.set_text(text_format=args[0])
-
-########## MAIN APP ##########
-
-for arg in sys.argv:
-    if arg != 'main.py':
-        p = arg
-
-pyta = PytaText(port=p)
-pyta.on_start()
-
-mykeys = pi3d.Keyboard()
-pyta.CAMERA = pi3d.Camera.instance()
-pyta.CAMERA.was_moved = False # to save a tiny bit of work each loop
-
-while pyta.DISPLAY.loop_running():
-    pyta.ctnr.draw()
-
-    k = mykeys.read()
-
-    if k> -1:
-        first = False
-        if k == 27: #ESC
-            mykeys.close()
-            pyta.DISPLAY.stop()
-            break
-
-pyta.destroy()
+        self.text.set_material(self.color)
+        self.text.draw()
