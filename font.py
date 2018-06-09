@@ -14,6 +14,8 @@ from PIL import Image, ImageDraw, ImageFont
 from pi3d.constants import *
 from pi3d.Texture import Texture
 
+from math import sqrt, ceil
+
 MAX_SIZE = 1920
 
 class Font(Texture):
@@ -110,12 +112,11 @@ class Font(Texture):
       raise Exception(msg)
 
     ascent, descent = imgfont.getmetrics()
+    print(ascent, descent)
     if spacing is None:
       spacing = shadow_radius
     self.height = ascent + descent + spacing # allow extra pixels if shadow or for certain fonts
-    self.spacing = 64
-
-    image_size = self.spacing  * 16  # or 1024 TODO this may go wrong if self.height != 64
+    self.spacing = 256
 
     if codepoints is not None:
       codepoints = list(codepoints)
@@ -126,6 +127,12 @@ class Font(Texture):
       if (len(codepoints) + len(add_codepoints)) > 256: # make room at end
         codepoints = codepoints[:(256 - len(add_codepoints))]
       codepoints += add_codepoints
+
+
+    ch_per_line = int(ceil(sqrt(len(codepoints))))
+
+    image_size = self.spacing  * ch_per_line  # or 1024 TODO this may go wrong if self.height != 64
+
 
     is_draw_shadows = shadow_radius > 0
     is_text_transparent = is_draw_shadows or (background_color == None)
@@ -146,7 +153,6 @@ class Font(Texture):
     curY = 0.0
     yindex = 0
     xindex = 0
-    characters = []
 
     for i in itertools.chain([0], codepoints):
       try:
@@ -160,7 +166,7 @@ class Font(Texture):
       curY = yindex * self.spacing
 
       offset = (self.spacing - chwidth)  / 2.0
-      draw.text((curX + offset, curY), ch, font=imgfont, fill=color)
+      draw.text((curX + offset, curY + descent/4.), ch, font=imgfont, fill=color)
       if is_draw_shadows:
         shadow_draw.text((curX + offset, curY), ch, font=imgfont, fill=shadow)
       chwidth += spacing * 2 # make a little more room (for w for instance)
@@ -183,7 +189,7 @@ class Font(Texture):
       self.glyph_table[ch] = table_entry
 
       xindex += 1
-      if xindex >= 16:
+      if xindex >= ch_per_line:
         xindex = 0
         yindex += 1
 
