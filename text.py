@@ -74,6 +74,50 @@ class Text:
         self.need_regen = False
         self.new_string()
 
+    def new_string(self):
+        """
+        Generate a new string instance and apply all options.
+        """
+
+        x = self.x
+        y = self.y
+
+        if self.h_align == 'L':
+            x -= self.parent.DISPLAY.width / 2.
+        elif self.h_align == 'R':
+            x += self.parent.DISPLAY.width / 2.
+
+        if self.v_align == 'T':
+            y = y + self.parent.DISPLAY.height / 2. - self.font.size * self.size * 2
+        elif self.v_align == 'B':
+            y = y - self.parent.DISPLAY.height / 2. + self.font.size * self.size * 2
+
+        self.text = pi3d.String(font=self.font, string=self.string, size=self.size,
+                      camera=self.parent.CAMERA, x=x, y=y, z=0.01, is_3d=False, justify=self.h_align)
+
+        self.text.set_shader(self.shader)
+
+    def draw(self):
+
+        if self.need_regen:
+            self.need_regen = False
+            self.new_string()
+
+        if self.strobe:
+            self.strobeState = not self.strobeState
+
+        if self.visible and (not self.strobe or self.strobeState):
+
+            if len(self.string) == len(self.text.string):
+                self.text.quick_change(self.string)
+
+            if self.colorStrobe:
+                self.text.set_material((random.random(),random.random(),random.random()))
+            else:
+                self.text.set_material(self.color)
+
+            self.text.draw()
+
     def set_text(self, string):
         """
         Set the text's string regenerate inner String instance
@@ -188,51 +232,3 @@ class Text:
         """
         self.strobeState = False
         self.strobe = bool(strobe)
-
-    def new_string(self):
-        """
-        Generate a new string instance and apply all options.
-        """
-
-        x = self.x
-        y = self.y
-
-        if self.h_align == 'L':
-            x -= self.parent.DISPLAY.width / 2.
-        elif self.h_align == 'R':
-            x += self.parent.DISPLAY.width / 2.
-
-        if self.v_align == 'T':
-            y = y + self.parent.DISPLAY.height / 2. - self.font.size * self.size * 2
-        elif self.v_align == 'B':
-            y = y - self.parent.DISPLAY.height / 2. + self.font.size * self.size * 2
-
-        self.text = pi3d.String(font=self.font, string=self.string, size=self.size,
-                      camera=self.parent.CAMERA, x=x, y=y, z=0.01, is_3d=False, justify=self.h_align)
-
-        self.text.set_shader(self.shader)
-
-    def draw(self):
-        # pipshow mode for testing
-        # r = random.random()
-        # self.string = str(r) if r > 0.5 else ''
-        # self.need_regen = True
-
-        if self.need_regen:
-            self.need_regen = False
-            self.new_string()
-
-        if self.strobe:
-            self.strobeState = not self.strobeState
-
-        if self.visible and (not self.strobe or self.strobeState):
-
-            if len(self.string) == len(self.text.string):
-                self.text.quick_change(self.string)
-
-            if self.colorStrobe:
-                self.text.set_material((random.random(),random.random(),random.random()))
-            else:
-                self.text.set_material(self.color)
-
-            self.text.draw()
