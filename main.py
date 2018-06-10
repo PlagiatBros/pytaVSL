@@ -523,7 +523,7 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/text/color', 'ifff')
     @osc_range_method(N_TEXTS)
     def set_text_color_float(self, path, args):
-        sself.text[args[0]].set_color((args[1],args[2],args[3]))
+        self.text[args[0]].set_color((args[1],args[2],args[3]))
 
     @liblo.make_method('/pyta/text/color/strobe', 'ii')
     @osc_range_method(N_TEXTS)
