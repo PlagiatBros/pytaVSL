@@ -28,7 +28,7 @@ LOGGER = pi3d.Log()
 LOGGER.info("Log using this expression.")
 
 FONTS = {
-    "sans": Font('sans.ttf', background_color=(0,0,0,0), font_size=170, offset_y=-0.025),
+    "sans": Font('sans.ttf', background_color=(0,0,0,0), font_size=170, offset_y=0.015),
     "mono": Font('mono.ttf', background_color=(0,0,0,0), font_size=200, offset_y=0.015)
 }
 V_ALIGN = ['C', 'B', 'T']
@@ -106,7 +106,7 @@ class Text:
         if self.strobe:
             self.strobeState = not self.strobeState
 
-        if self.visible and (not self.strobe or self.strobeState):
+        if self.visible and self.string and (not self.strobe or self.strobeState):
 
             if len(self.string) == len(self.text.string):
                 self.text.quick_change(self.string)
