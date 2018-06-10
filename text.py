@@ -57,11 +57,11 @@ class Text:
         self.visible = True
 
         self.strobe = False
-        self.strobeState = True
+        self.strobe_state = True
 
         self.string = ''
         self.color = (1.0, 1.0, 1.0)
-        self.colorStrobe = False
+        self.color_strobe = False
 
         self.size = 1
 
@@ -70,6 +70,11 @@ class Text:
 
         self.x = 0
         self.y = 0
+
+        self.rx = 0
+        self.ry = 0
+        self.rz = 0
+
 
         self.need_regen = False
         self.new_string()
@@ -93,7 +98,8 @@ class Text:
             y = y - self.parent.DISPLAY.height / 2. + self.font.size * self.size * 2
 
         self.text = pi3d.String(font=self.font, string=self.string, size=self.size,
-                      camera=self.parent.CAMERA, x=x, y=y, z=0.01, is_3d=False, justify=self.h_align)
+                      camera=self.parent.CAMERA, x=x, y=y, z=1000, is_3d=False,
+                      justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
 
         self.text.set_shader(self.shader)
 
@@ -104,14 +110,14 @@ class Text:
             self.new_string()
 
         if self.strobe:
-            self.strobeState = not self.strobeState
+            self.strobe_state = not self.strobe_state
 
-        if self.visible and self.string and (not self.strobe or self.strobeState):
+        if self.visible and self.string and (not self.strobe or self.strobe_state):
 
             if len(self.string) == len(self.text.string):
                 self.text.quick_change(self.string)
 
-            if self.colorStrobe:
+            if self.color_strobe:
                 self.text.set_material((random.random(),random.random(),random.random()))
             else:
                 self.text.set_material(self.color)
@@ -141,7 +147,7 @@ class Text:
         self.need_regen = True
 
     def set_color_strobe(self, strobe):
-        self.colorStrobe = bool(strobe)
+        self.color_strobe = bool(strobe)
 
     def set_align(self, h, v):
         """
@@ -204,6 +210,24 @@ class Text:
         self.y = y
         self.need_regen = True
 
+    def set_rotation(self, rx, ry, rz):
+        """
+        Set rotation. Triggers String regeneration.
+
+        Args:
+            rx (float):
+            ry (float):
+            rz (float):
+        """
+        if rx is not None:
+            self.rx = rx
+        if ry is not None:
+            self.ry = ry
+        if rz is not None:
+            self.rz = rz
+
+        self.need_regen = True
+
     def set_size(self, size):
         """
         Set size. Triggers String regeneration.
@@ -230,5 +254,5 @@ class Text:
         Args:
             strobe (bool): True to enable strobe mode
         """
-        self.strobeState = False
+        self.strobe_state = False
         self.strobe = bool(strobe)

@@ -182,7 +182,7 @@ class Container:
             # Textured Slides
             self.slides[i] = Slide()
 
-            self.slides[i].positionZ(0.8-(i/20))
+            self.slides[i].positionZ(2000.8-(i/20))
             self.items[i] = [self.parent.iFiles[i%self.parent.nFi], self.slides[i]]
             self.parent.fileQ.put(self.items[i])
 
@@ -190,7 +190,7 @@ class Container:
             # Mask Slides
             self.slides[i].mask.set_shader(self.parent.matsh)
             self.slides[i].mask.set_material((1.0, 0.0, 0.0))
-            self.slides[i].mask.positionZ(0.81-(i/10))
+            self.slides[i].mask.positionZ(2000.81-(i/10))
         # self.text.position(100,0, 0.01)
 
         self.focus = 0 # holds the index of the focused image
@@ -510,19 +510,34 @@ class PytaVSL(object):
     def set_text_position(self, path, args):
         self.text[args[0]].set_position(args[1], args[2])
 
+    @liblo.make_method('/pyta/text/rotate', 'ifff')
+    @liblo.make_method('/pyta/text/rotate_x', 'if')
+    @liblo.make_method('/pyta/text/rotate_y', 'if')
+    @liblo.make_method('/pyta/text/rotate_z', 'if')
+    @osc_range_method(N_TEXTS)
+    def set_text_rotate_x(self, path, args):
+        if path == '/pyta/text/rotate':
+            self.text[args[0]].set_rotation(args[1], args[2], args[3])
+        elif path == '/pyta/text/rotate_x':
+            self.text[args[0]].set_rotation(args[1], None, None)
+        elif path == '/pyta/text/rotate_y':
+            self.text[args[0]].set_rotation(None, args[1], None)
+        elif path == '/pyta/text/rotate_z':
+            self.text[args[0]].set_rotation(None, None, args[1])
+
     @liblo.make_method('/pyta/text/align', 'iss')
     @osc_range_method(N_TEXTS)
     def set_text_align(self, path, args):
         self.text[args[0]].set_align(args[1], args[2])
 
     @liblo.make_method('/pyta/text/color', 'iiii')
-    @osc_range_method(N_TEXTS)
-    def set_text_color_int(self, path, args):
-        self.text[args[0]].set_color((args[1]/255.,args[2]/255.,args[3]/255.))
-
     @liblo.make_method('/pyta/text/color', 'ifff')
     @osc_range_method(N_TEXTS)
-    def set_text_color_float(self, path, args):
+    def set_text_color(self, path, args):
+        if type(args[1]) is int:
+            args[1] /= 255.
+            args[2] /= 255.
+            args[3] /= 255.
         self.text[args[0]].set_color((args[1],args[2],args[3]))
 
     @liblo.make_method('/pyta/text/color/strobe', 'ii')
