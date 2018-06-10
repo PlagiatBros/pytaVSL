@@ -28,7 +28,8 @@ from six.moves import queue
 LOGGER = pi3d.Log()
 LOGGER.info("Log using this expression.")
 
-N_TEXTS = 1
+TEXTS_FONTS = ["sans", "sans", "mono", "mono"]
+N_TEXTS = len(TEXTS_FONTS)
 
 class Slide(pi3d.Sprite):
     '''
@@ -235,7 +236,7 @@ class PytaVSL(object):
         # Texts
         self.text = {}
         for i in range(N_TEXTS):
-            self.text[i] = Text(self)
+            self.text[i] = Text(self, font=TEXTS_FONTS[i])
 
 
 
