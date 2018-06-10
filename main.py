@@ -20,6 +20,7 @@ import sys
 import getopt
 
 from text import Text
+from utils import osc_range_method
 
 from six.moves import queue
 
@@ -27,6 +28,7 @@ from six.moves import queue
 LOGGER = pi3d.Log()
 LOGGER.info("Log using this expression.")
 
+N_TEXTS = 1
 
 class Slide(pi3d.Sprite):
     '''
@@ -215,7 +217,7 @@ class PytaVSL(object):
         self.port = port
 
         # setup OpenGL
-        self.DISPLAY = pi3d.Display.create(background=(0.0, 0.0, 0.0, 1.0), frames_per_second=25)
+        self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=25)
         self.shader = pi3d.Shader("uv_light")
         self.matsh = pi3d.Shader("mat_light")
         self.CAMERA = pi3d.Camera(is_3d=False)
@@ -232,7 +234,7 @@ class PytaVSL(object):
 
         # Texts
         self.text = {}
-        for i in range(1):
+        for i in range(N_TEXTS):
             self.text[i] = Text(self)
 
 
@@ -482,24 +484,51 @@ class PytaVSL(object):
 
 
     @liblo.make_method('/pyta/text', 'is')
+    @osc_range_method(N_TEXTS)
     def set_text_string(self, path, args):
         self.text[args[0]].set_text(args[1])
 
     @liblo.make_method('/pyta/text/size', 'if')
+    @osc_range_method(N_TEXTS)
     def set_text_size(self, path, args):
         self.text[args[0]].set_size(args[1])
 
+    @liblo.make_method('/pyta/text/visible', 'ii')
+    @osc_range_method(N_TEXTS)
+    def set_text_visible(self, path, args):
+        self.text[args[0]].set_visible(args[1])
+
+    @liblo.make_method('/pyta/text/strobe', 'ii')
+    @osc_range_method(N_TEXTS)
+    def set_text_strobe(self, path, args):
+        self.text[args[0]].set_strobe(args[1])
+
+
+    @liblo.make_method('/pyta/text/position', 'iii')
+    @osc_range_method(N_TEXTS)
+    def set_text_position(self, path, args):
+        self.text[args[0]].set_position(args[1], args[2])
+
     @liblo.make_method('/pyta/text/align', 'iss')
+    @osc_range_method(N_TEXTS)
     def set_text_align(self, path, args):
         self.text[args[0]].set_align(args[1], args[2])
 
-    @liblo.make_method('/pyta/text/rgb', 'iiii')
+    @liblo.make_method('/pyta/text/color', 'iiii')
+    @osc_range_method(N_TEXTS)
     def set_text_color_int(self, path, args):
         self.text[args[0]].set_color((args[1]/255.,args[2]/255.,args[3]/255.))
 
-    @liblo.make_method('/pyta/text/rgb', 'ifff')
+    @liblo.make_method('/pyta/text/color', 'ifff')
+    @osc_range_method(N_TEXTS)
     def set_text_color_float(self, path, args):
         sself.text[args[0]].set_color((args[1],args[2],args[3]))
+
+    @liblo.make_method('/pyta/text/color/strobe', 'ii')
+    @osc_range_method(N_TEXTS)
+    def set_text_color_strobe(self, path, args):
+        self.text[args[0]].set_color_strobe(args[1])
+
 
 ########## MAIN APP ##########
 

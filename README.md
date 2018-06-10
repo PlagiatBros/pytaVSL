@@ -1,7 +1,7 @@
 pytaVSL
 =======
 
-pytaVSL stands for python tiny alpproximative VSL. 
+pytaVSL stands for python tiny alpproximative VSL.
 It's a VJing and lights-projector virtualization program using pi3d, and aimed to reproduce some of the features one could find in the pd-patches set called VSL. The final destination arch of pytaVSL is the Raspberry PI.
 
 Copyright
@@ -14,7 +14,7 @@ http://ammd.net/-DIY-
 License
 =======
 
-pytaVSL is released under the terms of the GNU General Public License, version 2 or later. 
+pytaVSL is released under the terms of the GNU General Public License, version 2 or later.
 
 Dependencies
 ============
@@ -39,3 +39,10 @@ PytaVSL
 -------
 
 The main class, it contains the OSC server and methods, the 3D Display, the Shader, the Camera, the files list, and the Containers.
+
+
+Fonts
+=====
+
+sans: league gothic
+mono: roboto mono

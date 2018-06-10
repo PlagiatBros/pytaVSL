@@ -32,7 +32,7 @@ class Font(Texture):
                add_codepoints=None, font_size=42, image_size=512,
                italic_adjustment=1.1, background_color=None,
                shadow=(0,0,0,255), shadow_radius=0, spacing=None,
-               mipmap=True, filter=None):
+               mipmap=True, filter=None, offset_y=0):
     """Arguments:
     *font*:
       File path/name to a TrueType font file.
@@ -98,6 +98,9 @@ class Font(Texture):
 
     *filter*:
       Resulting texture filter option, default None
+
+    *offset_y*:
+      Y-axis correction relative to font size
     """
     super(Font, self).__init__(font, mipmap=mipmap, filter=filter)
     self.font = font
@@ -112,6 +115,7 @@ class Font(Texture):
       raise Exception(msg)
 
     ascent, descent = imgfont.getmetrics()
+    self.size = font_size
 
     if spacing is None:
       spacing = shadow_radius
@@ -166,9 +170,9 @@ class Font(Texture):
       curY = yindex * self.spacing
 
       offset = (self.spacing - chwidth)  / 2.0
-      draw.text((curX + offset, curY + descent/4.), ch, font=imgfont, fill=color)
+      draw.text((curX + offset, curY + offset_y * font_size), ch, font=imgfont, fill=color)
       if is_draw_shadows:
-        shadow_draw.text((curX + offset, curY), ch, font=imgfont, fill=shadow)
+        shadow_draw.text((curX + offset, curY + offset_y * font_size), ch, font=imgfont, fill=shadow)
       chwidth += spacing * 2 # make a little more room (for w for instance)
       offset -= spacing
 
