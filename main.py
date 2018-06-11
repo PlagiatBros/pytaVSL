@@ -24,12 +24,13 @@ from utils import osc_range_method
 
 from six.moves import queue
 
-# LOGGER = pi3d.Log.logger(__name__)
 LOGGER = pi3d.Log()
 LOGGER.info("Log using this expression.")
 
 TEXTS_FONTS = ["sans", "sans", "mono", "mono"]
 N_TEXTS = len(TEXTS_FONTS)
+
+N_SLIDES = 10
 
 class Slide(pi3d.Sprite):
     '''
@@ -50,10 +51,6 @@ class Slide(pi3d.Sprite):
         self.ax = 0.0
         self.ay = 0.0
         self.az = 0.0
-
-        # Mask Slide
-        self.mask = pi3d.Sprite()
-        self.mask_on = False
 
     def animate(self, start, end, duration, step, function):
         '''
@@ -130,14 +127,12 @@ class Slide(pi3d.Sprite):
         set_position aims to set the position of the slides and to keep a trace of it
         '''
         self.position(x, y, z)
-        self.mask.position(x, y, z+0.1)
 
     def set_translation(self, dx, dy, dz):
         '''
         set_translation does a translation operation on the slide
         '''
         self.translate(dx, dy, dz)
-        self.mask.translate(dx, dy, dz)
 
     def set_scale(self, sx, sy, sz):
         '''
@@ -147,8 +142,6 @@ class Slide(pi3d.Sprite):
         self.sy = sy
         self.sz = sz
         self.scale(sx, sy, sz)
-        if self.mask_on:
-            self.mask.scale(sx, sy, sz)
 
     def set_angle(self, ax, ay, az):
         # set angle (absolute)
@@ -161,11 +154,6 @@ class Slide(pi3d.Sprite):
         self.rotateToX(ax)
         self.rotateToY(ay)
         self.rotateToZ(az)
-        if self.mask_on:
-            self.mask.rotateToX(ax)
-            self.mask.rotateToY(ay)
-            self.mask.rotateToZ(az)
-
 
 class Container:
     '''
@@ -186,15 +174,7 @@ class Container:
             self.items[i] = [self.parent.iFiles[i%self.parent.nFi], self.slides[i]]
             self.parent.fileQ.put(self.items[i])
 
-
-            # Mask Slides
-            self.slides[i].mask.set_shader(self.parent.matsh)
-            self.slides[i].mask.set_material((1.0, 0.0, 0.0))
-            self.slides[i].mask.positionZ(2000.81-(i/10))
-        # self.text.position(100,0, 0.01)
-
         self.focus = 0 # holds the index of the focused image
-#        self.slides[self.focus].visible = True
 
 
     def draw(self):
@@ -205,8 +185,6 @@ class Container:
         for i in range(self.nSli):
             ix = (self.focus+i+1)%self.nSli
             if self.slides[ix].visible == True:
-                if self.slides[ix].mask_on:
-                    self.slides[ix].mask.draw()
                 self.slides[ix].draw()
 
 class PytaVSL(object):
@@ -235,7 +213,7 @@ class PytaVSL(object):
         self.fileQ = queue.Queue()
 
         # Containers
-        self.ctnr = Container(parent=self, nSli=10)
+        self.ctnr = Container(parent=self, nSli=N_SLIDES)
 
         # Texts
         self.text = {}
@@ -294,22 +272,6 @@ class PytaVSL(object):
 			self.ctnr.slides[i].visible = False
 		else:
 		    self.ctnr.slides[args[0]].visible = False
-        else:
-            LOGGER.error("OSC ARGS ERROR: Slide number out of range")
-
-    @liblo.make_method('/pyta/slide/mask_on', 'ii')
-    def slide_mask_on_cb(self, path, args):
-        if args[0] < self.ctnr.nSli:
-            if args[1]:
-                slide = self.ctnr.slides[args[0]]
-                slide.mask.position(slide.x(), slide.y(), slide.z()+0.1)
-                slide.mask.scale(slide.sx, slide.sy, slide.sz)
-                slide.mask.rotateToX(slide.ax)
-                slide.mask.rotateToY(slide.ay)
-                slide.mask.rotateToZ(slide.az)
-                slide.mask_on = True
-            else:
-                self.ctnr.slides[args[0]].mask_on = False
         else:
             LOGGER.error("OSC ARGS ERROR: Slide number out of range")
 

@@ -44,5 +44,5 @@ The main class, it contains the OSC server and methods, the 3D Display, the Shad
 Fonts
 =====
 
-sans: league gothic
-mono: roboto mono
+sans: leaguegothic
+mono: freemono

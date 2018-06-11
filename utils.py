@@ -2,6 +2,7 @@ class osc_range_method():
 
     def __init__(self, n):
 
+        self.n = n
         self.range = range(n)
 
     def __call__(self, method):
@@ -12,7 +13,9 @@ class osc_range_method():
                 for i in self.range:
                     args[0] = i
                     method(this, path, args)
-            else:
+            elif args[0] < self.n:
                 method(this, path, args)
+            else:
+                LOGGER.error("OSC ARGS ERROR: Slide number out of range")
 
         return range_method
