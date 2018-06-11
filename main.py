@@ -29,18 +29,21 @@ LOGGER = pi3d.Log()
 TEXTS_FONTS = ["sans", "sans", "mono", "mono"]
 N_TEXTS = len(TEXTS_FONTS)
 
-N_SLIDES = 10
+MAX_SLIDE_Z = 2000
 
 class Slide(pi3d.Sprite):
     '''
     The slide are sprites to be textured. They might be transformed using OSC messages, and the textures they do draw too.
     There might be several of them in one container.
     '''
-    def __init__(self):
+    def __init__(self, name, path):
+
         super(Slide, self).__init__(w=1.0, h=1.0)
+
         self.visible = False
-        self.creation = True
-        self.name = None
+
+        self.name = name
+        self.path = path
 
         # Scales
         self.sx = 1.0
@@ -52,7 +55,7 @@ class Slide(pi3d.Sprite):
         self.ay = 0.0
         self.az = 0.0
 
-    def animate(self, start, end, duration, step, function):
+    def animate(self, function, start, end, duration):
         '''
         animate aims to animate any transformation, in order to prevent pytaVSL to have too many incoming OSC message to manage.
         It is threaded so that you might animate several slides at a time, or one slide with several transformations.
@@ -63,8 +66,8 @@ class Slide(pi3d.Sprite):
         - function is the function to be animated: position_[xyz], rotate_[xyz], scale_[xyz], alpha
         '''
         def threaded():
-            nb_step = int(round(duration/step))
-            a = float(end-start)/nb_step
+            nb_step = int(round(duration * 25.))
+            a = float(end-start) / nb_step
 
             # Needs of some factorization there
             if function == 'position_x':
@@ -116,7 +119,7 @@ class Slide(pi3d.Sprite):
                 for i in range(nb_step+1):
                     val = a*i+start
                     self.set_alpha(val)
-                    time.sleep(step)
+                    time.sleep(1/25.)
 
         t = threading.Thread(target=threaded)
         t.start()
@@ -155,39 +158,9 @@ class Slide(pi3d.Sprite):
         self.rotateToY(ay)
         self.rotateToZ(az)
 
-class Container:
-    '''
-    Container might contains several slides which inherits from its position, angle, scale...
-    # TODO : container might be moved
-    # TODO : several containers in one pytaVSL instance
-    '''
-    def __init__(self, parent, nSli):
-        self.parent = parent
-        self.nSli = nSli # number of slides per container
-        self.slides = [None]*self.nSli
-        self.items = {}
-        self.slides_by_name = {}
-
-        for i in range(self.nSli):
-            # Textured Slides
-            self.slides[i] = Slide()
-            self.slides[i].positionZ(2000.8-(i/20))
-            # self.items[i] = [self.parent.iFiles[i%self.parent.nFi], self.slides[i]]
-            # self.parent.fileQ.put(self.items[i])
-
-
-        self.focus = 0 # holds the index of the focused image
-
-
-    def draw(self):
-        # slides have to be drawn back to front for transparency to work.
-        # the 'focused' slide by definition at z=0.1, with deeper z
-        # trailing to the left.  So start by drawing the one to the right
-        # of 'focused', if it is set to visible.  It will be in the back.
-        for i in range(self.nSli):
-            ix = (self.focus+i+1)%self.nSli
-            if self.slides[ix].visible == True:
-                self.slides[ix].draw()
+    def draw(self, *args, **kwargs):
+        if self.visible:
+            super(Slide, self).draw(*args, **kwargs)
 
 class PytaVSL(object):
     '''
@@ -199,7 +172,6 @@ class PytaVSL(object):
 
         # setup OpenGL
         self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=25)
-
         self.shader = pi3d.Shader("uv_light")
         self.matsh = pi3d.Shader("mat_light")
 
@@ -209,19 +181,16 @@ class PytaVSL(object):
         self.light = pi3d.Light(lightpos=(1, 1, -3))
         self.light.ambient((1, 1, 1))
 
-        # Loading files in the queue
-        self.iFiles = glob.glob("pix/*.*")
-        self.nFi = len(self.iFiles)
         self.fileQ = queue.Queue()
 
-        # Containers
-        self.ctnr = Container(parent=self, nSli=N_SLIDES)
+        # Slides
+        self.slides = {}
+        self.slides_order = []
 
         # Texts
         self.text = {}
         for i in range(N_TEXTS):
             self.text[i] = Text(self, font=TEXTS_FONTS[i])
-
 
 
     def on_start(self):
@@ -240,41 +209,39 @@ class PytaVSL(object):
         """ Threaded function. mimap = False will make it faster.
         """
         while True:
-            item = self.fileQ.get()
-            # reminder, item is [filename, target Slide]
-            fname = item[0]
-            slide = item[1]
-            tex = pi3d.Texture(item[0], blend=True, mipmap=True)
-            slide.name = item[0].split('/')[-1].split('.')[0]
-            self.ctnr.slides_by_name[slide.name] = slide
-            if slide.creation:
-                xrat = self.DISPLAY.width/tex.ix
-                yrat = self.DISPLAY.height/tex.iy
-                if yrat < xrat:
-                    xrat = yrat
-                wi, hi = tex.ix * xrat, tex.iy * xrat
-                slide.set_scale(wi, hi, 1.0)
+            path = self.fileQ.get()
+            tex = pi3d.Texture(path, blend=True, mipmap=True)
+            name = path.split('/')[-1].split('.')[0]
 
-            slide.set_draw_details(self.shader,[tex])
+            if name not in self.slides:
+                self.slides[name] = Slide(name, path)
+                self.slides_order.insert(0, name)
+
+            xrat = self.DISPLAY.width/tex.ix
+            yrat = self.DISPLAY.height/tex.iy
+            if yrat < xrat:
+                xrat = yrat
+            wi, hi = tex.ix * xrat, tex.iy * xrat
+
+            self.slides[name].set_scale(wi, hi, 1.0)
+            self.slides[name].set_draw_details(self.shader,[tex])
+
             self.fileQ.task_done()
-            slide.creation = False
 
     def destroy(self):
         self.DISPLAY.destroy()
 
 
     def get_slide(self, name):
-        slides = []
-        if name in self.ctnr.slides_by_name:
-            slides.append(self.ctnr.slides_by_name[name])
+
+        if name in self.slides:
+            return [self.slides[name]]
         elif name == -1:
-            slides = self.ctnr.slides
-        elif type(name) is int and name < self.ctnr.nSli:
-            slides.append(self.ctnr.slides[name])
+            return self.slides.values()
         else:
             LOGGER.error("OSC ARGS ERROR: Slide \"%s\" not found" % name)
+            return []
 
-        return slides
 
     # OSC Methods
     @liblo.make_method('/pyta/slide/visible', 'si')
@@ -396,32 +363,14 @@ class PytaVSL(object):
             slide.set_light(self.light,0)
 
 
-    @liblo.make_method('/pyta/slide/load_file', 'sss')
-    @liblo.make_method('/pyta/slide/load_file', 'ss')
-    @liblo.make_method('/pyta/slide/load_file', 'iss')
-    @liblo.make_method('/pyta/slide/load_file', 'is')
+    @liblo.make_method('/pyta/slide/load_file', 's')
     def slide_load_file_cb(self, path, args):
-        slides = self.get_slide(args[0])
-        for slide in slides:
-            if len(args) == 3: # Auto-scaling disabled
-                slide.creation = False
-            else:
-                slide.creation = True
-            if slide.visible:
-                LOGGER.info("WARNING: you're loading a file in a potentially visible slide - loading takes a bit of time, the effect might not render immediately")
-            fexist = False
-            for i in range(self.nFi):
-                if args[1] == str(self.iFiles[i]):
-                    self.ctnr.items[args[0]] = [self.iFiles[i%self.nFi], slide]
-                    self.fileQ.put(self.ctnr.items[args[0]])
-                    LOGGER.info("loading file " + args[1] + " in slide " + str(args[0]))
-                    fexist = True
-            if fexist == False:
-                LOGGER.info(args[1] + ": no such file in the current list - please consider adding it with /pyta/add_file ,s [path to the file]")
-                LOGGER.info("Current list of files:")
-                LOGGER.info(self.iFiles)
-
-
+        files = glob.glob(args[0])
+        if len(files):
+            for file in files:
+                self.fileQ.put(file)
+        else:
+            LOGGER.info("ERROR: file \"%s\" not found" % file)
 
     @liblo.make_method('/pyta/slide/slide_info', 'si')
     @liblo.make_method('/pyta/slide/slide_info', 'ii')
@@ -437,18 +386,18 @@ class PytaVSL(object):
             liblo.send(dest, prefix + 'visible', slide.visible)
             liblo.send(dest, prefix + 'alpha', slide.alpha())
 
-    @liblo.make_method('/pyta/slide/save_state', 'ss')
-    @liblo.make_method('/pyta/slide/save_state', 'is')
+    @liblo.make_method('/pyta/slide/save_state', 's')
+    @liblo.make_method('/pyta/slide/save_state', 'i')
     def slide_save_state(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
             prefix = '/pyta/slide/'
-            filename = 's' + str(args[0]) + '.' + args[1] + '.state'
+            filename = 's' + str(slide.name + '.state')
             LOGGER.info('Write in progress in ' + filename)
 
             statef = open(filename, 'w')
             statef.write("slide " + str(args[0]) + "\n")
-            statef.write("file " + str(self.ctnr.items[args[0]][0]) + "\n")
+            statef.write("file " + str(slide.path) + "\n")
             statef.write("position " + str(slide.x()) + " " + str(slide.y()) + " " + str(slide.z()) + "\n")
             statef.write("scale " + str(slide.sx) + " " + str(slide.sy) + " " + str(slide.sy) + "\n")
             statef.write("angle " + str(slide.ax) + " " + str(slide.ay) + " " + str(slide.az) + "\n")
@@ -459,32 +408,21 @@ class PytaVSL(object):
     def slide_load_state(self, path, args):
         statef = open(args[0], 'r')
         param = statef.read()
-        sn = int(param.split("\n")[0].split(" ")[1])
-        fn = param.split("\n")[1].split(" ")[1]
+        # sn = int(param.split("\n")[0].split(" ")[1])
+        # fn = param.split("\n")[1].split(" ")[1]
+        sn = param.split("\n")[0].split(" ")[1]
         pos = param.split("\n")[2].split(" ")[1:]
         sc = param.split("\n")[3].split(" ")[1:]
         ag = param.split("\n")[4].split(" ")[1:]
         al = float(param.split("\n")[5].split(" ")[1])
 
-        slide = self.get_slide(sn)
+        slides = self.get_slide(sn)
         for slide in slides:
-            self.slide_load_file_cb('/hop', (sn, fn, "NoCreation"))
+            # self.slide_load_file_cb('/hop', (fn))
             slide.position(float(pos[0]), float(pos[1]), float(pos[2]))
             slide.set_scale(float(sc[0]), float(sc[1]), float(sc[2]))
             slide.set_angle(float(ag[0]), float(ag[1]), float(ag[2]))
             slide.set_alpha(al)
-
-
-    @liblo.make_method('/pyta/add_file', 's')
-    def add_file_cb(self, path, args):
-        if os.path.exists(args[0]):
-            self.iFiles.extend(glob.glob(args[0]))
-            self.nFi = len(self.iFiles)
-            LOGGER.info("file " + args[0] + " added to the list:")
-            for i in range(self.nFi):
-                LOGGER.info("  + " + self.iFiles[i])
-        else:
-            LOGGER.error("ERROR: " + args[0] + ": no such file or directory")
 
 
     @liblo.make_method('/pyta/text', 'is')
@@ -578,7 +516,8 @@ mykeys = pi3d.Keyboard()
 
 while pyta.DISPLAY.loop_running():
 
-    pyta.ctnr.draw()
+    for name in pyta.slides_order:
+        pyta.slides[name].draw()
 
     for i in pyta.text:
         pyta.text[i].draw()
