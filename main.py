@@ -149,10 +149,10 @@ class Slide(pi3d.Sprite):
                 self.set_positionZ(val)
         elif name == 'rotate_x':
             def set_val(val):
-                self.set_rotate(val, self.ay, self.az)
+                self.set_angle(val, self.ay, self.az)
         elif name == 'rotate_y':
             def set_val(val):
-                self.set_rotate(self.ax, val, self.az)
+                self.set_angle(self.ax, val, self.az)
         elif name == 'rotate_z':
             def set_val(val):
                 self.set_angle(self.ax, self.ay, val)
