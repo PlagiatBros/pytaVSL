@@ -344,8 +344,8 @@ class PytaVSL(object):
             elif path == "/pyta/slide/rotate_z":
                 slide.set_angle(slide.ax, slide.ay, args[1])
 
-    @liblo.make_method('/pyta/slide/animate', 'siiffs') # slide, start, end, duration, step, function
-    @liblo.make_method('/pyta/slide/animate', 'iiiffs') # slide, start, end, duration, step, function
+    @liblo.make_method('/pyta/slide/animate', 'ssfff')
+    @liblo.make_method('/pyta/slide/animate', 'isfff')
     def slide_animate(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
