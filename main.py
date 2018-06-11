@@ -247,14 +247,22 @@ class PytaVSL(object):
 
     def get_slide(self, name):
 
-        if name in self.slides:
-            return [self.slides[name]]
-        elif name == -1:
-            return self.slides.values()
-        else:
-            LOGGER.error("OSC ARGS ERROR: Slide \"%s\" not found" % name)
-            return []
+        slides = []
 
+        if ' ' in name:
+
+            for n in name.split(' '):
+                slides += self.get_slide(n)
+
+        else:
+            if name in self.slides:
+                slides += [self.slides[name]]
+            elif name == -1:
+                slides += self.slides.values()
+            else:
+                LOGGER.error("OSC ARGS ERROR: Slide \"%s\" not found" % name)
+
+        return slides
 
     # OSC Methods
     @liblo.make_method('/pyta/slide/visible', 'si')
