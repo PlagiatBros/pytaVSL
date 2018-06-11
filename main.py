@@ -47,6 +47,7 @@ class Slide(pi3d.Sprite):
         self.path = path
 
         self.animations = {}
+        self.z_index = 100
 
         # Scales
         self.sx = 1.0
@@ -62,7 +63,13 @@ class Slide(pi3d.Sprite):
         '''
         set_position aims to set the position of the slides and to keep a trace of it
         '''
-        self.position(x, y, z)
+        self.position(x, y, z + self.z_index)
+
+    def set_positionZ(self, z):
+        '''
+        set_position aims to set the position of the slides and to keep a trace of it
+        '''
+        self.positionZ(z + self.z_index)
 
     def set_translation(self, dx, dy, dz):
         '''
@@ -93,7 +100,7 @@ class Slide(pi3d.Sprite):
 
     def draw(self, *args, **kwargs):
         if self.visible:
-            super(Slide, self).draw(*args, **kwargs)
+            self.draw(*args, **kwargs)
 
     def animate(self, name, start, end, duration):
         """
@@ -130,13 +137,13 @@ class Slide(pi3d.Sprite):
 
         if name == 'position_x':
             def set_val(val):
-                self.set_position(val, self.y(), self.z())
+                self.set_positionX(val)
         elif name == 'position_y':
             def set_val(val):
-                self.set_position(self.x(), val, self.z())
+                self.set_positionY(val)
         elif name == 'position_z':
             def set_val(val):
-                self.set_position(self.x(), self.y(), val)
+                self.set_positionZ(val)
         elif name == 'rotate_x':
             def set_val(val):
                 self.set_rotate(val, self.ay, self.az)
@@ -274,11 +281,11 @@ class PytaVSL(object):
             if path == "/pyta/slide/position":
                 slide.set_position(args[1], args[2], args[3])
             elif path == "/pyta/slide/position_x":
-                slide.set_position(args[1], slide.y(), slide.z())
+                slide.set_positionX(args[1])
             elif path == "/pyta/slide/position_y":
-                slide.set_position(slide.x(), args[1], slide.z())
+                slide.set_positionY(args[1])
             elif path == "/pyta/slide/position_z":
-                slide.set_position(slide.x(), slide.y(), args[1])
+                slide.set_positionZ(args[1])
 
     @liblo.make_method('/pyta/slide/translate', 'sfff')
     @liblo.make_method('/pyta/slide/translate_x', 'sf')
