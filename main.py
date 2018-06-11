@@ -222,7 +222,7 @@ class PytaVSL(object):
         """
         while True:
             path = self.fileQ.get()
-            tex = pi3d.Texture(path, blend=True, mipmap=True)
+            tex = pi3d.Texture(path, blend=False, mipmap=True)
             name = path.split('/')[-1].split('.')[0]
 
             if name not in self.slides:
