@@ -27,9 +27,12 @@ from font import Font
 LOGGER = pi3d.Log()
 LOGGER.info("Log using this expression.")
 
+
+RESOLUTION = 0.5
+
 FONTS = {
-    "sans": Font('sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=170, offset_y=0.015),
-    "mono": Font('mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=200, offset_y=-0.005,
+    "sans": Font('sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(170*RESOLUTION), offset_y=0.015),
+    "mono": Font('mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(200*RESOLUTION), offset_y=-0.005,
                 add_codepoints=range(439, 441)) # ʒ
 }
 
@@ -98,7 +101,7 @@ class Text:
         elif self.v_align == 'B':
             y = y - self.parent.DISPLAY.height / 2. + self.font.size * self.size * 2
 
-        self.text = pi3d.String(font=self.font, string=self.string, size=self.size,
+        self.text = pi3d.String(font=self.font, string=self.string, size=self.size/RESOLUTION,
                       camera=self.parent.CAMERA, x=x, y=y, z=1000, is_3d=False,
                       justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
 
