@@ -249,7 +249,7 @@ class PytaVSL(object):
 
         slides = []
 
-        if ' ' in name:
+        if type(name) is str  and ' ' in name:
 
             for n in name.split(' '):
                 slides += self.get_slide(n)
