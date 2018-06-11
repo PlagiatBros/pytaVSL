@@ -28,8 +28,8 @@ LOGGER = pi3d.Log()
 LOGGER.info("Log using this expression.")
 
 FONTS = {
-    "sans": Font('sans.ttf', background_color=(0,0,0,0), font_size=170, offset_y=0.015),
-    "mono": Font('mono.ttf', background_color=(0,0,0,0), font_size=200, offset_y=0.015)
+    "sans": Font('sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=170, offset_y=0.015),
+    "mono": Font('mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=200, offset_y=0.015)
 }
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
@@ -49,10 +49,8 @@ class Text:
         self.parent = parent
 
         self.font = FONTS[font]
-        self.font.blend=True
-        self.font.mipmap=True
 
-        self.shader = pi3d.Shader("uv_flat")
+        self.shader = pi3d.Shader("uv_light")
 
         self.visible = True
 
