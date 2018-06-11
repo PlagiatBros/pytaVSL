@@ -45,6 +45,8 @@ class Slide(pi3d.Sprite):
         self.name = name
         self.path = path
 
+        self.animations = {}
+
         # Scales
         self.sx = 1.0
         self.sy = 1.0
