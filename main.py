@@ -171,8 +171,9 @@ class Container:
             self.slides[i] = Slide()
 
             self.slides[i].positionZ(2000.8-(i/20))
-            self.items[i] = [self.parent.iFiles[i%self.parent.nFi], self.slides[i]]
-            self.parent.fileQ.put(self.items[i])
+            # self.items[i] = [self.parent.iFiles[i%self.parent.nFi], self.slides[i]]
+            # self.parent.fileQ.put(self.items[i])
+
 
         self.focus = 0 # holds the index of the focused image
 
