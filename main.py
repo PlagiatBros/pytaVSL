@@ -224,6 +224,7 @@ class PytaVSL(object):
 
             if name not in self.slides:
                 self.slides[name] = Slide(name, path)
+                self.slides[name].set_positionZ(0)
                 self.slides_order.insert(0, name)
 
             xrat = self.DISPLAY.width/tex.ix
