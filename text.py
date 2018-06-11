@@ -55,7 +55,7 @@ class Text:
 
         self.font = FONTS[font]
 
-        self.shader = pi3d.Shader("uv_light")
+        self.shader = pi3d.Shader("uv_flat")
 
         self.visible = True
 
