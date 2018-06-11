@@ -520,6 +520,11 @@ class PytaVSL(object):
     def text_animate(self, path, args):
         self.text[args[0]].animate(*args[1:])
 
+    @liblo.make_method('/pyta/text/animate/stop', None)
+    @osc_range_method(N_TEXTS)
+    def text_stop_animate(self, path, args):
+        self.text[args[0]].stop_animate(args[1] if len(args) > 1 else None)
+
 ########## MAIN APP ##########
 
 for arg in sys.argv:

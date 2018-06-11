@@ -362,3 +362,15 @@ class Text:
             def set_val(val):
                 pass
         return set_val
+
+    def stop_animate(self, name=None):
+        """
+        Stop animations
+        """
+        if name  is not None:
+            self.animations[name].kill()
+            del self.animations[name]
+        else:
+            for name in self.animations:
+                self.animations[name].kill()
+            self.animations = {}
