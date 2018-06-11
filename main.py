@@ -55,76 +55,6 @@ class Slide(pi3d.Sprite):
         self.ay = 0.0
         self.az = 0.0
 
-    def animate(self, function, start, end, duration):
-        '''
-        animate aims to animate any transformation, in order to prevent pytaVSL to have too many incoming OSC message to manage.
-        It is threaded so that you might animate several slides at a time, or one slide with several transformations.
-        args:
-        - start and end are the initial and final values the transformation should reach,
-        - duration is the duration of the animation,
-        - step is the time-step of the animation (it determines the number of step),
-        - function is the function to be animated: position_[xyz], rotate_[xyz], scale_[xyz], alpha
-        '''
-        def threaded():
-            nb_step = int(round(duration * 25.))
-            a = float(end-start) / nb_step
-
-            # Needs of some factorization there
-            if function == 'position_x':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_position(val, self.y(), self.z())
-                    time.sleep(step)
-            elif function == 'position_y':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_position(self.x(), val, self.z())
-                    time.sleep(step)
-            elif function == 'position_z':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_position(self.x(), self.y(), val)
-                    time.sleep(step)
-            elif function == 'rotate_x':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_rotate(val, self.ay, self.az)
-                    time.sleep(step)
-            elif function == 'rotate_y':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_rotate(self.ax, val, self.az)
-                    time.sleep(step)
-            elif function == 'rotate_z':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_angle(self.ax, self.ay, val)
-                    time.sleep(step)
-            elif function == 'scale_x':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_scale(val, self.sy, self.sz)
-                    time.sleep(step)
-            elif function == 'scale_y':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_scale(self.sx, val, self.sz)
-                    time.sleep(step)
-            elif function == 'scale_z':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_scale(self.sx, self.sy, val)
-                    time.sleep(step)
-            elif function == 'alpha':
-                for i in range(nb_step+1):
-                    val = a*i+start
-                    self.set_alpha(val)
-                    time.sleep(1/25.)
-
-        t = threading.Thread(target=threaded)
-        t.start()
-
-
     def set_position(self, x, y, z):
         '''
         set_position aims to set the position of the slides and to keep a trace of it
@@ -161,6 +91,75 @@ class Slide(pi3d.Sprite):
     def draw(self, *args, **kwargs):
         if self.visible:
             super(Slide, self).draw(*args, **kwargs)
+
+    def animate(self, name, start, end, duration):
+        """
+        Animate one of the Slide's properties (25fps)
+
+        Args:
+            name  (str):
+            start (int):
+            end   (int):
+            duration (float):
+        """
+        def threaded():
+
+            nb_step = int(round(duration * 25.))
+
+            a = float(end - start) / nb_step
+
+            set_val = self.get_animate_function(name)
+
+            for i in range(nb_step + 1):
+
+                set_val(a * i + start)
+
+                time.sleep(1/25.)
+
+        if name in self.animations:
+            self.animations[name].kill()
+
+        self.animations[name] = Thread(target=threaded)
+        self.animations[name].start()
+
+
+    def get_animate_function(self, name):
+
+        if function == 'position_x':
+            def set_val(val):
+                self.set_position(val, self.y(), self.z())
+        elif function == 'position_y':
+            def set_val(val):
+                self.set_position(self.x(), val, self.z())
+        elif function == 'position_z':
+            def set_val(val):
+                self.set_position(self.x(), self.y(), val)
+        elif function == 'rotate_x':
+            def set_val(val):
+                self.set_rotate(val, self.ay, self.az)
+        elif function == 'rotate_y':
+            def set_val(val):
+                self.set_rotate(self.ax, val, self.az)
+        elif function == 'rotate_z':
+            def set_val(val):
+                self.set_angle(self.ax, self.ay, val)
+        elif function == 'scale_x':
+            def set_val(val):
+                self.set_scale(val, self.sy, self.sz)
+        elif function == 'scale_y':
+            def set_val(val):
+                self.set_scale(self.sx, val, self.sz)
+        elif function == 'scale_z':
+            def set_val(val):
+                self.set_scale(self.sx, self.sy, val)
+        elif function == 'alpha':
+            def set_val(val):
+                self.set_alpha(val)
+        else:
+            def set_val(val):
+                pass
+
+        return set_val
 
 class PytaVSL(object):
     '''
