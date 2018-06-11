@@ -25,7 +25,6 @@ from utils import osc_range_method
 from six.moves import queue
 
 LOGGER = pi3d.Log()
-LOGGER.info("Log using this expression.")
 
 TEXTS_FONTS = ["sans", "sans", "mono", "mono"]
 N_TEXTS = len(TEXTS_FONTS)
@@ -41,6 +40,7 @@ class Slide(pi3d.Sprite):
         super(Slide, self).__init__(w=1.0, h=1.0)
         self.visible = False
         self.creation = True
+        self.name = None
 
         # Scales
         self.sx = 1.0
@@ -166,10 +166,11 @@ class Container:
         self.nSli = nSli # number of slides per container
         self.slides = [None]*self.nSli
         self.items = {}
+        self.slides_by_name = {}
+
         for i in range(self.nSli):
             # Textured Slides
             self.slides[i] = Slide()
-
             self.slides[i].positionZ(2000.8-(i/20))
             # self.items[i] = [self.parent.iFiles[i%self.parent.nFi], self.slides[i]]
             # self.parent.fileQ.put(self.items[i])
@@ -244,6 +245,8 @@ class PytaVSL(object):
             fname = item[0]
             slide = item[1]
             tex = pi3d.Texture(item[0], blend=True, mipmap=True)
+            slide.name = item[0].split('/')[-1].split('.')[0]
+            self.ctnr.slides_by_name[slide.name] = slide
             if slide.creation:
                 xrat = self.DISPLAY.width/tex.ix
                 yrat = self.DISPLAY.height/tex.iy
@@ -260,63 +263,80 @@ class PytaVSL(object):
         self.DISPLAY.destroy()
 
 
+    def get_slide(self, name):
+        slides = []
+        if name in self.ctnr.slides_by_name:
+            slides.append(self.ctnr.slides_by_name[name])
+        elif name == -1:
+            slides = self.ctnr.slides
+        elif type(name) is int and name < self.ctnr.nSli:
+            slides.append(self.ctnr.slides[name])
+        else:
+            LOGGER.error("OSC ARGS ERROR: Slide \"%s\" not found" % name)
+
+        return slides
 
     # OSC Methods
+    @liblo.make_method('/pyta/slide/visible', 'si')
     @liblo.make_method('/pyta/slide/visible', 'ii')
     def slide_visible_cb(self, path, args):
-        if args[0] < self.ctnr.nSli:
-            if args[1]:
-	        self.ctnr.slides[args[0]].visible = True
-            else:
-		if args[0] < 0:
-		    for i in range(1, self.ctnr.nSli):
-			self.ctnr.slides[i].visible = False
-		else:
-		    self.ctnr.slides[args[0]].visible = False
-        else:
-            LOGGER.error("OSC ARGS ERROR: Slide number out of range")
+        slides = self.get_slide(args[0])
+        for slide in slides:
+	        slide.visible = bool(args[1])
 
+    @liblo.make_method('/pyta/slide/alpha', 'sf')
     @liblo.make_method('/pyta/slide/alpha', 'if')
     def slide_alpha_cb(self, path, args):
-        if args[0] < self.ctnr.nSli:
-            self.ctnr.slides[args[0]].set_alpha(args[1])
-        else:
-            LOGGER.error("OSC ARGS ERROR: Slide number out of range")
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.set_alpha(args[1])
 
+    @liblo.make_method('/pyta/slide/position', 'sfff')
+    @liblo.make_method('/pyta/slide/position_x', 'sf')
+    @liblo.make_method('/pyta/slide/position_y', 'sf')
+    @liblo.make_method('/pyta/slide/position_z', 'sf')
     @liblo.make_method('/pyta/slide/position', 'ifff')
     @liblo.make_method('/pyta/slide/position_x', 'if')
     @liblo.make_method('/pyta/slide/position_y', 'if')
     @liblo.make_method('/pyta/slide/position_z', 'if')
     def slide_position_cb(self, path, args):
-        if args[0] < self.ctnr.nSli:
+        slides = self.get_slide(args[0])
+        for slide in slides:
             if path == "/pyta/slide/position":
-                self.ctnr.slides[args[0]].set_position(args[1], args[2], args[3])
+                slide.set_position(args[1], args[2], args[3])
             elif path == "/pyta/slide/position_x":
-                self.ctnr.slides[args[0]].set_position(args[1], self.ctnr.slides[args[0]].y(), self.ctnr.slides[args[0]].z())
+                slide.set_position(args[1], slide.y(), slide.z())
             elif path == "/pyta/slide/position_y":
-                self.ctnr.slides[args[0]].set_position(self.ctnr.slides[args[0]].x(), args[1], self.ctnr.slides[args[0]].z())
+                slide.set_position(slide.x(), args[1], slide.z())
             elif path == "/pyta/slide/position_z":
-                self.ctnr.slides[args[0]].set_position(self.ctnr.slides[args[0]].x(), self.ctnr.slides[args[0]].y(), args[1])
-        else:
-            LOGGER.error("OSC ARGS ERROR: Slide number out of range")
+                slide.set_position(slide.x(), slide.y(), args[1])
 
+    @liblo.make_method('/pyta/slide/translate', 'sfff')
+    @liblo.make_method('/pyta/slide/translate_x', 'sf')
+    @liblo.make_method('/pyta/slide/translate_y', 'sf')
+    @liblo.make_method('/pyta/slide/translate_z', 'sf')
     @liblo.make_method('/pyta/slide/translate', 'ifff')
     @liblo.make_method('/pyta/slide/translate_x', 'if')
     @liblo.make_method('/pyta/slide/translate_y', 'if')
     @liblo.make_method('/pyta/slide/translate_z', 'if')
     def slide_translate_cb(self, path, args):
-        if args[0] < self.ctnr.nSli:
+        slides = self.get_slide(args[0])
+        for slide in slides:
             if path == "/pyta/slide/translate":
-                self.ctnr.slides[args[0]].set_translation(args[1], args[2], args[3])
+                slide.set_translation(args[1], args[2], args[3])
             elif path == "/pyta/slide/translate_x":
-                self.ctnr.slides[args[0]].set_translation(args[1], 0.0, 0.0)
+                slide.set_translation(args[1], 0.0, 0.0)
             elif path == "/pyta/slide/translate_y":
-                self.ctnr.slides[args[0]].set_translation(0.0, args[1], 0.0)
+                slide.set_translation(0.0, args[1], 0.0)
             elif path == "/pyta/slide/translate_z":
-                self.ctnr.slides[args[0]].set_translation(0.0, 0.0, args[1])
-        else:
-            LOGGER.error("OSC ARGS ERROR: Slide number out of range")
+                slide.set_translation(0.0, 0.0, args[1])
 
+    @liblo.make_method('/pyta/slide/scale', 'sfff')
+    @liblo.make_method('/pyta/slide/scale_x', 'sf')
+    @liblo.make_method('/pyta/slide/scale_y', 'sf')
+    @liblo.make_method('/pyta/slide/scale_z', 'sf')
+    @liblo.make_method('/pyta/slide/relative_scale_xy', 'sf')
+    @liblo.make_method('/pyta/slide/rsxy', 'sf')
     @liblo.make_method('/pyta/slide/scale', 'ifff')
     @liblo.make_method('/pyta/slide/scale_x', 'if')
     @liblo.make_method('/pyta/slide/scale_y', 'if')
@@ -324,101 +344,116 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/relative_scale_xy', 'if')
     @liblo.make_method('/pyta/slide/rsxy', 'if')
     def slide_scale_cb(self, path, args):
-        if args[0] < self.ctnr.nSli:
+        slides = self.get_slide(args[0])
+        for slide in slides:
             if path == "/pyta/slide/scale":
-                self.ctnr.slides[args[0]].set_scale(args[1], args[2], args[3])
+                slide.set_scale(args[1], args[2], args[3])
             elif path == "/pyta/slide/scale_x":
-                self.ctnr.slides[args[0]].set_scale(args[1], self.ctnr.slides[args[0]].sy, self.ctnr.slides[args[0]].sz)
+                slide.set_scale(args[1], slide.sy, slide.sz)
             elif path == "/pyta/slide/scale_y":
-                self.ctnr.slides[args[0]].set_scale(self.ctnr.slides[args[0]].sx, args[1], self.ctnr.slides[args[0]].sz)
+                slide.set_scale(slide.sx, args[1], slide.sz)
             elif path == "/pyta/slide/scale_z":
-                self.ctnr.slides[args[0]].set_scale(self.ctnr.slides[args[0]].sx, self.ctnr.slides[args[0]].sy, args[1])
+                slide.set_scale(slide.sx, slide.sy, args[1])
             elif path == "/pyta/slide/relative_scale_xy" or path == "/pyta/slide/rsxy":
-                self.ctnr.slides[args[0]].set_scale(self.ctnr.slides[args[0]].sx*args[1], self.ctnr.slides[args[0]].sy*args[1], self.ctnr.slides[args[0]].sz)
+                slide.set_scale(slide.sx*args[1], slide.sy*args[1], slide.sz)
 
-        else:
-            LOGGER.error("OSC ARGS ERROR: Slide number out of range")
-
+    @liblo.make_method('/pyta/slide/rotate', 'sfff')
+    @liblo.make_method('/pyta/slide/rotate_x', 'sf')
+    @liblo.make_method('/pyta/slide/rotate_y', 'sf')
+    @liblo.make_method('/pyta/slide/rotate_z', 'sf')
     @liblo.make_method('/pyta/slide/rotate', 'ifff')
     @liblo.make_method('/pyta/slide/rotate_x', 'if')
     @liblo.make_method('/pyta/slide/rotate_y', 'if')
     @liblo.make_method('/pyta/slide/rotate_z', 'if')
     def slide_rotate_cb(self, path, args):
-        if args[0] < self.ctnr.nSli:
+        slides = self.get_slide(args[0])
+        for slide in slides:
             if path == "/pyta/slide/rotate":
-                self.ctnr.slides[args[0]].set_angle(args[1], args[2], args[3])
+                slide.set_angle(args[1], args[2], args[3])
             elif path == "/pyta/slide/rotate_x":
-                self.ctnr.slides[args[0]].set_angle(args[1], self.ctnr.slides[args[0]].ay, self.ctnr.slides[args[0]].az)
+                slide.set_angle(args[1], slide.ay, slide.az)
             elif path == "/pyta/slide/rotate_y":
-                self.ctnr.slides[args[0]].set_angle(self.ctnr.slides[args[0]].ax, args[1], self.ctnr.slides[args[0]].az)
+                slide.set_angle(slide.ax, args[1], slide.az)
             elif path == "/pyta/slide/rotate_z":
-                self.ctnr.slides[args[0]].set_angle(self.ctnr.slides[args[0]].ax, self.ctnr.slides[args[0]].ay, args[1])
-        else:
-            LOGGER.error("OSC ARGS ERROR: Slide number out of range")
+                slide.set_angle(slide.ax, slide.ay, args[1])
 
+    @liblo.make_method('/pyta/slide/animate', 'siiffs') # slide, start, end, duration, step, function
     @liblo.make_method('/pyta/slide/animate', 'iiiffs') # slide, start, end, duration, step, function
     def slide_animate(self, path, args):
-        self.ctnr.slides[args[0]].animate(*args[1:])
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.animate(*args[1:])
 
+    @liblo.make_method('/pyta/slide/rgb', 'sfff')
     @liblo.make_method('/pyta/slide/rgb', 'ifff')
     def slide_enlighten(self, path, args):
         '''
         Colorize the slide with rgb color.
         '''
         self.light.ambient((args[1], args[2], args[3]))
-        self.ctnr.slides[args[0]].set_light(self.light,0)
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.set_light(self.light,0)
 
 
+    @liblo.make_method('/pyta/slide/load_file', 'sss')
+    @liblo.make_method('/pyta/slide/load_file', 'ss')
     @liblo.make_method('/pyta/slide/load_file', 'iss')
     @liblo.make_method('/pyta/slide/load_file', 'is')
     def slide_load_file_cb(self, path, args):
-        if len(args) == 3: # Auto-scaling disabled
-            self.ctnr.slides[args[0]].creation = False
-        else:
-            self.ctnr.slides[args[0]].creation = True
-        if self.ctnr.slides[args[0]].visible:
-            LOGGER.info("WARNING: you're loading a file in a potentially visible slide - loading takes a bit of time, the effect might not render immediately")
-        fexist = False
-        for i in range(self.nFi):
-            if args[1] == str(self.iFiles[i]):
-                self.ctnr.items[args[0]] = [self.iFiles[i%self.nFi], self.ctnr.slides[args[0]]]
-                self.fileQ.put(self.ctnr.items[args[0]])
-                LOGGER.info("loading file " + args[1] + " in slide " + str(args[0]))
-                fexist = True
-        if fexist == False:
-            LOGGER.info(args[1] + ": no such file in the current list - please consider adding it with /pyta/add_file ,s [path to the file]")
-            LOGGER.info("Current list of files:")
-            LOGGER.info(self.iFiles)
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            if len(args) == 3: # Auto-scaling disabled
+                slide.creation = False
+            else:
+                slide.creation = True
+            if slide.visible:
+                LOGGER.info("WARNING: you're loading a file in a potentially visible slide - loading takes a bit of time, the effect might not render immediately")
+            fexist = False
+            for i in range(self.nFi):
+                if args[1] == str(self.iFiles[i]):
+                    self.ctnr.items[args[0]] = [self.iFiles[i%self.nFi], slide]
+                    self.fileQ.put(self.ctnr.items[args[0]])
+                    LOGGER.info("loading file " + args[1] + " in slide " + str(args[0]))
+                    fexist = True
+            if fexist == False:
+                LOGGER.info(args[1] + ": no such file in the current list - please consider adding it with /pyta/add_file ,s [path to the file]")
+                LOGGER.info("Current list of files:")
+                LOGGER.info(self.iFiles)
 
 
 
+    @liblo.make_method('/pyta/slide/slide_info', 'si')
     @liblo.make_method('/pyta/slide/slide_info', 'ii')
     def slide_info_cb(self, path, args, types, src):
-	slide = self.ctnr.slides[args[0]]
-	dest = src.get_url().split(":")[0] + ':' + src.get_url().split(":")[1] + ':' + str(args[1])
-	prefix = '/pyta/slide_info/'
-        liblo.send(dest, prefix + 'slidenumber', args[0])
-        liblo.send(dest, prefix + 'position', slide.x(), slide.y(), slide.z())
-        liblo.send(dest, prefix + 'scale', slide.sx, slide.sy, slide.sz)
-        liblo.send(dest, prefix + 'angle', slide.ax, slide.ay, slide.az)
-        liblo.send(dest, prefix + 'visible', slide.visible)
-        liblo.send(dest, prefix + 'alpha', slide.alpha())
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            dest = src.get_url().split(":")[0] + ':' + src.get_url().split(":")[1] + ':' + str(args[1])
+            prefix = '/pyta/slide_info/'
+            liblo.send(dest, prefix + 'slidenumber', args[0])
+            liblo.send(dest, prefix + 'position', slide.x(), slide.y(), slide.z())
+            liblo.send(dest, prefix + 'scale', slide.sx, slide.sy, slide.sz)
+            liblo.send(dest, prefix + 'angle', slide.ax, slide.ay, slide.az)
+            liblo.send(dest, prefix + 'visible', slide.visible)
+            liblo.send(dest, prefix + 'alpha', slide.alpha())
 
+    @liblo.make_method('/pyta/slide/save_state', 'ss')
     @liblo.make_method('/pyta/slide/save_state', 'is')
     def slide_save_state(self, path, args):
-	slide = self.ctnr.slides[args[0]]
-	prefix = '/pyta/slide/'
-        filename = 's' + str(args[0]) + '.' + args[1] + '.state'
-	LOGGER.info('Write in progress in ' + filename)
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            prefix = '/pyta/slide/'
+            filename = 's' + str(args[0]) + '.' + args[1] + '.state'
+            LOGGER.info('Write in progress in ' + filename)
 
-        statef = open(filename, 'w')
-        statef.write("slide " + str(args[0]) + "\n")
-        statef.write("file " + str(self.ctnr.items[args[0]][0]) + "\n")
-        statef.write("position " + str(slide.x()) + " " + str(slide.y()) + " " + str(slide.z()) + "\n")
-        statef.write("scale " + str(slide.sx) + " " + str(slide.sy) + " " + str(slide.sy) + "\n")
-        statef.write("angle " + str(slide.ax) + " " + str(slide.ay) + " " + str(slide.az) + "\n")
-        statef.write("alpha " + str(slide.alpha()) + "\n")
-        statef.close()
+            statef = open(filename, 'w')
+            statef.write("slide " + str(args[0]) + "\n")
+            statef.write("file " + str(self.ctnr.items[args[0]][0]) + "\n")
+            statef.write("position " + str(slide.x()) + " " + str(slide.y()) + " " + str(slide.z()) + "\n")
+            statef.write("scale " + str(slide.sx) + " " + str(slide.sy) + " " + str(slide.sy) + "\n")
+            statef.write("angle " + str(slide.ax) + " " + str(slide.ay) + " " + str(slide.az) + "\n")
+            statef.write("alpha " + str(slide.alpha()) + "\n")
+            statef.close()
 
     @liblo.make_method('/pyta/slide/load_state', 's')
     def slide_load_state(self, path, args):
@@ -431,12 +466,13 @@ class PytaVSL(object):
         ag = param.split("\n")[4].split(" ")[1:]
         al = float(param.split("\n")[5].split(" ")[1])
 
-        slide = self.ctnr.slides[sn]
-        self.slide_load_file_cb('/hop', (sn, fn, "NoCreation"))
-        slide.position(float(pos[0]), float(pos[1]), float(pos[2]))
-        slide.set_scale(float(sc[0]), float(sc[1]), float(sc[2]))
-        slide.set_angle(float(ag[0]), float(ag[1]), float(ag[2]))
-        slide.set_alpha(al)
+        slide = self.get_slide(sn)
+        for slide in slides:
+            self.slide_load_file_cb('/hop', (sn, fn, "NoCreation"))
+            slide.position(float(pos[0]), float(pos[1]), float(pos[2]))
+            slide.set_scale(float(sc[0]), float(sc[1]), float(sc[2]))
+            slide.set_angle(float(ag[0]), float(ag[1]), float(ag[2]))
+            slide.set_alpha(al)
 
 
     @liblo.make_method('/pyta/add_file', 's')
