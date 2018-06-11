@@ -289,6 +289,9 @@ class Text:
 
             nb_step = int(round(duration * 25.))
 
+            if nb_step < 1:
+                return
+
             a = float(end - start) / nb_step
 
             set_val = self.get_animate_function(name)
