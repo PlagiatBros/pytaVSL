@@ -10,7 +10,7 @@ Images are loaded as textures, which then are mapped onto slides (canvases - 8 o
 This file was deeply instpired by Slideshow.py demo file of pi3d.
 """
 
-import time, glob, threading
+import time, glob
 import pi3d
 import liblo
 import random
@@ -20,13 +20,12 @@ import sys
 import getopt
 import math
 
+from utils import KillableThread as Thread
+
 from six.moves import queue
 from font import Font
 
-# LOGGER = pi3d.Log.logger(__name__)
 LOGGER = pi3d.Log()
-LOGGER.info("Log using this expression.")
-
 
 RESOLUTION = 0.5
 
@@ -79,6 +78,7 @@ class Text:
         self.ry = 0
         self.rz = 0
 
+        self.animations = {}
 
         self.need_regen = False
         self.new_string()
@@ -274,3 +274,42 @@ class Text:
         """
         self.strobe_state = False
         self.strobe = bool(strobe)
+
+    def animate(self, name, start, end, duration):
+        """
+        Animate one of the Text's properties (25fps)
+
+        Args:
+            name  (str):
+            start (int):
+            end   (int):
+            duration (float):
+        """
+        def threaded():
+
+            nb_step = int(round(duration * 25.))
+
+            a = float(end - start) / nb_step
+
+            set_val = self.get_animate_function(name)
+
+            for i in range(nb_step + 1):
+
+                set_val(a * i + start)
+
+                time.sleep(1/25.)
+
+        if name in self.animations:
+            self.animations[name].kill()
+
+        self.animations[name] = Thread(target=threaded)
+        self.animations[name].start()
+
+    def get_animate_function(self, name):
+        if name == 'size':
+            def set_val(val):
+                self.set_size(val)
+        else:
+            def set_val(val):
+                pass
+        return set_val

@@ -554,6 +554,10 @@ class PytaVSL(object):
     def set_text_alpha(self, path, args):
         self.text[args[0]].set_alpha(args[1])
 
+    @liblo.make_method('/pyta/text/animate', 'isfff')
+    @osc_range_method(N_TEXTS)
+    def text_animate(self, path, args):
+        self.text[args[0]].animate(*args[1:])
 
 ########## MAIN APP ##########
 
