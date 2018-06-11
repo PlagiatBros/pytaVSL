@@ -29,8 +29,10 @@ LOGGER.info("Log using this expression.")
 
 FONTS = {
     "sans": Font('sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=170, offset_y=0.015),
-    "mono": Font('mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=200, offset_y=0.015)
+    "mono": Font('mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=200, offset_y=-0.005,
+                add_codepoints=range(439, 441)) # ʒ
 }
+
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
 
