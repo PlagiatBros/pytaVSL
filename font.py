@@ -120,7 +120,7 @@ class Font(Texture):
     if spacing is None:
       spacing = shadow_radius
     self.height = ascent + descent + spacing # allow extra pixels if shadow or for certain fonts
-    self.spacing = 256
+    self.spacing = int(font_size * 1.2)
 
     if codepoints is not None:
       codepoints = list(codepoints)
