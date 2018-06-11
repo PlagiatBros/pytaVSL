@@ -157,7 +157,6 @@ class Text:
         Args:
             alpha (tuple): alpha float values between 0.0 and 1.0
         """
-        print(alpha, self.alpha)
         if alpha != self.alpha:
             self.alpha = alpha
             self.text.set_alpha(self.alpha)
@@ -224,7 +223,8 @@ class Text:
         """
         self.x = x
         self.y = y
-        self.need_regen = True
+        self.text.positionX(self.x)
+        self.text.positionY(self.x)
 
     def set_rotation(self, rx, ry, rz):
         """
@@ -237,12 +237,13 @@ class Text:
         """
         if rx is not None:
             self.rx = rx
+            self.text.rotateToX(self.rx)
         if ry is not None:
             self.ry = ry
+            self.text.rotateToY(self.ry)
         if rz is not None:
             self.rz = rz
-
-        self.need_regen = True
+            self.text.rotateToZ(self.rz)
 
     def set_size(self, size):
         """
@@ -252,7 +253,8 @@ class Text:
             size (float): between 0.0 and 1.0. 1.0 for full height characters
         """
         self.size = min(max(float(size),0.),1.)
-        self.need_regen = True
+        s = self.size * 4.0 * RESOLUTION
+        self.text.scale(s, s, 1.0)
 
     def set_visible(self, visible):
         """
