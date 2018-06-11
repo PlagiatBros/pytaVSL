@@ -32,7 +32,7 @@ RESOLUTION = 0.5
 FONTS = {
     "sans": Font('sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(170*RESOLUTION), offset_y=0.015),
     "mono": Font('mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(200*RESOLUTION), offset_y=-0.005,
-                add_codepoints=range(439, 441)) # ʒ
+                codepoints=range(32, 126)+range(160,255)+['ʒ']) # ʒ
 }
 
 V_ALIGN = ['C', 'B', 'T']
