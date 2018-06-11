@@ -454,10 +454,20 @@ class PytaVSL(object):
         self.text[args[0]].set_visible(args[1])
 
     @liblo.make_method('/pyta/text/strobe', 'ii')
+    @liblo.make_method('/pyta/text/strobe', 'iiff')
     @osc_range_method(N_TEXTS)
     def set_text_strobe(self, path, args):
-        self.text[args[0]].set_strobe(args[1])
+        self.text[args[0]].set_strobe(*args[1:])
 
+    @liblo.make_method('/pyta/text/strobe/period', 'if')
+    @osc_range_method(N_TEXTS)
+    def set_text_strobe_len(self, path, args):
+        self.text[args[0]].set_strobe(None, args[1], None)
+
+    @liblo.make_method('/pyta/text/strobe/ratio', 'if')
+    @osc_range_method(N_TEXTS)
+    def set_text_strobe_per(self, path, args):
+        self.text[args[0]].set_strobe(None, None, args[1])
 
     @liblo.make_method('/pyta/text/position', 'iii')
     @osc_range_method(N_TEXTS)

@@ -38,6 +38,35 @@ FONTS = {
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
 
+class Strobe():
+    def __init__(self):
+        self.period = 2.0
+        self.ratio = 0.5
+        self.cursor = 0
+        self.visble = False
+        self.regen()
+
+    def regen(self):
+        self.breakpoint = self.period * self.ratio
+
+    def set_period(self, l):
+        self.period = max(int(l), 0.0)
+        self.regen()
+
+    def set_ratio(self, r):
+        self.ratio = max(float(r), 0.0)
+        self.regen()
+
+    def next(self):
+        self.cursor += 1
+        if self.cursor < self.breakpoint:
+            self.visible = False
+        elif self.cursor < self.period:
+            self.visible = True
+        else:
+            self.cursor = 0
+            self.visible = False
+
 class Text:
     """
     Dynamic text
@@ -59,9 +88,9 @@ class Text:
         self.visible = True
 
         self.strobe = False
-        self.strobe_state = True
+        self.strobe_state = Strobe()
 
-        self.string = ''
+        self.string = ' '
         self.color = (1.0, 1.0, 1.0)
         self.color_strobe = False
         self.alpha = 1.0
@@ -114,9 +143,9 @@ class Text:
             self.new_string()
 
         if self.strobe:
-            self.strobe_state = not self.strobe_state
+            self.strobe_state.next()
 
-        if self.visible and self.string and (not self.strobe or self.strobe_state):
+        if self.visible and self.string and (not self.strobe or self.strobe_state.visible):
 
             if len(self.string) == len(self.text.string):
                 self.text.quick_change(self.string)
@@ -265,15 +294,28 @@ class Text:
         """
         self.visible = bool(visible)
 
-    def set_strobe(self, strobe):
+    def set_strobe(self, strobe=None, period=None, ratio=None):
         """
         Set strobe mode
 
         Args:
-            strobe (bool): True to enable strobe mode
+            strobe  (bool): True to enable strobe mode
+            period (float): (optional) period of the strobe cycle in frames
+            ratio  (float): (optional) ratio between hidden and show frames
         """
-        self.strobe_state = False
-        self.strobe = bool(strobe)
+        if not self.strobe and strobe:
+            self.strobe_state.cursor = 0
+
+        if period is not None:
+            self.strobe_state.set_period(period)
+
+        if ratio is not None:
+            self.strobe_state.set_ratio(ratio)
+
+        if strobe is not None:
+            self.strobe = bool(strobe)
+
+
 
     def animate(self, name, start, end, duration):
         """
