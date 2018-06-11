@@ -219,9 +219,13 @@ class PytaVSL(object):
 
         # setup OpenGL
         self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=25)
+
         self.shader = pi3d.Shader("uv_light")
         self.matsh = pi3d.Shader("mat_light")
+
         self.CAMERA = pi3d.Camera(is_3d=False)
+        self.CAMERA.was_moved = False
+
         self.light = pi3d.Light(lightpos=(1, 1, -3))
         self.light.ambient((1, 1, 1))
 
@@ -562,10 +566,9 @@ t.start()
 pyta.fileQ.join()
 
 mykeys = pi3d.Keyboard()
-pyta.CAMERA = pi3d.Camera.instance()
-pyta.CAMERA.was_moved = False # to save a tiny bit of work each loop
 
 while pyta.DISPLAY.loop_running():
+
     pyta.ctnr.draw()
 
     for i in pyta.text:
@@ -573,14 +576,9 @@ while pyta.DISPLAY.loop_running():
 
     k = mykeys.read()
 
-    if k> -1:
-        first = False
-        if k == 27: #ESC
-            mykeys.close()
-            pyta.DISPLAY.stop()
-            break
-        #             ctnr.posit()
-        #         else:
-        #             ctnr.join()
+    if k == 27: #ESC
+        mykeys.close()
+        pyta.DISPLAY.stop()
+        break
 
 pyta.destroy()
