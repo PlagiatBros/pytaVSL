@@ -128,34 +128,34 @@ class Slide(pi3d.Sprite):
 
     def get_animate_function(self, name):
 
-        if function == 'position_x':
+        if name == 'position_x':
             def set_val(val):
                 self.set_position(val, self.y(), self.z())
-        elif function == 'position_y':
+        elif name == 'position_y':
             def set_val(val):
                 self.set_position(self.x(), val, self.z())
-        elif function == 'position_z':
+        elif name == 'position_z':
             def set_val(val):
                 self.set_position(self.x(), self.y(), val)
-        elif function == 'rotate_x':
+        elif name == 'rotate_x':
             def set_val(val):
                 self.set_rotate(val, self.ay, self.az)
-        elif function == 'rotate_y':
+        elif name == 'rotate_y':
             def set_val(val):
                 self.set_rotate(self.ax, val, self.az)
-        elif function == 'rotate_z':
+        elif name == 'rotate_z':
             def set_val(val):
                 self.set_angle(self.ax, self.ay, val)
-        elif function == 'scale_x':
+        elif name == 'scale_x':
             def set_val(val):
                 self.set_scale(val, self.sy, self.sz)
-        elif function == 'scale_y':
+        elif name == 'scale_y':
             def set_val(val):
                 self.set_scale(self.sx, val, self.sz)
-        elif function == 'scale_z':
+        elif name == 'scale_z':
             def set_val(val):
                 self.set_scale(self.sx, self.sy, val)
-        elif function == 'alpha':
+        elif name == 'alpha':
             def set_val(val):
                 self.set_alpha(val)
         else:
