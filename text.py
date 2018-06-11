@@ -29,10 +29,11 @@ LOGGER = pi3d.Log()
 
 RESOLUTION = 0.5
 
+CODEPOINTS = range(32, 126) + range(160,255) + ['ʒ']
+
 FONTS = {
-    "sans": Font('sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(170*RESOLUTION), offset_y=0.015),
-    "mono": Font('mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(200*RESOLUTION), offset_y=-0.005,
-                codepoints=range(32, 126)+range(160,255)+['ʒ']) # ʒ
+    "sans": Font('sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(170*RESOLUTION), offset_y=0.015, codepoints=CODEPOINTS),
+    "mono": Font('mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(200*RESOLUTION), offset_y=-0.005, codepoints=CODEPOINTS)
 }
 
 V_ALIGN = ['C', 'B', 'T']
@@ -109,6 +110,7 @@ class Text:
 
         self.animations = {}
 
+        self.quick_change = False
         self.need_regen = False
         self.new_string()
 
@@ -147,7 +149,7 @@ class Text:
 
         if self.visible and self.string and (not self.strobe or self.strobe_state.visible):
 
-            if len(self.string) == len(self.text.string):
+            if self.quick_change:
                 self.text.quick_change(self.string)
 
             if self.color_strobe:
@@ -164,8 +166,10 @@ class Text:
         quick_change method (can distort some characters).
         """
 
+        self.quick_change = len(self.string) == len(string)
         self.string = string
-        if len(self.string) != len(self.text.string):
+
+        if not self.quick_change:
             self.need_regen = True
 
 
