@@ -100,7 +100,7 @@ class Slide(pi3d.Sprite):
 
     def draw(self, *args, **kwargs):
         if self.visible:
-            self.draw(*args, **kwargs)
+            super(Slide, self).draw(*args, **kwargs)
 
     def animate(self, name, start, end, duration):
         """
