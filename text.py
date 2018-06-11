@@ -60,6 +60,7 @@ class Text:
         self.string = ''
         self.color = (1.0, 1.0, 1.0)
         self.color_strobe = False
+        self.alpha = 1.0
 
         self.size = 1
 
@@ -143,6 +144,18 @@ class Text:
         """
         self.color = color
         self.need_regen = True
+
+    def set_alpha(self, alpha):
+        """
+        Set the text's opacity.
+
+        Args:
+            alpha (tuple): alpha float values between 0.0 and 1.0
+        """
+        print(alpha, self.alpha)
+        if alpha != self.alpha:
+            self.alpha = alpha
+            self.text.set_alpha(self.alpha)
 
     def set_color_strobe(self, strobe):
         self.color_strobe = bool(strobe)

@@ -534,20 +534,26 @@ class PytaVSL(object):
     def set_text_align(self, path, args):
         self.text[args[0]].set_align(args[1], args[2])
 
-    @liblo.make_method('/pyta/text/color', 'iiii')
-    @liblo.make_method('/pyta/text/color', 'ifff')
+    @liblo.make_method('/pyta/text/rgb', 'iiiii')
+    @liblo.make_method('/pyta/text/rgb', 'iiii')
     @osc_range_method(N_TEXTS)
     def set_text_color(self, path, args):
-        if type(args[1]) is int:
-            args[1] /= 255.
-            args[2] /= 255.
-            args[3] /= 255.
-        self.text[args[0]].set_color((args[1],args[2],args[3]))
+        args[1] /= 255.
+        args[2] /= 255.
+        args[3] /= 255.
+        self.text[args[0]].set_color(args[1:])
+        if len(args) == 5:
+            self.text[args[0]].set_alpha(args[4] / 255.)
 
-    @liblo.make_method('/pyta/text/color/strobe', 'ii')
+    @liblo.make_method('/pyta/text/rgb/strobe', 'ii')
     @osc_range_method(N_TEXTS)
     def set_text_color_strobe(self, path, args):
         self.text[args[0]].set_color_strobe(args[1])
+
+    @liblo.make_method('/pyta/text/alpha', 'if')
+    @osc_range_method(N_TEXTS)
+    def set_text_alpha(self, path, args):
+        self.text[args[0]].set_alpha(args[1])
 
 
 ########## MAIN APP ##########
