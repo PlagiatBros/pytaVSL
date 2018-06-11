@@ -21,6 +21,7 @@ import getopt
 
 from text import Text
 from utils import osc_range_method
+from utils import KillableThread as Thread
 
 from six.moves import queue
 
@@ -507,7 +508,7 @@ for arg in sys.argv:
 pyta = PytaVSL(port=p)
 pyta.on_start()
 
-t = threading.Thread(target=pyta.tex_load)
+t = Thread(target=pyta.tex_load)
 t.daemon = True
 t.start()
 
