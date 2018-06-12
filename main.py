@@ -619,8 +619,10 @@ for arg in sys.argv:
 
 def loaded(pyta):
     print('%i slides loaded in %s' % (len(pyta.slides.values()), pyta.path))
-    liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/position_z', 'Mask_1', -99)
-    liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/visible', 'Mask_1', 1)
+    if 'Mask_1' in pyta.slides:
+        print('Displaying Mask_1 with Z = -99')
+        liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/position_z', 'Mask_1', -99)
+        liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/visible', 'Mask_1', 1)
 
 pyta = PytaVSL(port=p, path=path, load_cb=loaded)
 pyta.start()
