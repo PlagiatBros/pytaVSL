@@ -1,41 +1,23 @@
-#!/usr/bin/python
 # encoding: utf-8
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-"""This is the main file of pytaVSL. It aims to provide a VJing and lights-projector-virtualisation tool.
-
-Images are loaded as textures, which then are mapped onto slides (canvases - 8 of them).
-
-This file was deeply instpired by Slideshow.py demo file of pi3d.
-"""
-
-import time, glob
+import time
 import pi3d
-import liblo
 import random
-import os.path
-import os
-import sys
-import getopt
-import math
 
 from utils import KillableThread as Thread
 
-from six.moves import queue
 from font import Font
 
 LOGGER = pi3d.Log(__name__)
 
 RESOLUTION = 0.5
-
 CODEPOINTS = range(32, 126) + range(160,255) + ['ʒ']
-
 FONTS = {
     "sans": Font('sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(170*RESOLUTION), offset_y=0.015, codepoints=CODEPOINTS),
     "mono": Font('mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(200*RESOLUTION), offset_y=-0.005, codepoints=CODEPOINTS)
 }
-
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
 
