@@ -346,11 +346,29 @@ class Text:
 
                 time.sleep(1/25.)
 
-        if name in self.animations:
-            self.animations[name].kill()
+        self.stop_animate(name)
 
         self.animations[name] = Thread(target=threaded)
         self.animations[name].start()
+
+    def stop_animate(self, name=None):
+        """
+        Stop animations
+        """
+        if name is not None and name in self.animations:
+            try:
+                self.animations[name].kill()
+            except:
+                pass
+            del self.animations[name]
+        elif name is None:
+            for name in self.animations:
+                try:
+                    self.animations[name].kill()
+                except:
+                    pass
+                self.animations = {}
+
 
     def get_animate_function(self, name):
         if name == 'size':
@@ -360,15 +378,3 @@ class Text:
             def set_val(val):
                 pass
         return set_val
-
-    def stop_animate(self, name=None):
-        """
-        Stop animations
-        """
-        if name  is not None:
-            self.animations[name].kill()
-            del self.animations[name]
-        else:
-            for name in self.animations:
-                self.animations[name].kill()
-            self.animations = {}
