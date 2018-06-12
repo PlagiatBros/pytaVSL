@@ -34,20 +34,20 @@ N_TEXTS = len(TEXTS_FONTS)
 
 SLIDE_BASE_Z = 100
 
-class Slide(pi3d.Sprite):
+class Slide(pi3d.Plane):
     '''
     The slide are sprites to be textured. They might be transformed using OSC messages, and the textures they do draw too.
     There might be several of them in one container.
     '''
-    def __init__(self, name, path):
+    def __init__(self, name, path, light):
 
-        super(Slide, self).__init__(w=1.0, h=1.0)
+        super(Slide, self).__init__(w=1.0, h=1.0, light=light)
 
         self.visible = False
 
         self.name = name
         self.path = path
-
+        self.light = light
         self.animations = {}
 
         # Scales
@@ -62,6 +62,10 @@ class Slide(pi3d.Sprite):
         self.ax = 0.0
         self.ay = 0.0
         self.az = 0.0
+
+    def set_color(self, color):
+        self.light.ambient(color)
+        self.set_light(self.light)
 
     def set_position(self, x, y, z):
         '''
@@ -84,11 +88,13 @@ class Slide(pi3d.Sprite):
         self.sz = sz
         self.scale(sx, sy, sz)
 
-    def reset_scale(self):
+    def reset(self):
         self.sx = self.init_w
         self.sy = self.init_h
         self.sz = 1.0
         self.scale(self.sx, self.sy, self.sz)
+        self.set_position(0, 0, SLIDE_BASE_Z)
+        self.set_angle(0, 0, 0)
 
     def set_angle(self, ax, ay, az):
         # set angle (absolute)
@@ -211,8 +217,8 @@ class PytaVSL(object):
 
         self.shader = pi3d.Shader("uv_light")
 
-        self.light = pi3d.Light(lightpos=(1, 1, -3))
-        self.light.ambient((1, 1, 1))
+        self.light = pi3d.Light(lightpos=(0, 0, -1))
+        self.light.ambient((0, 0, 0))
 
         self.fileQ = queue.Queue()
         self.path = path
@@ -274,7 +280,7 @@ class PytaVSL(object):
             name = path.split('/')[-1].split('.')[0]
 
             if name not in self.slides:
-                self.slides[name] = Slide(name, path)
+                self.slides[name] = Slide(name, path, self.light)
                 self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
 
             xrat = self.DISPLAY.width/tex.ix
@@ -407,12 +413,13 @@ class PytaVSL(object):
                 slide.set_scale(slide.init_h*args[1], slide.init_h*args[1], slide.sz)
 
 
-    @liblo.make_method('/pyta/slide/scale/reset', 'i')
+    @liblo.make_method('/pyta/slide/reset', 'i')
+    @liblo.make_method('/pyta/slide/reset', 's')
     @liblo.make_method('/pyta/slide/scale/reset', 's')
     def slide_reset_scale_cb(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
-            slide.reset_scale()
+            slide.reset()
 
     @liblo.make_method('/pyta/slide/rotate', 'sfff')
     @liblo.make_method('/pyta/slide/rotate_x', 'sf')
@@ -447,10 +454,9 @@ class PytaVSL(object):
         '''
         Colorize the slide with rgb color.
         '''
-        self.light.ambient((args[1], args[2], args[3]))
         slides = self.get_slide(args[0])
         for slide in slides:
-            slide.set_light(self.light,0)
+            slide.set_color((args[1], args[2], args[3]))
 
 
     @liblo.make_method('/pyta/slide/load_file', 's')
