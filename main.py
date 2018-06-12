@@ -553,9 +553,16 @@ class PytaVSL(object):
         self.text[args[0]].set_strobe(None, None, args[1])
 
     @liblo.make_method('/pyta/text/position', 'iii')
+    @liblo.make_method('/pyta/text/position_x', 'ii')
+    @liblo.make_method('/pyta/text/position_y', 'ii')
     @osc_range_method(N_TEXTS)
     def set_text_position(self, path, args):
-        self.text[args[0]].set_position(args[1], args[2])
+        if path == '/pyta/text/position':
+            self.text[args[0]].set_position(args[1], args[2])
+        elif path == '/pyta/text/position_x':
+            self.text[args[0]].set_position(args[1], None)
+        elif path == '/pyta/text/position_y':
+            self.text[args[0]].set_position(None, args[1])
 
     @liblo.make_method('/pyta/text/rotate', 'ifff')
     @liblo.make_method('/pyta/text/rotate_x', 'if')

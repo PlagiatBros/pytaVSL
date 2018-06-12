@@ -254,8 +254,11 @@ class Text:
             x (int): horizontal offset in pixels
             y (int): vertical offset in pixels
         """
-        self.x = x
-        self.y = y
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+
         self.need_regen = True
 
     def set_rotation(self, rx, ry, rz):
@@ -374,6 +377,24 @@ class Text:
         if name == 'size':
             def set_val(val):
                 self.set_size(val)
+        elif name == 'rotate_x':
+            def set_val(val):
+                self.set_rotation(val, None, None)
+        elif name == 'rotate_y':
+            def set_val(val):
+                self.set_rotation(None, val, None)
+        elif name == 'rotate_z':
+            def set_val(val):
+                self.set_rotation(None, None, val)
+        elif name == 'size':
+            def set_val(val):
+                self.set_size(val)
+        elif name == 'position_x':
+            def set_val(val):
+                self.set_position(val, None)
+        elif name == 'position_y':
+            def set_val(val):
+                self.set_position(None, val)
         else:
             def set_val(val):
                 pass
