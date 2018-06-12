@@ -285,8 +285,7 @@ class Text:
             size (float): between 0.0 and 1.0. 1.0 for full height characters
         """
         self.size = min(max(float(size),0.),1.)
-        s = self.size
-        self.text.scale(s, s, 1.0)
+        self.need_regen = True
 
     def set_visible(self, visible):
         """
