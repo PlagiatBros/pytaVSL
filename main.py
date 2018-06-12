@@ -30,7 +30,7 @@ LOGGER = pi3d.Log()
 TEXTS_FONTS = ["sans", "sans", "mono", "mono"]
 N_TEXTS = len(TEXTS_FONTS)
 
-MAX_SLIDE_Z = 2000
+SLIDE_BASE_Z = 100
 
 class Slide(pi3d.Sprite):
     '''
@@ -226,7 +226,7 @@ class PytaVSL(object):
 
             if name not in self.slides:
                 self.slides[name] = Slide(name, path)
-                self.slides[name].set_positionZ(100)
+                self.slides[name].set_positionZ(SLIDE_BASE_Z)
                 self.slides_order.insert(0, name)
 
             xrat = self.DISPLAY.width/tex.ix
@@ -290,13 +290,13 @@ class PytaVSL(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             if path == "/pyta/slide/position":
-                slide.set_position(args[1], args[2], args[3])
+                slide.set_position(args[1], args[2], args[3] + SLIDE_BASE_Z)
             elif path == "/pyta/slide/position_x":
                 slide.set_position(args[1], slide.y(), slide.z())
             elif path == "/pyta/slide/position_y":
                 slide.set_position(slide.x(), args[1], slide.z())
             elif path == "/pyta/slide/position_z":
-                slide.set_position(slide.x(), slide.y(), args[1])
+                slide.set_position(slide.x(), slide.y(), args[1] + SLIDE_BASE_Z)
 
     @liblo.make_method('/pyta/slide/translate', 'sfff')
     @liblo.make_method('/pyta/slide/translate_x', 'sf')
