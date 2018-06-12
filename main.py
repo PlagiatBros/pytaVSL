@@ -53,6 +53,9 @@ class Slide(pi3d.Sprite):
         self.sy = 1.0
         self.sz = 1.0
 
+        self.init_w = 1.0
+        self.init_h = 1.0
+
         # Angle
         self.ax = 0.0
         self.ay = 0.0
@@ -63,12 +66,6 @@ class Slide(pi3d.Sprite):
         set_position aims to set the position of the slides and to keep a trace of it
         '''
         self.position(x, y, z)
-
-    def set_positionZ(self, z):
-        '''
-        set_position aims to set the position of the slides and to keep a trace of it
-        '''
-        self.positionZ(z)
 
     def set_translation(self, dx, dy, dz):
         '''
@@ -84,6 +81,12 @@ class Slide(pi3d.Sprite):
         self.sy = sy
         self.sz = sz
         self.scale(sx, sy, sz)
+
+    def reset_scale(self):
+        self.sx = self.init_w
+        self.sy = self.init_h
+        self.sz = 1.0
+        self.scale(self.sx, self.sy, self.sz)
 
     def set_angle(self, ax, ay, az):
         # set angle (absolute)
@@ -221,12 +224,12 @@ class PytaVSL(object):
         """
         while True:
             path = self.fileQ.get()
-            tex = pi3d.Texture(path, blend=False, mipmap=True)
+            tex = pi3d.Texture(path, blend=True, mipmap=True)
             name = path.split('/')[-1].split('.')[0]
 
             if name not in self.slides:
                 self.slides[name] = Slide(name, path)
-                self.slides[name].set_positionZ(SLIDE_BASE_Z)
+                self.slides[name].set_positionZ(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
                 self.slides_order.insert(0, name)
 
             xrat = self.DISPLAY.width/tex.ix
@@ -235,6 +238,8 @@ class PytaVSL(object):
                 xrat = yrat
             wi, hi = tex.ix * xrat, tex.iy * xrat
 
+            self.slides[name].init_w = w
+            self.slides[name].init_h = h
             self.slides[name].set_scale(wi, hi, 1.0)
             self.slides[name].set_draw_details(self.shader,[tex])
 
@@ -343,6 +348,14 @@ class PytaVSL(object):
                 slide.set_scale(slide.sx, slide.sy, args[1])
             elif path == "/pyta/slide/relative_scale_xy" or path == "/pyta/slide/rsxy":
                 slide.set_scale(slide.sx*args[1], slide.sy*args[1], slide.sz)
+
+
+    @liblo.make_method('/pyta/slide/scale/reset', 'i')
+    @liblo.make_method('/pyta/slide/scale/reset', 's')
+    def slide_scale_cb(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.reset_scale()
 
     @liblo.make_method('/pyta/slide/rotate', 'sfff')
     @liblo.make_method('/pyta/slide/rotate_x', 'sf')
