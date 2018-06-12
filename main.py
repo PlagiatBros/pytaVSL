@@ -219,7 +219,7 @@ class PytaVSL(object):
 
         # Slides
         self.slides = {}
-        self.slides_order = []
+        self.sorted_slides = []
 
         # Texts
         self.text = {}
@@ -248,8 +248,8 @@ class PytaVSL(object):
 
         while self.DISPLAY.loop_running():
 
-            for name in self.slides_order:
-                self.slides[name].draw()
+            for slide in self.sorted_slides:
+                slide.draw()
 
             for i in self.text:
                 self.text[i].draw()
@@ -267,6 +267,7 @@ class PytaVSL(object):
         """ Threaded function. mimap = False will make it faster.
         """
         while True:
+
             path = self.fileQ.get()
             tex = pi3d.Texture(path, blend=True, mipmap=True)
             name = path.split('/')[-1].split('.')[0]
@@ -274,7 +275,6 @@ class PytaVSL(object):
             if name not in self.slides:
                 self.slides[name] = Slide(name, path)
                 self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
-                self.slides_order.insert(0, name)
 
             xrat = self.DISPLAY.width/tex.ix
             yrat = self.DISPLAY.height/tex.iy
@@ -288,8 +288,13 @@ class PytaVSL(object):
             self.slides[name].set_draw_details(self.shader,[tex])
 
             self.fileQ.task_done()
+
             if self.fileQ.empty():
-                print("Total slides in memory: %i" % len(self.slides_order))
+                self.sort_slides()
+                print("Total slides in memory: %i" % len(self.slides.values()))
+
+    def sort_slides(self):
+        self.sorted_slides = sorted(self.slides.values(), key=lambda slide: slide.z(), reverse=True)
 
     def get_slide(self, name):
 
@@ -343,7 +348,11 @@ class PytaVSL(object):
             elif path == "/pyta/slide/position_y":
                 slide.set_position(slide.x(), args[1], slide.z())
             elif path == "/pyta/slide/position_z":
-                slide.set_position(slide.x(), slide.y(), args[1] + SLIDE_BASE_Z)
+                z = slide.z()
+                nz = args[1] + SLIDE_BASE_Z
+                if z != nz:
+                    slide.set_position(slide.x(), slide.y(), )
+                    self.sort_slides()
 
     @liblo.make_method('/pyta/slide/translate', 'sfff')
     @liblo.make_method('/pyta/slide/translate_x', 'sf')
@@ -364,6 +373,7 @@ class PytaVSL(object):
                 slide.set_translation(0.0, args[1], 0.0)
             elif path == "/pyta/slide/translate_z":
                 slide.set_translation(0.0, 0.0, args[1])
+                self.sort_slides()
 
     @liblo.make_method('/pyta/slide/scale', 'sfff')
     @liblo.make_method('/pyta/slide/scale_x', 'sf')
