@@ -262,6 +262,8 @@ class PytaVSL(object):
             self.slides[name].set_draw_details(self.shader,[tex])
 
             self.fileQ.task_done()
+            if self.fileQ.empty():
+                print("Total slides in memory: %i" % len(self.slides_order))
 
     def destroy(self):
         self.DISPLAY.destroy()
@@ -365,12 +367,12 @@ class PytaVSL(object):
             elif path == "/pyta/slide/scale_z":
                 slide.set_scale(slide.sx, slide.sy, args[1])
             elif path == "/pyta/slide/relative_scale_xy" or path == "/pyta/slide/rsxy":
-                slide.set_scale(slide.sx*args[1], slide.sy*args[1], slide.sz)
+                slide.set_scale(slide.init_h*args[1], slide.init_h*args[1], slide.sz)
 
 
     @liblo.make_method('/pyta/slide/scale/reset', 'i')
     @liblo.make_method('/pyta/slide/scale/reset', 's')
-    def slide_scale_cb(self, path, args):
+    def slide_reset_scale_cb(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
             slide.reset_scale()
@@ -417,7 +419,6 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/load_file', 's')
     def slide_load_file_cb(self, path, args):
         files = glob.glob(args[0])
-        print(files)
         if len(files):
             for file in files:
                 self.fileQ.put(file)
@@ -570,7 +571,10 @@ for arg in sys.argv:
     if arg.isdigit():
         p = arg
     if '/' in arg and arg != 'main.py':
-        path = arg
+        if os.path.isabs(arg):
+            path = arg
+        else:
+            path = os.path.join(os.path.dirname(__file__), arg)
 
 pyta = PytaVSL(port=p)
 pyta.on_start()
