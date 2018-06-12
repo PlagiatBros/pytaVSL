@@ -23,9 +23,11 @@ from text import Text
 from utils import osc_range_method
 from utils import KillableThread as Thread
 
+from signal import signal, SIGINT, SIGTERM
+
 from six.moves import queue
 
-LOGGER = pi3d.Log()
+LOGGER = pi3d.Log(__name__)
 
 TEXTS_FONTS = ["sans", "sans", "mono", "mono"]
 N_TEXTS = len(TEXTS_FONTS)
@@ -198,22 +200,22 @@ class PytaVSL(object):
     '''
     PytaVSL contains the screen, the camera, the light, and the slides containers. It's also an OSC server which contains the method to control all of its children.
     '''
-    def __init__(self, port=56418):
+    def __init__(self, port=56418, path=None):
         # setup OSC
         self.port = port
 
         # setup OpenGL
         self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=25)
-        self.shader = pi3d.Shader("uv_light")
-        self.matsh = pi3d.Shader("mat_light")
-
         self.CAMERA = pi3d.Camera(is_3d=False)
         self.CAMERA.was_moved = False
+
+        self.shader = pi3d.Shader("uv_light")
 
         self.light = pi3d.Light(lightpos=(1, 1, -3))
         self.light.ambient((1, 1, 1))
 
         self.fileQ = queue.Queue()
+        self.path = path
 
         # Slides
         self.slides = {}
@@ -225,17 +227,41 @@ class PytaVSL(object):
             self.text[i] = Text(self, font=TEXTS_FONTS[i])
 
 
-    def on_start(self):
-        if self.port is not None:
-            self.server = liblo.ServerThread(self.port)
-            self.server.register_methods(self)
-            self.server.start()
-            LOGGER.info("Listening on OSC port: " + str(self.port))
+        # sys
+        self.keyboard = pi3d.Keyboard()
+        signal(SIGINT, self.stop)
+        signal(SIGTERM, self.stop)
 
-    def on_exit(self):
-        if self.port is not None:
-            self.server.stop()
-            del self.server
+    def start(self):
+
+        t = Thread(target=self.tex_load)
+        t.daemon = True
+        t.start()
+
+        if self.path:
+            self.slide_load_file_cb(None, [path])
+
+        self.server = liblo.ServerThread(self.port)
+        self.server.register_methods(self)
+        self.server.start()
+        LOGGER.info("Listening on OSC port: " + str(self.port))
+
+        while self.DISPLAY.loop_running():
+
+            for name in self.slides_order:
+                self.slides[name].draw()
+
+            for i in self.text:
+                self.text[i].draw()
+
+            if self.keyboard.read() == 27: #ESC
+                self.stop()
+                break
+
+    def stop(self, *args):
+        self.keyboard.close()
+        self.DISPLAY.stop()
+        self.DISPLAY.destroy()
 
     def tex_load(self):
         """ Threaded function. mimap = False will make it faster.
@@ -264,10 +290,6 @@ class PytaVSL(object):
             self.fileQ.task_done()
             if self.fileQ.empty():
                 print("Total slides in memory: %i" % len(self.slides_order))
-
-    def destroy(self):
-        self.DISPLAY.destroy()
-
 
     def get_slide(self, name):
 
@@ -567,6 +589,9 @@ class PytaVSL(object):
 
 ########## MAIN APP ##########
 
+p = None
+path = None
+
 for arg in sys.argv:
     if arg.isdigit():
         p = arg
@@ -576,34 +601,6 @@ for arg in sys.argv:
         else:
             path = os.path.join(os.path.dirname(__file__), arg)
 
-pyta = PytaVSL(port=p)
-pyta.on_start()
 
-t = Thread(target=pyta.tex_load)
-t.daemon = True
-t.start()
-
-pyta.fileQ.join()
-
-
-if path:
-    pyta.slide_load_file_cb(None, [path])
-
-mykeys = pi3d.Keyboard()
-
-while pyta.DISPLAY.loop_running():
-
-    for name in pyta.slides_order:
-        pyta.slides[name].draw()
-
-    for i in pyta.text:
-        pyta.text[i].draw()
-
-    k = mykeys.read()
-
-    if k == 27: #ESC
-        mykeys.close()
-        pyta.DISPLAY.stop()
-        break
-
-pyta.destroy()
+pyta = PytaVSL(port=p, path=path)
+pyta.start()

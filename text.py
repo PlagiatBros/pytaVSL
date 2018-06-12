@@ -25,7 +25,7 @@ from utils import KillableThread as Thread
 from six.moves import queue
 from font import Font
 
-LOGGER = pi3d.Log()
+LOGGER = pi3d.Log(__name__)
 
 RESOLUTION = 0.5
 
