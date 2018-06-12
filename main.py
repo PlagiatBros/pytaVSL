@@ -200,9 +200,9 @@ class PytaVSL(object):
     '''
     PytaVSL contains the screen, the camera, the light, and the slides containers. It's also an OSC server which contains the method to control all of its children.
     '''
-    def __init__(self, port=56418, path=None):
+    def __init__(self, port=56418, path=None, load_cb=None):
         # setup OSC
-        self.port = port
+        self.port = int(port)
 
         # setup OpenGL
         self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=25)
@@ -216,6 +216,7 @@ class PytaVSL(object):
 
         self.fileQ = queue.Queue()
         self.path = path
+        self.load_cb = load_cb
 
         # Slides
         self.slides = {}
@@ -291,7 +292,11 @@ class PytaVSL(object):
 
             if self.fileQ.empty():
                 self.sort_slides()
-                print("Total slides in memory: %i" % len(self.slides.values()))
+                LOGGER.info("Total slides in memory: %i" % len(self.slides.values()))
+                if self.load_cb is not None:
+                    self.load_cb(self)
+                    self.load_cb = None
+
 
     def sort_slides(self):
         self.sorted_slides = sorted(self.slides.values(), key=lambda slide: slide.z(), reverse=True)
@@ -351,7 +356,7 @@ class PytaVSL(object):
                 z = slide.z()
                 nz = args[1] + SLIDE_BASE_Z
                 if z != nz:
-                    slide.set_position(slide.x(), slide.y(), )
+                    slide.set_position(slide.x(), slide.y(), nz)
                     self.sort_slides()
 
     @liblo.make_method('/pyta/slide/translate', 'sfff')
@@ -612,5 +617,10 @@ for arg in sys.argv:
             path = os.path.join(os.path.dirname(__file__), arg)
 
 
-pyta = PytaVSL(port=p, path=path)
+def loaded(pyta):
+    print('%i slides loaded in %s' % (len(pyta.slides.values()), pyta.path))
+    liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/position_z', 'Mask_1', -99)
+    liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/visible', 'Mask_1', 1)
+
+pyta = PytaVSL(port=p, path=path, load_cb=loaded)
 pyta.start()
