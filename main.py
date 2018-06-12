@@ -256,8 +256,8 @@ class PytaVSL(object):
                 xrat = yrat
             wi, hi = tex.ix * xrat, tex.iy * xrat
 
-            self.slides[name].init_w = w
-            self.slides[name].init_h = h
+            self.slides[name].init_w = wu
+            self.slides[name].init_h = hi
             self.slides[name].set_scale(wi, hi, 1.0)
             self.slides[name].set_draw_details(self.shader,[tex])
 
@@ -417,6 +417,7 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/load_file', 's')
     def slide_load_file_cb(self, path, args):
         files = glob.glob(args[0])
+        print(files)
         if len(files):
             for file in files:
                 self.fileQ.put(file)
