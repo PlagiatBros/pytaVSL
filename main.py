@@ -256,7 +256,7 @@ class PytaVSL(object):
                 xrat = yrat
             wi, hi = tex.ix * xrat, tex.iy * xrat
 
-            self.slides[name].init_w = wu
+            self.slides[name].init_w = wi
             self.slides[name].init_h = hi
             self.slides[name].set_scale(wi, hi, 1.0)
             self.slides[name].set_draw_details(self.shader,[tex])
