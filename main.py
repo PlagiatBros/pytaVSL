@@ -247,7 +247,7 @@ class PytaVSL(object):
 
             if name not in self.slides:
                 self.slides[name] = Slide(name, path)
-                self.slides[name].set_positionZ(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
+                self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
                 self.slides_order.insert(0, name)
 
             xrat = self.DISPLAY.width/tex.ix
@@ -566,8 +566,10 @@ class PytaVSL(object):
 ########## MAIN APP ##########
 
 for arg in sys.argv:
-    if arg != 'main.py':
+    if arg.isdigit():
         p = arg
+    if '/' in arg and arg != 'main.py':
+        path = arg
 
 pyta = PytaVSL(port=p)
 pyta.on_start()
@@ -577,6 +579,10 @@ t.daemon = True
 t.start()
 
 pyta.fileQ.join()
+
+
+if path:
+    pyta.slide_load_file_cb(None, [path])
 
 mykeys = pi3d.Keyboard()
 
