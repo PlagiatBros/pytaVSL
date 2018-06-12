@@ -63,6 +63,14 @@ class Slide(pi3d.Plane):
         self.ay = 0.0
         self.az = 0.0
 
+    def clone(self, name):
+        state = self.__getstate__()
+        clone = Slide(name, self.path, self.light)
+        clone.__setstate__(state)
+        clone.init_w = self.init_w
+        clone.init_h = self.init_h
+        return clone
+
     def set_color(self, color):
         self.light.ambient(color)
         self.set_light(self.light)
@@ -458,6 +466,18 @@ class PytaVSL(object):
         for slide in slides:
             slide.set_color((args[1], args[2], args[3]))
 
+    @liblo.make_method('/pyta/slide/clone', 'ss')
+    def slide_clone(self, path, args):
+        '''
+        Create a slide clone
+        '''
+        slides = self.get_slide(args[0])
+        if len(slides) > 1:
+            LOGGER.error('ERROR: cannot clone more than one slide at a time')
+        elif len(slides) == 1:
+            if args[1] not in self.slides:
+                self.slides[args[1]] = slides[0].clone(args[1])
+                self.sort_slides()
 
     @liblo.make_method('/pyta/slide/load_file', 's')
     def slide_load_file_cb(self, path, args):
@@ -519,7 +539,6 @@ class PytaVSL(object):
             slide.set_scale(float(sc[0]), float(sc[1]), float(sc[2]))
             slide.set_angle(float(ag[0]), float(ag[1]), float(ag[2]))
             slide.set_alpha(al)
-
 
     @liblo.make_method('/pyta/text', 'is')
     @osc_range_method(N_TEXTS)
