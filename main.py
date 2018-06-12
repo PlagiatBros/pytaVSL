@@ -410,7 +410,7 @@ class PytaVSL(object):
             elif path == "/pyta/slide/scale_z":
                 slide.set_scale(slide.sx, slide.sy, args[1])
             elif path == "/pyta/slide/relative_scale_xy" or path == "/pyta/slide/rsxy":
-                slide.set_scale(slide.init_h*args[1], slide.init_h*args[1], slide.sz)
+                slide.set_scale(slide.init_w*args[1], slide.init_h*args[1], slide.sz)
 
 
     @liblo.make_method('/pyta/slide/reset', 'i')
