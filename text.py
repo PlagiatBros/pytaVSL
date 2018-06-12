@@ -256,8 +256,7 @@ class Text:
         """
         self.x = x
         self.y = y
-        self.text.positionX(self.x)
-        self.text.positionY(self.x)
+        self.need_regen = True
 
     def set_rotation(self, rx, ry, rz):
         """
