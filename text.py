@@ -302,7 +302,17 @@ class Text:
         if strobe is not None:
             self.strobe = bool(strobe)
 
-
+    def reset(self):
+        self.set_size(1)
+        self.set_strobe(0, 2, 0.5)
+        self.set_rotation(0, 0, 0)
+        self.set_position(0, 0)
+        self.set_align('c', 'c')
+        self.set_alpha(1)
+        self.set_color((1, 1, 1))
+        self.set_color_strobe(False)
+        self.set_visible(0)
+        self.stop_animate()
 
     def animate(self, name, start, end, duration):
         """

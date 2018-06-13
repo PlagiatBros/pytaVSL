@@ -364,6 +364,11 @@ class PytaVSL(object):
     def set_text_string(self, path, args):
         self.text[args[0]].set_text(args[1])
 
+    @liblo.make_method('/pyta/text/reset', 'i')
+    @osc_range_method(N_TEXTS)
+    def set_text_reset(self, path, args):
+        self.text[args[0]].reset()
+
     @liblo.make_method('/pyta/text/size', 'if')
     @osc_range_method(N_TEXTS)
     def set_text_size(self, path, args):
