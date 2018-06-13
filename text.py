@@ -90,6 +90,8 @@ class Text(Strobe, Animation):
 
     def draw(self):
 
+        self.animate_next_frame()
+
         if self.need_regen:
             self.need_regen = False
             self.new_string()

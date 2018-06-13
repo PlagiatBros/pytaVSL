@@ -15,7 +15,8 @@ class Animation(object):
         super(Animation, self).__init__()
 
         self.rate = pi3d.Display.Display.INSTANCE.frames_per_second
-        self.framelength = 1. / self.rate
+
+        self.wait_for_next_frame = False
 
         self.animations = {}
 
@@ -45,16 +46,27 @@ class Animation(object):
 
             set_val = self.get_animate_setter(name)
 
-            for i in range(nb_step + 1):
-
+            i = 0
+            while i < nb_step + 1:
                 set_val(a * i + _start)
+                while self.wait_for_next_frame:
+                    time.sleep(1. / self.rate / 4)
+                self.wait_for_next_frame = True
+                i += 1
 
-                time.sleep(self.framelength)
+            # for i in range(nb_step + 1):
+            #
+            #     set_val(a * i + _start)
+            #
+            #     time.sleep(self.framelength)
 
         self.stop_animate(name)
 
         self.animations[name] = Thread(target=threaded)
         self.animations[name].start()
+
+    def animate_next_frame(self):
+        self.wait_for_next_frame = False
 
     def stop_animate(self, name=None):
         """

@@ -95,6 +95,9 @@ class Slide(Strobe, Animation, pi3d.Plane):
         self.visible = bool(visible)
 
     def draw(self, *args, **kwargs):
+
+        self.animate_next_frame()
+
         if self.strobe:
             self.strobe_state.next()
         if self.visible and (not self.strobe or self.strobe_state.visible):
