@@ -123,6 +123,7 @@ class Slide(Strobe, pi3d.Plane):
             current = self.get_value(name)
             _start = self.parse_animate_value(start, current)
             _end = self.parse_animate_value(end, current)
+
             a = float(_end - _start) / nb_step
 
             set_val = self.get_animate_function(name)
@@ -161,14 +162,18 @@ class Slide(Strobe, pi3d.Plane):
 
         if type(val) is str and len(val) > 1:
             operator = val[0]
-            if operator is '+' or operator is '-':
-                val = current + float(val)
-            elif operator is '*':
-                val = current * float(val[1:])
-            elif operator is '/':
-                val = current / float(val[1:])
+            if operator == '+' or operator == '-':
+                return current + float(val)
+            elif operator == '*':
+                return current * float(val[1:])
+            elif operator == '/':
+                return current / float(val[1:])
 
-        return val
+        if type(val) is not str:
+            return val
+        else:
+            LOGGER.error('ERROR: failed to parse animate value %s (%s)' % (val, type(val)))
+            return current
 
     def get_value(self, name):
         val = 0

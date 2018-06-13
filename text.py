@@ -323,14 +323,18 @@ class Text(Strobe):
 
         if type(val) is str and len(val) > 1:
             operator = val[0]
-            if operator is '+' or operator is '-':
-                val = current + float(val)
-            elif operator is '*':
-                val = current * float(val[1:])
-            elif operator is '/':
-                val = current / float(val[1:])
+            if operator == '+' or operator == '-':
+                return current + float(val)
+            elif operator == '*':
+                return current * float(val[1:])
+            elif operator == '/':
+                return current / float(val[1:])
 
-        return val
+        if type(val) is not str:
+            return val
+        else:
+            LOGGER.error('ERROR: failed to parse animate value %s (%s)' % (val, type(val)))
+            return current
 
     def get_value(self, name):
         val = 0
