@@ -302,6 +302,30 @@ class PytaVSL(object):
         for slide in slides:
             slide.set_color((args[1], args[2], args[3]))
 
+    @liblo.make_method('/pyta/slide/strobe', 'ii')
+    @liblo.make_method('/pyta/slide/strobe', 'iiff')
+    @liblo.make_method('/pyta/slide/strobe', 'si')
+    @liblo.make_method('/pyta/slide/strobe', 'siff')
+    def set_slide_strobe(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.set_strobe(*args[1:])
+
+    @liblo.make_method('/pyta/slide/strobe/period', 'if')
+    @liblo.make_method('/pyta/slide/strobe/period', 'sf')
+    def set_slide_strobe_len(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.set_strobe(None, args[1], None)
+
+    @liblo.make_method('/pyta/slide/strobe/ratio', 'if')
+    @liblo.make_method('/pyta/slide/strobe/ratio', 'sf')
+    def set_slide_strobe_per(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.set_strobe(None, None, args[1])
+
+
     @liblo.make_method('/pyta/slide/clone', 'ss')
     def slide_clone(self, path, args):
         '''

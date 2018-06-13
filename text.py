@@ -7,6 +7,7 @@ import pi3d
 import random
 
 from utils import KillableThread as Thread
+from strobe import Strobe
 
 from font import Font
 
@@ -21,36 +22,7 @@ FONTS = {
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
 
-class Strobe():
-    def __init__(self):
-        self.period = 2.0
-        self.ratio = 0.5
-        self.cursor = 0
-        self.visble = False
-        self.regen()
-
-    def regen(self):
-        self.breakpoint = self.period * self.ratio
-
-    def set_period(self, l):
-        self.period = max(int(l), 0.0)
-        self.regen()
-
-    def set_ratio(self, r):
-        self.ratio = max(float(r), 0.0)
-        self.regen()
-
-    def next(self):
-        self.cursor += 1
-        if self.cursor < self.breakpoint:
-            self.visible = False
-        elif self.cursor < self.period:
-            self.visible = True
-        else:
-            self.cursor = 0
-            self.visible = False
-
-class Text:
+class Text(Strobe):
     """
     Dynamic text
     """
@@ -62,6 +34,8 @@ class Text:
             font (str): "sans" or "mono" (see FONTS global)
         """
 
+        super(Text, self).__init__()
+
         self.parent = parent
 
         self.font = FONTS[font]
@@ -69,9 +43,6 @@ class Text:
         self.shader = pi3d.Shader("uv_flat")
 
         self.visible = True
-
-        self.strobe = False
-        self.strobe_state = Strobe()
 
         self.string = ' '
         self.color = (1.0, 1.0, 1.0)
@@ -281,27 +252,6 @@ class Text:
         """
         self.visible = bool(visible)
 
-    def set_strobe(self, strobe=None, period=None, ratio=None):
-        """
-        Set strobe mode
-
-        Args:
-            strobe  (bool): True to enable strobe mode
-            period (float): (optional) period of the strobe cycle in frames
-            ratio  (float): (optional) ratio between hidden and show frames
-        """
-        if not self.strobe and strobe:
-            self.strobe_state.cursor = 0
-
-        if period is not None:
-            self.strobe_state.set_period(period)
-
-        if ratio is not None:
-            self.strobe_state.set_ratio(ratio)
-
-        if strobe is not None:
-            self.strobe = bool(strobe)
-
     def reset(self):
         self.set_size(1)
         self.set_strobe(0, 2, 0.5)
@@ -368,7 +318,7 @@ class Text:
                 except:
                     pass
                 self.animations = {}
-                
+
     def parse_animate_value(self, val, current):
 
         if type(val) is str and len(val) > 1:

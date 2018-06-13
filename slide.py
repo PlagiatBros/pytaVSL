@@ -7,10 +7,11 @@ import pi3d
 import liblo
 
 from utils import KillableThread as Thread
+from strobe import Strobe
 
 LOGGER = pi3d.Log(__name__)
 
-class Slide(pi3d.Plane):
+class Slide(Strobe, pi3d.Plane):
     '''
     The slide are sprites to be textured. They might be transformed using OSC messages, and the textures they do draw too.
     There might be several of them in one container.
@@ -93,8 +94,13 @@ class Slide(pi3d.Plane):
         self.rotateToY(ay)
         self.rotateToZ(az)
 
+    def set_visible(self, visible):
+        self.visible = bool(visible)
+
     def draw(self, *args, **kwargs):
-        if self.visible:
+        if self.strobe:
+            self.strobe_state.next()
+        if self.visible and (not self.strobe or self.strobe_state.visible):
             super(Slide, self).draw(*args, **kwargs)
 
     def animate(self, name, start, end, duration):
