@@ -8,14 +8,12 @@ import liblo
 
 from utils import KillableThread as Thread
 from strobe import Strobe
+from animation import Animation
 
 LOGGER = pi3d.Log(__name__)
 
-class Slide(Strobe, pi3d.Plane):
-    '''
-    The slide are sprites to be textured. They might be transformed using OSC messages, and the textures they do draw too.
-    There might be several of them in one container.
-    '''
+class Slide(Strobe, Animation, pi3d.Plane):
+
     def __init__(self, name, path, light, z):
 
         super(Slide, self).__init__(w=1.0, h=1.0, light=light)
@@ -25,7 +23,6 @@ class Slide(Strobe, pi3d.Plane):
         self.name = name
         self.path = path
         self.light = light
-        self.animations = {}
 
         # Scales
         self.sx = 1.0
@@ -54,21 +51,21 @@ class Slide(Strobe, pi3d.Plane):
         self.set_light(self.light)
 
     def set_position(self, x, y, z):
-        '''
+        """
         set_position aims to set the position of the slides and to keep a trace of it
-        '''
+        """
         self.position(x, y, z)
 
     def set_translation(self, dx, dy, dz):
-        '''
+        """
         set_translation does a translation operation on the slide
-        '''
+        """
         self.translate(dx, dy, dz)
 
     def set_scale(self, sx, sy, sz):
-        '''
+        """
         set_scale sets the scale of the slides and keeps track of it
-        '''
+        """
         self.sx = sx
         self.sy = sy
         self.sz = sz
@@ -84,9 +81,9 @@ class Slide(Strobe, pi3d.Plane):
 
     def set_angle(self, ax, ay, az):
         # set angle (absolute)
-        '''
+        """
         set_angle sets the rotation of the slide and keeps track of it. It's an absolute angle, not a rotation one.
-        '''
+        """
         self.ax = ax
         self.ay = ay
         self.az = az
@@ -103,79 +100,10 @@ class Slide(Strobe, pi3d.Plane):
         if self.visible and (not self.strobe or self.strobe_state.visible):
             super(Slide, self).draw(*args, **kwargs)
 
-    def animate(self, name, start, end, duration):
+    def get_animate_value(self, name):
         """
-        Animate one of the Slide's properties (25fps)
-
-        Args:
-            name  (str):
-            start (int):
-            end   (int):
-            duration (float):
+        Getters for animations
         """
-        def threaded():
-
-            nb_step = int(round(duration * 25.))
-
-            if nb_step < 1:
-                return
-
-            current = self.get_value(name)
-            _start = self.parse_animate_value(start, current)
-            _end = self.parse_animate_value(end, current)
-
-            a = float(_end - _start) / nb_step
-
-            set_val = self.get_animate_function(name)
-
-            for i in range(nb_step + 1):
-
-                set_val(a * i + _start)
-
-                time.sleep(1/25.)
-
-        self.stop_animate(name)
-
-        self.animations[name] = Thread(target=threaded)
-        self.animations[name].start()
-
-
-    def stop_animate(self, name=None):
-        """
-        Stop animations
-        """
-        if name is not None and name in self.animations:
-            try:
-                self.animations[name].kill()
-            except:
-                pass
-            del self.animations[name]
-        elif name is None:
-            for name in self.animations:
-                try:
-                    self.animations[name].kill()
-                except:
-                    pass
-                self.animations = {}
-
-    def parse_animate_value(self, val, current):
-
-        if type(val) is str and len(val) > 1:
-            operator = val[0]
-            if operator == '+' or operator == '-':
-                return current + float(val)
-            elif operator == '*':
-                return current * float(val[1:])
-            elif operator == '/':
-                return current / float(val[1:])
-
-        if type(val) is not str:
-            return val
-        else:
-            LOGGER.error('ERROR: failed to parse animate value %s (%s)' % (val, type(val)))
-            return current
-
-    def get_value(self, name):
         val = 0
         if name == 'position_x':
             val = self.x()
@@ -200,8 +128,10 @@ class Slide(Strobe, pi3d.Plane):
 
         return val
 
-    def get_animate_function(self, name):
-
+    def get_animate_setter(self, name):
+        """
+        Setters for animations
+        """
         if name == 'position_x':
             def set_val(val):
                 self.set_position(val, self.y(), self.z())

@@ -2,12 +2,11 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import time
 import pi3d
 import random
 
-from utils import KillableThread as Thread
 from strobe import Strobe
+from animation import Animation
 
 from font import Font
 
@@ -22,7 +21,7 @@ FONTS = {
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
 
-class Text(Strobe):
+class Text(Strobe, Animation):
     """
     Dynamic text
     """
@@ -60,8 +59,6 @@ class Text(Strobe):
         self.rx = 0
         self.ry = 0
         self.rz = 0
-
-        self.animations = {}
 
         self.quick_change = False
         self.need_regen = False
@@ -265,78 +262,12 @@ class Text(Strobe):
         self.set_text('')
         self.stop_animate()
 
-    def animate(self, name, start, end, duration):
+
+
+    def get_animate_value(self, name):
         """
-        Animate one of the Text's properties (25fps)
-
-        Args:
-            name  (str):
-            start (int):
-            end   (int):
-            duration (float):
+        Getters for animations
         """
-        def threaded():
-
-            nb_step = int(round(duration * 25.))
-
-            if nb_step < 1:
-                return
-
-            current = self.get_value(name)
-            _start = self.parse_animate_value(start, current)
-            _end = self.parse_animate_value(end, current)
-
-            a = float(_end - _start) / nb_step
-
-            set_val = self.get_animate_function(name)
-
-            for i in range(nb_step + 1):
-
-                set_val(a * i + _start)
-
-                time.sleep(1/25.)
-
-        self.stop_animate(name)
-
-        self.animations[name] = Thread(target=threaded)
-        self.animations[name].start()
-
-    def stop_animate(self, name=None):
-        """
-        Stop animations
-        """
-        if name is not None and name in self.animations:
-            try:
-                self.animations[name].kill()
-            except:
-                pass
-            del self.animations[name]
-        elif name is None:
-            for name in self.animations:
-                try:
-                    self.animations[name].kill()
-                except:
-                    pass
-                self.animations = {}
-
-    def parse_animate_value(self, val, current):
-
-        if type(val) is str and len(val) > 1:
-            operator = val[0]
-            if operator == '+' or operator == '-':
-                return current + float(val)
-            elif operator == '*':
-                return current * float(val[1:])
-            elif operator == '/':
-                return current / float(val[1:])
-
-        if type(val) is not str:
-            return val
-        else:
-            LOGGER.error('ERROR: failed to parse animate value %s (%s)' % (val, type(val)))
-            return current
-
-    def get_value(self, name):
         val = 0
         if name == 'size':
             val = self.size
@@ -355,7 +286,10 @@ class Text(Strobe):
 
         return val
 
-    def get_animate_function(self, name):
+    def get_animate_setter(self, name):
+        """
+        Setters for one-arg animations
+        """
         if name == 'size':
             def set_val(val):
                 self.set_size(val)
