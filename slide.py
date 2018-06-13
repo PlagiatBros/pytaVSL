@@ -114,13 +114,15 @@ class Slide(pi3d.Plane):
             if nb_step < 1:
                 return
 
-            a = float(end - start) / nb_step
+            _start = self.get_animate_start(name) if type(start) is str and start == 'current' else start
+
+            a = float(end - _start) / nb_step
 
             set_val = self.get_animate_function(name)
 
             for i in range(nb_step + 1):
 
-                set_val(a * i + start)
+                set_val(a * i + _start)
 
                 time.sleep(1/25.)
 
@@ -148,6 +150,30 @@ class Slide(pi3d.Plane):
                     pass
                 self.animations = {}
 
+    def get_animate_start(self, name):
+        val = 0
+        if name == 'position_x':
+            val = self.x()
+        elif name == 'position_y':
+            val = self.y()
+        elif name == 'position_z':
+            val = self.z()
+        elif name == 'rotate_x':
+            val = self.ax
+        elif name == 'rotate_y':
+            val = self.ay
+        elif name == 'rotate_z':
+            val = self.az
+        elif name == 'scale_x':
+            val = self.sx
+        elif name == 'scale_y':
+            val = self.sy
+        elif name == 'scale_z':
+            val = self.sz
+        elif name == 'alpha':
+            val = self.alpha()
+
+        return val
 
     def get_animate_function(self, name):
 

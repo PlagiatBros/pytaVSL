@@ -331,13 +331,15 @@ class Text:
             if nb_step < 1:
                 return
 
-            a = float(end - start) / nb_step
+            _start = self.get_animate_start(name) if type(start) is str and start == 'current' else start
+
+            a = float(end - _start) / nb_step
 
             set_val = self.get_animate_function(name)
 
             for i in range(nb_step + 1):
 
-                set_val(a * i + start)
+                set_val(a * i + _start)
 
                 time.sleep(1/25.)
 
@@ -364,6 +366,24 @@ class Text:
                     pass
                 self.animations = {}
 
+    def get_animate_start(self, name):
+        val = 0
+        if name == 'size':
+            val = self.size
+        elif name == 'position_x':
+            val = self.x
+        elif name == 'position_y':
+            val = self.y
+        elif name == 'rotate_x':
+            val = self.rx
+        elif name == 'rotate_y':
+            val = self.ry
+        elif name == 'rotate_z':
+            val = self.rz
+        elif name == 'alpha':
+            val = self.alpha
+
+        return val
 
     def get_animate_function(self, name):
         if name == 'size':
@@ -378,16 +398,17 @@ class Text:
         elif name == 'rotate_z':
             def set_val(val):
                 self.set_rotation(None, None, val)
-        elif name == 'size':
-            def set_val(val):
-                self.set_size(val)
         elif name == 'position_x':
             def set_val(val):
                 self.set_position(val, None)
         elif name == 'position_y':
             def set_val(val):
                 self.set_position(None, val)
+        elif name == 'alpha':
+            def set_val(val):
+                self.set_alpha(val)
         else:
             def set_val(val):
                 pass
+
         return set_val

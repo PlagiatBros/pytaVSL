@@ -270,10 +270,23 @@ class PytaVSL(object):
 
     @liblo.make_method('/pyta/slide/animate', 'ssfff')
     @liblo.make_method('/pyta/slide/animate', 'isfff')
+    @liblo.make_method('/pyta/slide/animate', 'sssff')
+    @liblo.make_method('/pyta/slide/animate', 'issff')
     def slide_animate(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
             slide.animate(*args[1:])
+
+    @liblo.make_method('/pyta/slide/animate/stop', 'i')
+    @liblo.make_method('/pyta/slide/animate/stop', 's')
+    @liblo.make_method('/pyta/slide/animate/stop', 'is')
+    @liblo.make_method('/pyta/slide/animate/stop', 'ss')
+    @osc_range_method(N_TEXTS)
+    def slide_stop_animate(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.stop_animate(args[1] if len(args) > 1 else None)
+
 
     @liblo.make_method('/pyta/slide/rgb', 'sfff')
     @liblo.make_method('/pyta/slide/rgb', 'ifff')
@@ -449,11 +462,13 @@ class PytaVSL(object):
         self.text[args[0]].set_alpha(args[1])
 
     @liblo.make_method('/pyta/text/animate', 'isfff')
+    @liblo.make_method('/pyta/text/animate', 'issff')
     @osc_range_method(N_TEXTS)
     def text_animate(self, path, args):
         self.text[args[0]].animate(*args[1:])
 
-    @liblo.make_method('/pyta/text/animate/stop', None)
+    @liblo.make_method('/pyta/text/animate/stop', 'is')
+    @liblo.make_method('/pyta/text/animate/stop', 's')
     @osc_range_method(N_TEXTS)
     def text_stop_animate(self, path, args):
         self.text[args[0]].stop_animate(args[1] if len(args) > 1 else None)
