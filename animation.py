@@ -36,8 +36,8 @@ class Animation(object):
             nb_step = int(round(duration * self.rate))
 
             if nb_step < 1:
-                return
-
+                nb_step = 1
+            
             current = self.get_animate_value(name)
             _start = self.parse_animate_value(start, current)
             _end = self.parse_animate_value(end, current)
