@@ -110,9 +110,9 @@ class Text:
             x += self.parent.DISPLAY.width / 2.
 
         if self.v_align == 'T':
-            y = y + self.parent.DISPLAY.height / 2. - self.font.size * self.size * 2
+            y = y + self.parent.DISPLAY.height / 2. - self.font.size * self.size * 2 / RESOLUTION
         elif self.v_align == 'B':
-            y = y - self.parent.DISPLAY.height / 2. + self.font.size * self.size * 2
+            y = y - self.parent.DISPLAY.height / 2. + self.font.size * self.size * 2 / RESOLUTION
 
         self.text = pi3d.String(font=self.font, string=self.string, size=self.size/RESOLUTION,
                       camera=self.parent.CAMERA, x=x, y=y, z=0, is_3d=False,
