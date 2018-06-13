@@ -272,6 +272,10 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/animate', 'isfff')
     @liblo.make_method('/pyta/slide/animate', 'sssff')
     @liblo.make_method('/pyta/slide/animate', 'issff')
+    @liblo.make_method('/pyta/slide/animate', 'ssfsf')
+    @liblo.make_method('/pyta/slide/animate', 'isfsf')
+    @liblo.make_method('/pyta/slide/animate', 'ssssf')
+    @liblo.make_method('/pyta/slide/animate', 'isssf')
     def slide_animate(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
@@ -463,6 +467,8 @@ class PytaVSL(object):
 
     @liblo.make_method('/pyta/text/animate', 'isfff')
     @liblo.make_method('/pyta/text/animate', 'issff')
+    @liblo.make_method('/pyta/text/animate', 'isfsf')
+    @liblo.make_method('/pyta/text/animate', 'isssf')
     @osc_range_method(N_TEXTS)
     def text_animate(self, path, args):
         self.text[args[0]].animate(*args[1:])

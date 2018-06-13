@@ -331,9 +331,11 @@ class Text:
             if nb_step < 1:
                 return
 
-            _start = self.get_animate_start(name) if type(start) is str and start == 'current' else start
+            current = self.get_value(name)
+            _start = current + float(start) if type(start) is str else start
+            _end = current + float(end) if type(end) is str else end
 
-            a = float(end - _start) / nb_step
+            a = float(_end - _start) / nb_step
 
             set_val = self.get_animate_function(name)
 
@@ -366,7 +368,7 @@ class Text:
                     pass
                 self.animations = {}
 
-    def get_animate_start(self, name):
+    def get_value(self, name):
         val = 0
         if name == 'size':
             val = self.size
