@@ -148,7 +148,7 @@ class Text:
         quick_change method (can distort some characters).
         """
 
-        self.quick_change = len(self.string) == len(string)
+        # self.quick_change = len(self.string) == len(string)
         self.string = string
 
         if not self.quick_change:
