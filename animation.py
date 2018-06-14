@@ -8,13 +8,15 @@ from utils import KillableThread as Thread
 
 LOGGER = pi3d.Log(__name__)
 
+FPS = 25
+
 class Animation(object):
 
     def __init__(self, *args, **kwargs):
 
         super(Animation, self).__init__()
 
-        self.rate = pi3d.Display.Display.INSTANCE.frames_per_second
+        self.rate = FPS #pi3d.Display.Display.INSTANCE.frames_per_second
 
         self.wait_for_next_frame = False
 
@@ -37,7 +39,7 @@ class Animation(object):
 
             if nb_step < 1:
                 nb_step = 1
-            
+
             current = self.get_animate_value(name)
             _start = self.parse_animate_value(start, current)
             _end = self.parse_animate_value(end, current)
