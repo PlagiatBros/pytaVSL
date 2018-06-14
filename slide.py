@@ -75,7 +75,7 @@ class Slide(Strobe, Animation, pi3d.Plane):
         """
         Scaling relative to initial size, aka zoom
         """
-        self.set_scale(zoom * self.init_w, zoom * self.init_h, self.ze)
+        self.set_scale(zoom * self.init_w, zoom * self.init_h, self.z())
 
     def reset(self):
         self.sx = self.init_w
