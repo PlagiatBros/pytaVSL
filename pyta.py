@@ -219,12 +219,14 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/scale_z', 'sf')
     @liblo.make_method('/pyta/slide/relative_scale_xy', 'sf')
     @liblo.make_method('/pyta/slide/rsxy', 'sf')
+    @liblo.make_method('/pyta/slide/zoom', 'sf')
     @liblo.make_method('/pyta/slide/scale', 'ifff')
     @liblo.make_method('/pyta/slide/scale_x', 'if')
     @liblo.make_method('/pyta/slide/scale_y', 'if')
     @liblo.make_method('/pyta/slide/scale_z', 'if')
     @liblo.make_method('/pyta/slide/relative_scale_xy', 'if')
     @liblo.make_method('/pyta/slide/rsxy', 'if')
+    @liblo.make_method('/pyta/slide/zoom', 'if')
     def slide_scale_cb(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
@@ -236,8 +238,8 @@ class PytaVSL(object):
                 slide.set_scale(slide.sx, args[1], slide.sz)
             elif path == "/pyta/slide/scale_z":
                 slide.set_scale(slide.sx, slide.sy, args[1])
-            elif path == "/pyta/slide/relative_scale_xy" or path == "/pyta/slide/rsxy":
-                slide.set_scale(slide.init_w*args[1], slide.init_h*args[1], slide.sz)
+            elif path == "/pyta/slide/relative_scale_xy" or path == "/pyta/slide/rsxy" or path == "/pyta/slide/zoom":
+                slide.set_zoom(args[1])
 
 
     @liblo.make_method('/pyta/slide/reset', 'i')

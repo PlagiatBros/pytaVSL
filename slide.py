@@ -71,6 +71,12 @@ class Slide(Strobe, Animation, pi3d.Plane):
         self.sz = sz
         self.scale(sx, sy, sz)
 
+    def set_zoom(self, zoom):
+        """
+        Scaling relative to initial size, aka zoom
+        """
+        self.set_scale(zoom * self.init_w, zoom * self.init_h, self.ze)
+
     def reset(self):
         self.sx = self.init_w
         self.sy = self.init_h
@@ -126,6 +132,8 @@ class Slide(Strobe, Animation, pi3d.Plane):
             val = self.sy
         elif name == 'scale_z':
             val = self.sz
+        elif name == 'zoom' or name == 'rsxy':
+            val = self.sx / self.init_h
         elif name == 'alpha':
             val = self.alpha()
 
@@ -162,6 +170,9 @@ class Slide(Strobe, Animation, pi3d.Plane):
         elif name == 'scale_z':
             def set_val(val):
                 self.set_scale(self.sx, self.sy, val)
+        elif name == 'zoom' or name == 'rsxy':
+            def set_val(val):
+                self.set_zoom(val)
         elif name == 'alpha':
             def set_val(val):
                 self.set_alpha(val)
