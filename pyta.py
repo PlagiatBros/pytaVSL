@@ -287,7 +287,6 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/animate/stop', 's')
     @liblo.make_method('/pyta/slide/animate/stop', 'is')
     @liblo.make_method('/pyta/slide/animate/stop', 'ss')
-    @osc_range_method(N_TEXTS)
     def slide_stop_animate(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
