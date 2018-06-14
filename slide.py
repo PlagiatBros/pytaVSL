@@ -40,7 +40,7 @@ class Slide(Strobe, Animation, pi3d.Plane):
 
     def clone(self, name):
         state = self.__getstate__()
-        clone = Slide(name, self.path, self.light)
+        clone = Slide(name, self.path, self.light, self.z())
         clone.__setstate__(state)
         clone.init_w = self.init_w
         clone.init_h = self.init_h
