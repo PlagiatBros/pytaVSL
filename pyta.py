@@ -161,7 +161,7 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/lock', 'si')
     @liblo.make_method('/pyta/slide/lock', 'ii')
     def slide_lock_cb(self, path, args):
-        
+
         if args[0] == -1:
             LOGGER.error("ERROR: can't lock all slides")
             return
@@ -169,10 +169,10 @@ class PytaVSL(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             if args[1] == 1:
-                if slide not in self.locked:
+                if slide not in self.locked_slides:
                     self.locked_slides.append(slide)
             elif args[1] == 0:
-                if slide in self.locked:
+                if slide in self.locked_slides:
                     self.locked_slides.remove(slide)
 
     @liblo.make_method('/pyta/slide/visible', 'si')
