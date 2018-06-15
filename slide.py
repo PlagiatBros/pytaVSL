@@ -83,7 +83,7 @@ class Slide(Strobe, Animation, pi3d.Plane):
         self.sz = 1.0
         self.scale(self.sx, self.sy, self.sz)
         self.set_position(0, 0, self.init_z)
-        self.set_color(0,0,0)
+        self.set_color((0,0,0))
         self.set_angle(0, 0, 0)
         self.set_visible(False)
         self.stop_animate()
