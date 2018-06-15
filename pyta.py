@@ -54,6 +54,7 @@ class PytaVSL(object):
         # Slides
         self.slides = {}
         self.sorted_slides = []
+        self.locked_slides = []
 
         # Texts
         self.text = {}
@@ -148,12 +149,32 @@ class PytaVSL(object):
                 slides += [self.slides[name]]
             elif name == -1:
                 slides += self.slides.values()
+                for locked in self.locked_slides:
+                    if locked in slides:
+                        slides.remove(locked)
             else:
                 LOGGER.error("OSC ARGS ERROR: Slide \"%s\" not found" % name)
 
         return slides
 
     # OSC Methods
+    @liblo.make_method('/pyta/slide/lock', 'si')
+    @liblo.make_method('/pyta/slide/lock', 'ii')
+    def slide_lock_cb(self, path, args):
+        
+        if args[0] == -1:
+            LOGGER.error("ERROR: can't lock all slides")
+            return
+
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            if args[1] == 1:
+                if slide not in self.locked:
+                    self.locked_slides.append(slide)
+            elif args[1] == 0:
+                if slide in self.locked:
+                    self.locked_slides.remove(slide)
+
     @liblo.make_method('/pyta/slide/visible', 'si')
     @liblo.make_method('/pyta/slide/visible', 'ii')
     def slide_visible_cb(self, path, args):
