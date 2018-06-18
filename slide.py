@@ -38,6 +38,15 @@ class Slide(Strobe, Animation, pi3d.Plane):
         self.ay = 0.0
         self.az = 0.0
 
+    def draw(self, *args, **kwargs):
+
+        self.animate_next_frame()
+
+        if self.strobe:
+            self.strobe_state.next()
+        if self.visible and (not self.strobe or self.strobe_state.visible):
+            super(Slide, self).draw(*args, **kwargs)
+
     def clone(self, name):
         state = self.__getstate__()
         clone = Slide(name, self.path, self.light, self.z())
@@ -45,6 +54,9 @@ class Slide(Strobe, Animation, pi3d.Plane):
         clone.init_w = self.init_w
         clone.init_h = self.init_h
         return clone
+
+    def set_visible(self, visible):
+        self.visible = bool(visible)
 
     def set_color(self, color):
         self.light.ambient(color)
@@ -77,17 +89,6 @@ class Slide(Strobe, Animation, pi3d.Plane):
         """
         self.set_scale(zoom * self.init_w, zoom * self.init_h, self.z())
 
-    def reset(self):
-        self.sx = self.init_w
-        self.sy = self.init_h
-        self.sz = 1.0
-        self.scale(self.sx, self.sy, self.sz)
-        self.set_position(0, 0, self.init_z)
-        self.set_color((0,0,0))
-        self.set_angle(0, 0, 0)
-        self.set_visible(False)
-        self.stop_animate()
-
     def set_angle(self, ax, ay, az):
         # set angle (absolute)
         """
@@ -100,17 +101,16 @@ class Slide(Strobe, Animation, pi3d.Plane):
         self.rotateToY(ay)
         self.rotateToZ(az)
 
-    def set_visible(self, visible):
-        self.visible = bool(visible)
-
-    def draw(self, *args, **kwargs):
-
-        self.animate_next_frame()
-
-        if self.strobe:
-            self.strobe_state.next()
-        if self.visible and (not self.strobe or self.strobe_state.visible):
-            super(Slide, self).draw(*args, **kwargs)
+    def reset(self):
+        self.sx = self.init_w
+        self.sy = self.init_h
+        self.sz = 1.0
+        self.scale(self.sx, self.sy, self.sz)
+        self.set_position(0, 0, self.init_z)
+        self.set_color((0,0,0))
+        self.set_angle(0, 0, 0)
+        self.set_visible(False)
+        self.stop_animate()
 
     def get_animate_value(self, name):
         """

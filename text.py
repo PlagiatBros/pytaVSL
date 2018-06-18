@@ -264,8 +264,6 @@ class Text(Strobe, Animation):
         self.set_text('')
         self.stop_animate()
 
-
-
     def get_animate_value(self, name):
         """
         Getters for animations
