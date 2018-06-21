@@ -10,7 +10,7 @@ class StrobeState():
         self.period = 2.0
         self.ratio = 0.5
         self.cursor = 0
-        self.visble = False
+        self.visble = True
         self.regen()
 
     def regen(self):
@@ -27,12 +27,12 @@ class StrobeState():
     def next(self):
         self.cursor += 1
         if self.cursor < self.breakpoint:
-            self.visible = False
-        elif self.cursor < self.period:
             self.visible = True
+        elif self.cursor < self.period:
+            self.visible = False
         else:
             self.cursor = 0
-            self.visible = False
+            self.visible = True
 
 class Strobe(object):
 
