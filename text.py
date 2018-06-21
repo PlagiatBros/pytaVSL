@@ -7,6 +7,7 @@ import random
 
 from strobe import Strobe
 from animation import Animation
+from _string import String
 
 from font import Font
 
@@ -44,6 +45,7 @@ class Text(Strobe, Animation):
         self.visible = True
 
         self.string = ' '
+        self.length = len(self.string)
         self.color = (1.0, 1.0, 1.0)
         self.color_strobe = False
         self.alpha = 1.0
@@ -75,7 +77,7 @@ class Text(Strobe, Animation):
         x = self.x
         y = self.y
 
-        size = min(1, self.font.ratio / len(self.string) if self.size == 'auto' else self.size)
+        size = min(1, self.font.ratio / self.length if self.size == 'auto' else self.size)
 
         if self.h_align == 'L':
             x -= self.parent.DISPLAY.width / 2.
@@ -87,7 +89,7 @@ class Text(Strobe, Animation):
         elif self.v_align == 'B':
             y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / RESOLUTION
 
-        self.text = pi3d.String(font=self.font, string=self.string, size=size / RESOLUTION,
+        self.text = String(font=self.font, string=self.string, size=size / RESOLUTION,
                       camera=self.parent.CAMERA, x=x, y=y, z=0, is_3d=False,
                       justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
 
@@ -131,6 +133,11 @@ class Text(Strobe, Animation):
 
         # self.quick_change = len(self.string) == len(string)
         self.string = string
+
+        if '\n' in self.string:
+            self.length = max(map(lambda line: len(line), self.string.split('\n')))
+        else:
+            self.length = len(self.string)
 
         if not self.quick_change:
             self.need_regen = True
