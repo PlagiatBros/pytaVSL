@@ -90,7 +90,7 @@ class Animation(object):
                     self.animations[name].kill()
                 except:
                     pass
-                self.animations = {}
+            self.animations = {}
 
     def parse_animate_value(self, val, current):
 
