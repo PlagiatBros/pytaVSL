@@ -110,6 +110,7 @@ class Slide(Strobe, Animation, pi3d.Plane):
         self.set_color((0,0,0))
         self.set_angle(0, 0, 0)
         self.set_visible(False)
+        self.set_strobe(0, 2, 0.5)
         self.stop_animate()
 
     def get_animate_value(self, name):
