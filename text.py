@@ -280,6 +280,7 @@ class Text(Strobe, Animation):
 
     def reset(self):
         self.set_size('auto')
+        self.set_scale(1, 1, 1)
         self.set_strobe(0, 2, 0.5)
         self.set_rotation(0, 0, 0)
         self.set_position(0, 0)
