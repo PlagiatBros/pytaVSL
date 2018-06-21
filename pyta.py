@@ -447,13 +447,13 @@ class PytaVSL(object):
     def set_text_scale(self, path, args):
         text = self.text[args[0]]
         if path == "/pyta/text/scale":
-            text.set_scale(args[1], args[2], 1)
+            text.set_scale(args[1], args[2])
         elif path == "/pyta/text/scale_x":
-            text.set_scale(args[1], text.sy, 1)
+            text.set_scale(args[1], text.sy)
         elif path == "/pyta/text/scale_y":
-            text.set_scale(text.sx, args[1], 1)
+            text.set_scale(text.sx, args[1])
         elif path == "/pyta/text/scale_z":
-            text.set_scale(text.sx, text.sy, 1)
+            text.set_scale(text.sx, text.sy)
         elif path == "/pyta/text/zoom":
             text.set_zoom(args[1])
 

@@ -58,7 +58,6 @@ class Text(Strobe, Animation):
 
         self.sx = 1
         self.sy = 1
-        self.sz = 1
 
         self.rx = 0
         self.ry = 0
@@ -84,9 +83,9 @@ class Text(Strobe, Animation):
             x += self.parent.DISPLAY.width / 2.
 
         if self.v_align == 'T':
-            y = y + self.parent.DISPLAY.height / 2. - self.font.size * size * 2 / RESOLUTION
+            y = y + self.parent.DISPLAY.height / 2. - self.font.size * size * self.sy * 2 / RESOLUTION
         elif self.v_align == 'B':
-            y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * 2 / RESOLUTION
+            y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / RESOLUTION
 
         self.text = pi3d.String(font=self.font, string=self.string, size=size / RESOLUTION,
                       camera=self.parent.CAMERA, x=x, y=y, z=0, is_3d=False,
@@ -94,7 +93,7 @@ class Text(Strobe, Animation):
 
         self.text.set_shader(self.shader)
 
-        self.text.scale(self.sx, self.sy, self.sz)
+        self.text.scale(self.sx, self.sy, 1)
 
 
     def draw(self):
@@ -254,20 +253,23 @@ class Text(Strobe, Animation):
         self.size = 'auto' if type(size) is str else min(max(float(size),0.),1.)
         self.need_regen = True
 
-    def set_scale(self, sx, sy, sz):
+    def set_scale(self, sx, sy):
         """
         set_scale sets the scale of the text
         """
         self.sx = sx
         self.sy = sy
-        self.sz = sz
-        self.text.scale(sx, sy, sz)
+
+        if self.v_align != 'C':
+            self.need_regen = True
+        else:
+            self.text.scale(sx, sy, 1)
 
     def set_zoom(self, zoom):
         """
         Scaling relative to initial size, aka zoom
         """
-        self.set_scale(zoom, zoom, self.sz)
+        self.set_scale(zoom, zoom)
 
     def set_visible(self, visible):
         """
@@ -280,7 +282,7 @@ class Text(Strobe, Animation):
 
     def reset(self):
         self.set_size('auto')
-        self.set_scale(1, 1, 1)
+        self.set_scale(1, 1)
         self.set_strobe(0, 2, 0.5)
         self.set_rotation(0, 0, 0)
         self.set_position(0, 0)
@@ -338,13 +340,10 @@ class Text(Strobe, Animation):
                 self.set_rotation(None, None, val)
         elif name == 'scale_x':
             def set_val(val):
-                self.set_scale(val, self.sy, self.sz)
+                self.set_scale(val, self.sy)
         elif name == 'scale_y':
             def set_val(val):
-                self.set_scale(self.sx, val, self.sz)
-        elif name == 'scale_z':
-            def set_val(val):
-                self.set_scale(self.sx, self.sy, val)
+                self.set_scale(self.sx, val)
         elif name == 'zoom':
             def set_val(val):
                 self.set_zoom(val)
