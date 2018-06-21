@@ -494,10 +494,7 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/text/rgb', 'iiii')
     @osc_range_method(N_TEXTS)
     def set_text_color(self, path, args):
-        args[1] /= 255.
-        args[2] /= 255.
-        args[3] /= 255.
-        self.text[args[0]].set_color(args[1:])
+        self.text[args[0]].set_color((args[1] / 255., args[2] / 255., args[3] / 255.))
         if len(args) == 5:
             self.text[args[0]].set_alpha(args[4] / 255.)
 
