@@ -434,9 +434,28 @@ class PytaVSL(object):
         self.text[args[0]].reset()
 
     @liblo.make_method('/pyta/text/size', 'if')
+    @liblo.make_method('/pyta/text/size', 'is')
     @osc_range_method(N_TEXTS)
     def set_text_size(self, path, args):
         self.text[args[0]].set_size(args[1])
+
+    @liblo.make_method('/pyta/text/scale', 'iff')
+    @liblo.make_method('/pyta/text/scale_x', 'if')
+    @liblo.make_method('/pyta/text/scale_y', 'if')
+    @liblo.make_method('/pyta/text/zoom', 'if')
+    @osc_range_method(N_TEXTS)
+    def set_text_scale(self, path, args):
+        text = self.text[args[0]]
+        if path == "/pyta/text/scale":
+            text.set_scale(args[1], args[2], 1)
+        elif path == "/pyta/text/scale_x":
+            text.set_scale(args[1], text.sy, 1)
+        elif path == "/pyta/text/scale_y":
+            text.set_scale(text.sx, args[1], 1)
+        elif path == "/pyta/text/scale_z":
+            text.set_scale(text.sx, text.sy, 1)
+        elif path == "/pyta/text/zoom":
+            text.set_zoom(args[1])
 
     @liblo.make_method('/pyta/text/visible', 'ii')
     @osc_range_method(N_TEXTS)

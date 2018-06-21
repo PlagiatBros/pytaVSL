@@ -158,6 +158,8 @@ class Font(Texture):
     yindex = 0
     xindex = 0
 
+    self.ratio = None
+
     for i in itertools.chain([0], codepoints):
       try:
         ch = unichr(i)
@@ -165,6 +167,9 @@ class Font(Texture):
         ch = i
 
       chwidth, chheight = imgfont.getsize(ch)
+
+      if ch == 'A':
+          self.ratio = 1. * chheight / chwidth
 
       curX = xindex * self.spacing
       curY = yindex * self.spacing

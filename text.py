@@ -48,13 +48,17 @@ class Text(Strobe, Animation):
         self.color_strobe = False
         self.alpha = 1.0
 
-        self.size = 1
+        self.size = 'auto'
 
         self.h_align = 'C'
         self.v_align = 'C'
 
         self.x = 0
         self.y = 0
+
+        self.sx = 1
+        self.sy = 1
+        self.sz = 1
 
         self.rx = 0
         self.ry = 0
@@ -72,25 +76,33 @@ class Text(Strobe, Animation):
         x = self.x
         y = self.y
 
+        size = min(1, self.font.ratio / len(self.string) if self.size == 'auto' else self.size)
+
         if self.h_align == 'L':
             x -= self.parent.DISPLAY.width / 2.
         elif self.h_align == 'R':
             x += self.parent.DISPLAY.width / 2.
 
         if self.v_align == 'T':
-            y = y + self.parent.DISPLAY.height / 2. - self.font.size * self.size * 2 / RESOLUTION
+            y = y + self.parent.DISPLAY.height / 2. - self.font.size * size * 2 / RESOLUTION
         elif self.v_align == 'B':
-            y = y - self.parent.DISPLAY.height / 2. + self.font.size * self.size * 2 / RESOLUTION
+            y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * 2 / RESOLUTION
 
-        self.text = pi3d.String(font=self.font, string=self.string, size=self.size/RESOLUTION,
+        self.text = pi3d.String(font=self.font, string=self.string, size=size / RESOLUTION,
                       camera=self.parent.CAMERA, x=x, y=y, z=0, is_3d=False,
                       justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
 
         self.text.set_shader(self.shader)
 
+        self.text.scale(self.sx, self.sy, self.sz)
+
+
     def draw(self):
 
         self.animate_next_frame()
+
+        if self.string == '':
+            return
 
         if self.need_regen:
             self.need_regen = False
@@ -237,10 +249,25 @@ class Text(Strobe, Animation):
         Set size. Triggers String regeneration.
 
         Args:
-            size (float): between 0.0 and 1.0. 1.0 for full height characters
+            size (str|float): 'auto' or between 0.0 and 1.0. 1.0 for full height characters
         """
-        self.size = min(max(float(size),0.),1.)
+        self.size = 'auto' if type(size) is str else min(max(float(size),0.),1.)
         self.need_regen = True
+
+    def set_scale(self, sx, sy, sz):
+        """
+        set_scale sets the scale of the text
+        """
+        self.sx = sx
+        self.sy = sy
+        self.sz = sz
+        self.text.scale(sx, sy, sz)
+
+    def set_zoom(self, zoom):
+        """
+        Scaling relative to initial size, aka zoom
+        """
+        self.set_scale(zoom, zoom, self.sz)
 
     def set_visible(self, visible):
         """
@@ -252,7 +279,7 @@ class Text(Strobe, Animation):
         self.visible = bool(visible)
 
     def reset(self):
-        self.set_size(1)
+        self.set_size('auto')
         self.set_strobe(0, 2, 0.5)
         self.set_rotation(0, 0, 0)
         self.set_position(0, 0)
@@ -281,6 +308,12 @@ class Text(Strobe, Animation):
             val = self.ry
         elif name == 'rotate_z':
             val = self.rz
+        elif name == 'scale_x':
+            val = self.sx
+        elif name == 'scale_y':
+            val = self.sy
+        elif name == 'zoom':
+            val = self.sx
         elif name == 'alpha':
             val = self.alpha
 
@@ -302,6 +335,18 @@ class Text(Strobe, Animation):
         elif name == 'rotate_z':
             def set_val(val):
                 self.set_rotation(None, None, val)
+        elif name == 'scale_x':
+            def set_val(val):
+                self.set_scale(val, self.sy, self.sz)
+        elif name == 'scale_y':
+            def set_val(val):
+                self.set_scale(self.sx, val, self.sz)
+        elif name == 'scale_z':
+            def set_val(val):
+                self.set_scale(self.sx, self.sy, val)
+        elif name == 'zoom':
+            def set_val(val):
+                self.set_zoom(val)
         elif name == 'position_x':
             def set_val(val):
                 self.set_position(val, None)
