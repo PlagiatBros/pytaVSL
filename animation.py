@@ -63,8 +63,9 @@ class Animation(object):
             #     time.sleep(self.framelength)
 
         if self.get_animate_setter(name) is None:
+            LOGGER.error('ERROR: Attempting to animate non-animable property "%s" on %s' % (name, self))
             return
-            
+
         self.stop_animate(name)
 
         self.animations[name] = Thread(target=threaded)
