@@ -312,7 +312,6 @@ class Text(Strobe, Animation):
             def set_val(val):
                 self.set_alpha(val)
         else:
-            def set_val(val):
-                pass
+            set_val = None
 
         return set_val

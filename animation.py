@@ -62,6 +62,9 @@ class Animation(object):
             #
             #     time.sleep(self.framelength)
 
+        if self.get_animate_setter(name) is None:
+            return
+            
         self.stop_animate(name)
 
         self.animations[name] = Thread(target=threaded)
