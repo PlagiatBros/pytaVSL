@@ -257,7 +257,11 @@ class Text(Strobe, Animation):
         Args:
             size (str|float): 'auto' or between 0.0 and 1.0. 1.0 for full height characters
         """
-        self.size = 'auto' if type(size) is str else min(max(float(size), 0.), 1.)
+        if type(size) is str or type(size) is unicode:
+            self.size = 'auto'
+        else:
+            self.size = min(max(float(size), 0.), 1.)
+
         self.need_regen = True
 
     def set_scale(self, sx, sy):
