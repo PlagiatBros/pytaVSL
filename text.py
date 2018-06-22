@@ -257,7 +257,7 @@ class Text(Strobe, Animation):
         Args:
             size (str|float): 'auto' or between 0.0 and 1.0. 1.0 for full height characters
         """
-        self.size = 'auto' if type(size) is str else min(max(float(size),0.),1.)
+        self.size = 'auto' if type(size) is str else min(max(float(size), 0.), 1.)
         self.need_regen = True
 
     def set_scale(self, sx, sy):
@@ -307,7 +307,7 @@ class Text(Strobe, Animation):
         """
         val = 0
         if name == 'size':
-            val = self.size
+            val = min(1, self.font.ratio / self.length if self.size == 'auto' else self.size)
         elif name == 'position_x':
             val = self.x
         elif name == 'position_y':
