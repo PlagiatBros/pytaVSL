@@ -45,7 +45,7 @@ class Text(Strobe, Animation):
         self.visible = True
 
         self.string = ' '
-        self.length = len(self.string)
+        self.length = max(len(self.string), 1)
         self.color = (1.0, 1.0, 1.0)
         self.color_strobe = False
         self.alpha = 1.0
@@ -135,9 +135,9 @@ class Text(Strobe, Animation):
         self.string = string
 
         if '\n' in self.string:
-            self.length = max(map(lambda line: len(line), self.string.split('\n')))
+            self.length = max(map(lambda line: len(line), self.string.split('\n')), 1)
         else:
-            self.length = len(self.string)
+            self.length = max(len(self.string), 1)
 
         if not self.quick_change:
             self.need_regen = True
