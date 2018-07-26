@@ -23,7 +23,7 @@ from utils import osc_range_method
 from utils import KillableThread as Thread
 
 LOGGER = pi3d.Log(__name__)
-ROOTLOGGER = pi3d.Log()
+ROOTLOGGER = pi3d.Log(level='DEBUG' if '--debug' in sys.argv else 'WARNING')
 
 TEXTS_FONTS = ["sans", "sans", "mono", "mono"]
 N_TEXTS = len(TEXTS_FONTS)
