@@ -46,7 +46,6 @@ class Slide(Strobe, Animation, pi3d.Plane):
     def _unload(self):
         if self.loaded:
             self.loaded = False
-            self.reset()
             for t in self.textures:
                 t.unload_opengl()
                 # t.__del__()
