@@ -38,29 +38,38 @@ class Slide(Strobe, Animation, pi3d.Plane):
         self.az = 0.0
 
         self.unloading = False
+        self.loaded = False
 
     def unload(self):
         self.unloading = True
 
-    def draw(self, *args, **kwargs):
-
-        if self.unloading and not self.visible:
-            self.unloading = False
+    def _unload(self):
+        if self.loaded:
+            self.loaded = False
+            self.reset()
             for t in self.textures:
                 t.unload_opengl()
-                t.__del__()
+                # t.__del__()
             for b in self.buf:
                 b.unload_opengl()
-                b.__del__()
+                # b.__del__()
                 for t in b.textures:
                     t.unload_opengl()
-                    t.__del__()
+                    # t.__del__()
+
+    def draw(self, *args, **kwargs):
+
+        if self.unloading:
+            self.unloading = False
+            self._unload()
 
         self.animate_next_frame()
 
         if self.strobe:
             self.strobe_state.next()
         if self.visible and (not self.strobe or self.strobe_state.visible):
+            if not self.loaded:
+                self.loaded = True
             super(Slide, self).draw(*args, **kwargs)
 
     def clone(self, name):
