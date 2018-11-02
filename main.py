@@ -25,6 +25,8 @@ def loaded(pyta):
         print('Displaying Mask_1 with Z = -99')
         liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/position_z', 'Mask_1', -99)
         liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/visible', 'Mask_1', 1)
+        liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/alpha', 'Mask_1', 10)
+        liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/lock', 'Mask_1', 1)
 
 pyta = PytaVSL(port=p, path=path, load_cb=loaded)
 
