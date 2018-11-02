@@ -53,7 +53,6 @@ class PytaVSL(object):
         self.load_cb = load_cb
 
         # Slides
-        self.textures = {}
         self.slides = {}
         self.sorted_slides = []
         self.locked_slides = []
@@ -109,9 +108,7 @@ class PytaVSL(object):
             tex = pi3d.Texture(path, blend=True, mipmap=True)
             name = path.split('/')[-1].split('.')[0]
 
-            self.textures[name] = tex
-
-            self.init_slide(name)
+            self.init_slide(name, tex)
 
             self.fileQ.task_done()
 
@@ -123,9 +120,7 @@ class PytaVSL(object):
                     self.load_cb = None
 
 
-    def init_slide(self, name):
-
-        tex = self.textures[name]
+    def init_slide(self, name, tex):
 
         self.slides[name] = Slide(name, self.light, SLIDE_BASE_Z)
         self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
@@ -189,8 +184,9 @@ class PytaVSL(object):
     def slide_unload_cb(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
-	        self.init_slide(slide.name)
-        self.sort_slides()
+            slide.unload()
+	        # self.init_slide(slide.name)
+        # self.sort_slides()
 
     @liblo.make_method('/pyta/slide/visible', 'si')
     @liblo.make_method('/pyta/slide/visible', 'ii')

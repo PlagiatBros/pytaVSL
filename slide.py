@@ -37,7 +37,24 @@ class Slide(Strobe, Animation, pi3d.Plane):
         self.ay = 0.0
         self.az = 0.0
 
+        self.unloading = False
+
+    def unload(self):
+        self.unloading = True
+
     def draw(self, *args, **kwargs):
+
+        if self.unloading and not self.visible:
+            self.unloading = False
+            for t in self.textures:
+                t.unload_opengl()
+                t.__del__()
+            for b in self.buf:
+                b.unload_opengl()
+                b.__del__()
+                for t in b.textures:
+                    t.unload_opengl()
+                    t.__del__()
 
         self.animate_next_frame()
 
