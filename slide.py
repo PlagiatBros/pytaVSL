@@ -14,14 +14,13 @@ LOGGER = pi3d.Log(__name__)
 
 class Slide(Strobe, Animation, pi3d.Plane):
 
-    def __init__(self, name, path, light, z):
+    def __init__(self, name, light, z):
 
         super(Slide, self).__init__(w=1.0, h=1.0, light=light)
 
         self.visible = False
 
         self.name = name
-        self.path = path
         self.light = light
 
         # Scales
@@ -49,7 +48,7 @@ class Slide(Strobe, Animation, pi3d.Plane):
 
     def clone(self, name):
         state = self.__getstate__()
-        clone = Slide(name, self.path, self.light, self.z())
+        clone = Slide(name, self.light, self.z())
         clone.__setstate__(state)
         clone.init_w = self.init_w
         clone.init_h = self.init_h

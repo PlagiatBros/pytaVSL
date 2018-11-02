@@ -53,6 +53,7 @@ class PytaVSL(object):
         self.load_cb = load_cb
 
         # Slides
+        self.textures = {}
         self.slides = {}
         self.sorted_slides = []
         self.locked_slides = []
@@ -108,20 +109,9 @@ class PytaVSL(object):
             tex = pi3d.Texture(path, blend=True, mipmap=True)
             name = path.split('/')[-1].split('.')[0]
 
-            if name not in self.slides:
-                self.slides[name] = Slide(name, path, self.light, SLIDE_BASE_Z)
-                self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
+            self.textures[name] = tex
 
-            xrat = self.DISPLAY.width/tex.ix
-            yrat = self.DISPLAY.height/tex.iy
-            if yrat < xrat:
-                xrat = yrat
-            wi, hi = tex.ix * xrat, tex.iy * xrat
-
-            self.slides[name].init_w = wi
-            self.slides[name].init_h = hi
-            self.slides[name].set_scale(wi, hi, 1.0)
-            self.slides[name].set_draw_details(self.shader,[tex])
+            self.init_slide(name)
 
             self.fileQ.task_done()
 
@@ -132,6 +122,24 @@ class PytaVSL(object):
                     self.load_cb(self)
                     self.load_cb = None
 
+
+    def init_slide(self, name):
+
+        tex = self.textures[name]
+
+        self.slides[name] = Slide(name, self.light, SLIDE_BASE_Z)
+        self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
+
+        xrat = self.DISPLAY.width/tex.ix
+        yrat = self.DISPLAY.height/tex.iy
+        if yrat < xrat:
+            xrat = yrat
+        wi, hi = tex.ix * xrat, tex.iy * xrat
+
+        self.slides[name].init_w = wi
+        self.slides[name].init_h = hi
+        self.slides[name].set_scale(wi, hi, 1.0)
+        self.slides[name].set_draw_details(self.shader,[tex])
 
     def sort_slides(self):
         self.sorted_slides = sorted(self.slides.values(), key=lambda slide: slide.z(), reverse=True)
@@ -176,12 +184,20 @@ class PytaVSL(object):
                 if slide in self.locked_slides:
                     self.locked_slides.remove(slide)
 
+    @liblo.make_method('/pyta/slide/unload', 's')
+    @liblo.make_method('/pyta/slide/unload', 'i')
+    def slide_unload_cb(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+	        self.init_slide(slide.name)
+        self.sort_slides()
+
     @liblo.make_method('/pyta/slide/visible', 'si')
     @liblo.make_method('/pyta/slide/visible', 'ii')
     def slide_visible_cb(self, path, args):
         slides = self.get_slide(args[0])
         for slide in slides:
-	        slide.visible = bool(args[1])
+	        slide.set_visible(args[1])
 
     @liblo.make_method('/pyta/slide/alpha', 'sf')
     @liblo.make_method('/pyta/slide/alpha', 'if')
