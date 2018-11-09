@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import time, glob
 import pi3d
 import liblo
-import random
 import sys
 from signal import signal, SIGINT, SIGTERM
 from six.moves import queue
@@ -336,6 +335,16 @@ class PytaVSL(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             slide.set_color((args[1], args[2], args[3]))
+
+    @liblo.make_method('/pyta/slide/rgb/strobe', 'ii')
+    @liblo.make_method('/pyta/slide/rgb/strobe', 'si')
+    def set_slide_color_strobe(self, path, args):
+        '''
+        Enable color shit show
+        '''
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.set_color_strobe(args[1])
 
     @liblo.make_method('/pyta/slide/strobe', 'ii')
     @liblo.make_method('/pyta/slide/strobe', 'iiff')
