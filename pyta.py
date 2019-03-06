@@ -48,7 +48,6 @@ class PytaVSL(object):
         self.light = pi3d.Light(lightpos=(0, 0, -1))
         self.light.ambient((0, 0, 0))
 
-        self.post_processing = False
         self.post_process = PostProcess()
 
         self.fileQ = queue.Queue()
@@ -89,7 +88,7 @@ class PytaVSL(object):
 
         while self.DISPLAY.loop_running():
 
-            post_processing = self.post_processing
+            post_processing = self.post_process.visible
 
             if post_processing:
                 self.post_process.capture_start()
@@ -102,7 +101,8 @@ class PytaVSL(object):
 
             if post_processing:
                 self.post_process.capture_end()
-                self.post_process.draw()
+
+            self.post_process.draw()
 
             if self.keyboard.read() == 27: #ESC
                 self.stop()
@@ -582,24 +582,65 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/post_process/active', 'f')
     @liblo.make_method('/pyta/post_process/active', 'i')
     def post_process_active(self, path, args):
-        self.post_processing = bool(args[0])
+        self.post_process.set_visible(args[0])
 
-    @liblo.make_method('/pyta/post_process/glitch_strength', 'f')
+    @liblo.make_method('/pyta/post_process/animate', 'sfff')
+    def post_process_animate(self, path, args):
+        self.post_process.animate(*args)
+
+    @liblo.make_method('/pyta/post_process/animate/stop', '')
+    @liblo.make_method('/pyta/post_process/animate/stop', 's')
+    def post_process_animate_stop(self, path, args):
+        self.post_process.stop_animate(args[0] if len(args) > 0 else None)
+
+    @liblo.make_method('/pyta/post_process/set_all', None)
+    def post_process_set_all(self, path, args):
+        if len(args) > 0:
+            self.post_process.set_visible(args[0])
+        if len(args) > 1:
+            self.post_process.set_glitch_strength(args[1])
+        if len(args) > 2:
+            self.post_process.set_glitch_noise(args[2])
+        if len(args) > 3:
+            self.post_process.set_color_hue(args[3])
+        if len(args) > 4:
+            self.post_process.set_color_saturation(args[4])
+        if len(args) > 5:
+            self.post_process.set_color_value(args[5])
+        if len(args) > 6:
+            self.post_process.set_color_alpha(args[6])
+        if len(args) > 7:
+            self.post_process.set_color_invert(args[7])
+
+    @liblo.make_method('/pyta/post_process/glitch/strength', 'f')
     def post_process_glitch(self, path, args):
         self.post_process.set_glitch_strength(args[0])
 
-    @liblo.make_method('/pyta/post_process/glitch_noise', 'f')
+    @liblo.make_method('/pyta/post_process/glitch/noise', 'f')
     def post_process_noise(self, path, args):
         self.post_process.set_glitch_noise(args[0])
 
-    @liblo.make_method('/pyta/post_process/color_shift', 'f')
-    def post_process_shift(self, path, args):
-        self.post_process.set_color_shift(args[0])
+    @liblo.make_method('/pyta/post_process/color/hue', 'f')
+    def post_process_hue(self, path, args):
+        self.post_process.set_color_hue(args[0])
 
-    @liblo.make_method('/pyta/post_process/color_invert', 'f')
+    @liblo.make_method('/pyta/post_process/color/saturation', 'f')
+    def post_process_saturation(self, path, args):
+        self.post_process.set_color_saturation(args[0])
+
+    @liblo.make_method('/pyta/post_process/color/value', 'f')
+    def post_process_value(self, path, args):
+        self.post_process.set_color_value(args[0])
+
+    @liblo.make_method('/pyta/post_process/color/alpha', 'f')
+    def post_process_alpha(self, path, args):
+        self.post_process.set_color_alpha(args[0])
+
+    @liblo.make_method('/pyta/post_process/color/invert', 'f')
     def post_process_invert(self, path, args):
         self.post_process.set_color_invert(args[0])
 
-    @liblo.make_method('/pyta/post_process/color_alpha', 'f')
-    def post_process_alpha(self, path, args):
-        self.post_process.set_color_alpha(args[0])
+
+    @liblo.make_method('/pyta/post_process/reset', None)
+    def post_process_reset(self, path, args):
+        self.post_process.reset()

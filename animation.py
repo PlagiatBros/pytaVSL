@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import time
+from math import floor
 from abc import abstractmethod
 import pi3d
 
@@ -36,31 +37,39 @@ class Animation(object):
         def threaded():
 
             nb_step = int(round(duration * self.rate))
+            step_duration = 1.0 * duration / nb_step
 
             if nb_step < 1:
                 nb_step = 1
 
-            current = self.get_animate_value(name)
+            current = self.get_param_getter(name)
             _start = self.parse_animate_value(start, current)
             _end = self.parse_animate_value(end, current)
 
             a = float(_end - _start) / nb_step
 
-            set_val = self.get_animate_setter(name)
+            set_val = self.get_param_setter(name)
 
-            i = 0
-            while i < nb_step + 1:
-                set_val(a * i + _start)
+            tick = -1
+            clock_tick = 0
+            clock_time = time.time()
+            run = True
+
+            while run:
+                delta = time.time() - clock_time
+                delta_ticks = floor(delta/step_duration)
+                clock_tick += delta_ticks
+                clock_time += delta_ticks * step_duration
+                if tick < clock_tick:
+                    tick = clock_tick
+                    if tick >= nb_step :
+                        run = False
+                        tick = nb_step
+                    set_val(a * tick + _start)
                 while self.wait_for_next_frame:
-                    time.sleep(1. / self.rate / 4)
+                    time.sleep(0.001)
                 self.wait_for_next_frame = True
-                i += 1
 
-            # for i in range(nb_step + 1):
-            #
-            #     set_val(a * i + _start)
-            #
-            #     time.sleep(self.framelength)
 
         if self.get_animate_setter(name) is None:
             LOGGER.error('ERROR: Attempting to animate non-animable property "%s" on %s' % (name, self))

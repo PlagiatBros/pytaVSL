@@ -156,9 +156,9 @@ class Slide(Strobe, Animation, pi3d.Plane):
         self.set_strobe(0, 2, 0.5)
         self.stop_animate()
 
-    def get_animate_value(self, name):
+    def get_param_getter(self, name):
         """
-        Getters for animations
+        Getters for osc & animations
         """
         val = 0
         if name == 'position_x':
@@ -186,9 +186,9 @@ class Slide(Strobe, Animation, pi3d.Plane):
 
         return val
 
-    def get_animate_setter(self, name):
+    def get_param_setter(self, name):
         """
-        Setters for animations
+        Setters for osc & animations
         """
         if name == 'position_x':
             def set_val(val):

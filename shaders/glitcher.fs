@@ -26,12 +26,14 @@ void main(void){
 
   float randomseed = unif[15][0];
 
-  float noise_amount = unif[18][1];// 52
-  float strength = unif[18][2];    // 51
+  float noise_amount = unif[18][1];
+  float strength = unif[18][2];
 
-  float shift = unif[17][0]; // 54
-  float invert = unif[17][1]; // 55
-  float alpha = unif[17][2]; // 56
+  float hue = unif[16][0];
+  float saturation = unif[16][1];
+  float value = unif[16][2];
+  float alpha = unif[17][0];
+  float invert = unif[17][1];
 
   vec2 shake = vec2(strength * 8.0 + 0.5) * vec2(
     random(vec2(randomseed)) * 2.0 - 1.0,
@@ -54,10 +56,9 @@ void main(void){
 
   vec2 fcoord = vec2(0.0, 0.0);
   float f[7];
-  float ng = texture2D(tex0, texcoordout * randomseed * vec2(f[0], f[1])).b * step(1.0 - strength, random(vec2(randomseed,2))) ;
-  float nr = texture2D(tex0, texcoordout * randomseed * vec2(f[2], f[3])).g * step(1.0 - strength, random(vec2(randomseed,3)));
-  float nb = texture2D(tex0, texcoordout * randomseed * vec2(f[4], f[5])).r * step(1.0 - strength, random(vec2(randomseed,4)));
-  vec3 noisetex = vec3(nr, ng, nb) * noise_amount;
+  float nr = texture2D(tex0, texcoordout * randomseed * vec2(rgbWave * resolution.x)).b * step(1.0 - noise_amount, random(vec2(randomseed,2))) ;
+  float nb = texture2D(tex0, texcoordout * texcoordout * texcoordout * (randomseed+0.5)).g * step(1.0 - noise_amount, random(vec2(randomseed,3)));
+  vec3 noisetex = vec3(nr, 0.0, nb) * 0.75 * noise_amount;
 
   vec3 result = noisetex +  vec3(r, g, b);
 
@@ -70,9 +71,12 @@ void main(void){
 
 
   vec3 hsv = rgb2hsv(vec3(result.r, result.g, result.b));
-  hsv[0] = abs(hsv[0]+shift);
+  hsv[0] = abs(hsv[0] + hue);
+  hsv[1] = hsv[1] * saturation;
+  hsv[2] = hsv[2] * value;
   vec3 rgb = hsv2rgb(hsv);
 
-  gl_FragColor = vec4(rgb.r, rgb.g, rgb.b, 1.0) * alpha;
+
+  gl_FragColor = vec4(rgb.r, rgb.g, rgb.b, alpha);
 
 }
