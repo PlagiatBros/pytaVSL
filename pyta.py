@@ -17,6 +17,7 @@ from signal import signal, SIGINT, SIGTERM
 from six.moves import queue
 
 from text import Text
+from postprocess import PostProcess
 from slide import Slide
 from utils import osc_range_method
 from utils import KillableThread as Thread
@@ -31,7 +32,7 @@ SLIDE_BASE_Z = 100
 
 class PytaVSL(object):
     '''
-    PytaVSL contains the screen, the camera, the light, and the slides containers. It's also an OSC server which contains the method to control all of its children.
+    PytaVSL contains the screen, the , the light, and the slides containers. It's also an OSC server which contains the method to control all of its children.
     '''
     def __init__(self, port=56418, path=None, load_cb=None):
         # setup OSC
@@ -46,6 +47,9 @@ class PytaVSL(object):
 
         self.light = pi3d.Light(lightpos=(0, 0, -1))
         self.light.ambient((0, 0, 0))
+
+        self.post_processing = False
+        self.post_process = PostProcess()
 
         self.fileQ = queue.Queue()
         self.path = path
@@ -81,13 +85,24 @@ class PytaVSL(object):
         self.server.start()
         LOGGER.info("Listening on OSC port: " + str(self.port))
 
+
+
         while self.DISPLAY.loop_running():
+
+            post_processing = self.post_processing
+
+            if post_processing:
+                self.post_process.capture_start()
 
             for slide in self.sorted_slides:
                 slide.draw()
 
             for i in self.text:
                 self.text[i].draw()
+
+            if post_processing:
+                self.post_process.capture_end()
+                self.post_process.draw()
 
             if self.keyboard.read() == 27: #ESC
                 self.stop()
@@ -562,3 +577,29 @@ class PytaVSL(object):
     @osc_range_method(N_TEXTS)
     def text_stop_animate(self, path, args):
         self.text[args[0]].stop_animate(args[1] if len(args) > 1 else None)
+
+
+    @liblo.make_method('/pyta/post_process/active', 'f')
+    @liblo.make_method('/pyta/post_process/active', 'i')
+    def post_process_active(self, path, args):
+        self.post_processing = bool(args[0])
+
+    @liblo.make_method('/pyta/post_process/glitch_strength', 'f')
+    def post_process_glitch(self, path, args):
+        self.post_process.set_glitch_strength(args[0])
+
+    @liblo.make_method('/pyta/post_process/glitch_noise', 'f')
+    def post_process_noise(self, path, args):
+        self.post_process.set_glitch_noise(args[0])
+
+    @liblo.make_method('/pyta/post_process/color_shift', 'f')
+    def post_process_shift(self, path, args):
+        self.post_process.set_color_shift(args[0])
+
+    @liblo.make_method('/pyta/post_process/color_invert', 'f')
+    def post_process_invert(self, path, args):
+        self.post_process.set_color_invert(args[0])
+
+    @liblo.make_method('/pyta/post_process/color_alpha', 'f')
+    def post_process_alpha(self, path, args):
+        self.post_process.set_color_alpha(args[0])
