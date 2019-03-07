@@ -9,11 +9,11 @@ import liblo
 import random
 from utils import KillableThread as Thread
 from strobe import Strobe
-from animation import Animation
+from animation import Animable
 
 LOGGER = pi3d.Log(__name__)
 
-class Slide(Strobe, Animation, pi3d.Plane):
+class Slide(Strobe, Animable, pi3d.Plane):
 
     def __init__(self, name, light, z):
 

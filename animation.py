@@ -11,11 +11,30 @@ LOGGER = pi3d.Log(__name__)
 
 FPS = 25
 
-class Animation(object):
+class Animation():
+
+    def __init__(self, start, end, duration, setter):
+        self.start = start
+        self.duration = duration
+        self.start_date = time.time()
+        self.end_date = duration + self.start_date
+        self.a = 1.0 * (end - start) / duration
+        self.setter = setter
+        self.done = False
+
+    def play(self):
+        t = time.time() - self.start_date
+        if t >= self.duration:
+            t = self.duration
+            self.done = True
+        self.setter(self.a * t + self.start)
+
+
+class Animable(object):
 
     def __init__(self, *args, **kwargs):
 
-        super(Animation, self).__init__()
+        super(Animable, self).__init__()
 
         self.rate = FPS #pi3d.Display.Display.INSTANCE.frames_per_second
 
@@ -34,71 +53,33 @@ class Animation(object):
             end   (int):
             duration (float):
         """
-        def threaded():
+        current = self.get_param_getter(name)
+        _start = self.parse_animate_value(start, current)
+        _end = self.parse_animate_value(end, current)
+        setter = self.get_param_setter(name)
 
-            nb_step = int(round(duration * self.rate))
-            step_duration = 1.0 * duration / nb_step
-
-            if nb_step < 1:
-                nb_step = 1
-
-            current = self.get_param_getter(name)
-            _start = self.parse_animate_value(start, current)
-            _end = self.parse_animate_value(end, current)
-
-            a = float(_end - _start) / nb_step
-
-            set_val = self.get_param_setter(name)
-
-            tick = -1
-            clock_tick = 0
-            clock_time = time.time()
-            run = True
-
-            while run:
-                delta = time.time() - clock_time
-                delta_ticks = floor(delta/step_duration)
-                clock_tick += delta_ticks
-                clock_time += delta_ticks * step_duration
-                if tick < clock_tick:
-                    tick = clock_tick
-                    if tick >= nb_step :
-                        run = False
-                        tick = nb_step
-                    set_val(a * tick + _start)
-                while self.wait_for_next_frame:
-                    time.sleep(0.001)
-                self.wait_for_next_frame = True
-
-
-        if self.get_animate_setter(name) is None:
+        if setter is None:
             LOGGER.error('ERROR: Attempting to animate non-animable property "%s" on %s' % (name, self))
             return
 
-        self.stop_animate(name)
-
-        self.animations[name] = Thread(target=threaded)
-        self.animations[name].start()
+        self.animations[name] = Animation(_start, _end, duration, setter)
 
     def animate_next_frame(self):
-        self.wait_for_next_frame = False
+        delete = []
+        for name in self.animations:
+            self.animations[name].play()
+            if self.animations[name].done:
+                delete.append(name)
+        for n in delete:
+            del self.animations[n]
 
     def stop_animate(self, name=None):
         """
         Stop animations
         """
         if name is not None and name in self.animations:
-            try:
-                self.animations[name].kill()
-            except:
-                pass
             del self.animations[name]
         elif name is None:
-            for name in self.animations:
-                try:
-                    self.animations[name].kill()
-                except:
-                    pass
             self.animations = {}
 
     def parse_animate_value(self, val, current):

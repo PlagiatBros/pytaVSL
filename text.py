@@ -6,7 +6,7 @@ import pi3d
 import random
 
 from strobe import Strobe
-from animation import Animation
+from animation import Animable
 from pi3d_string import String
 
 try:
@@ -28,7 +28,7 @@ FONTS = {
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
 
-class Text(Strobe, Animation):
+class Text(Strobe, Animable):
     """
     Dynamic text
     """
