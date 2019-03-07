@@ -28,6 +28,6 @@ def loaded(pyta):
         # liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/alpha', 'Mask_1', 10)
         # liblo.send('osc.udp://127.0.0.1:%i' % pyta.port, '/pyta/slide/lock', 'Mask_1', 1)
 
-pyta = PytaVSL(port=p, path=path, load_cb=loaded)
+pyta = PytaVSL(port=p, path=path, load_cb=loaded, fps=25, depth=24)
 
 pyta.start()

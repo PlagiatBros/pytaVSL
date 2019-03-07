@@ -33,12 +33,12 @@ class PytaVSL(object):
     '''
     PytaVSL contains the screen, the , the light, and the slides containers. It's also an OSC server which contains the method to control all of its children.
     '''
-    def __init__(self, port=56418, path=None, load_cb=None):
+    def __init__(self, port=56418, path=None, load_cb=None, fps=25, depth=24):
         # setup OSC
         self.port = int(port)
 
         # setup OpenGL
-        self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=25)
+        self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=fps, depth=depth)
         self.CAMERA = pi3d.Camera(is_3d=False)
         self.CAMERA.was_moved = False
 
