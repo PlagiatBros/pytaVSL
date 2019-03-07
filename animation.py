@@ -1,9 +1,9 @@
 # encoding: utf-8
 
-import time
 from math import floor
 from abc import abstractmethod
 import pi3d
+from pi3d.Display import Display
 
 from utils import KillableThread as Thread
 
@@ -17,14 +17,14 @@ class Animation():
     def __init__(self, start, end, duration, setter):
         self.start = start
         self.duration = duration
-        self.start_date = time.time()
+        self.start_date = Display.INSTANCE.time
         self.end_date = duration + self.start_date
         self.a = 1.0 * (end - start) / duration
         self.setter = setter
         self.done = False
 
     def play(self):
-        t = time.time() - self.start_date
+        t = Display.INSTANCE.time - self.start_date
         if t >= self.duration:
             t = self.duration
             self.done = True
@@ -36,10 +36,6 @@ class Animable(object):
     def __init__(self, *args, **kwargs):
 
         super(Animable, self).__init__()
-
-        self.rate = FPS #pi3d.Display.Display.INSTANCE.frames_per_second
-
-        self.wait_for_next_frame = False
 
         self.animations = {}
 
