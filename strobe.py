@@ -2,7 +2,8 @@
 
 import pi3d
 
-LOGGER = pi3d.Log(__name__)
+import logging
+LOGGER = logging.getLogger(__name__)
 
 class StrobeState():
 

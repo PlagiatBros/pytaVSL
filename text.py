@@ -17,7 +17,8 @@ except:
 
 from pi3d_font import Font
 
-LOGGER = pi3d.Log(__name__)
+import logging
+LOGGER = logging.getLogger(__name__)
 
 RESOLUTION = 0.5
 CODEPOINTS = list(range(32, 126)) + list(range(160,255)) + ['ʒ', '~', 'ä']

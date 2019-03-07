@@ -7,7 +7,8 @@ import pi3d
 
 from utils import KillableThread as Thread
 
-LOGGER = pi3d.Log(__name__)
+import logging
+LOGGER = logging.getLogger(__name__)
 
 FPS = 25
 

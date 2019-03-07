@@ -4,7 +4,9 @@ from threading import Thread, current_thread
 from sys import settrace
 import pi3d
 
-LOGGER = pi3d.Log(__name__)
+import logging
+LOGGER = logging.getLogger(__name__)
+
 
 class osc_range_method():
 

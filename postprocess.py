@@ -10,7 +10,8 @@ import random
 from slide import Slide
 from pi3d.util.OffScreenTexture import OffScreenTexture
 
-LOGGER = pi3d.Log(__name__)
+import logging
+LOGGER = logging.getLogger(__name__)
 
 class PostProcess(Slide):
 

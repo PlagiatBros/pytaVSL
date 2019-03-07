@@ -11,7 +11,8 @@ from utils import KillableThread as Thread
 from strobe import Strobe
 from animation import Animable
 
-LOGGER = pi3d.Log(__name__)
+import logging
+LOGGER = logging.getLogger(__name__)
 
 class Slide(Strobe, Animable, pi3d.Plane):
 
