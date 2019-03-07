@@ -118,7 +118,7 @@ class PytaVSL(object):
         while True:
 
             path = self.fileQ.get()
-            tex = pi3d.Texture(path, blend=True, mipmap=True, free_after_load=True, defer=False)
+            tex = pi3d.Texture(path, blend=True, mipmap=True)
             name = path.split('/')[-1].split('.')[0]
 
             self.init_slide(name, tex)
@@ -195,10 +195,9 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/unload', 's')
     @liblo.make_method('/pyta/slide/unload', 'i')
     def slide_unload_cb(self, path, args):
-        pass
-        # slides = self.get_slide(args[0])
-        # for slide in slides:
-        #     slide.unload()
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.unload()
 	        # self.init_slide(slide.name)
         # self.sort_slides()
 
