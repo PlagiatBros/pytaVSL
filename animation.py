@@ -10,8 +10,6 @@ from utils import KillableThread as Thread
 import logging
 LOGGER = logging.getLogger(__name__)
 
-FPS = 25
-
 class Animation():
 
     def __init__(self, start, end, duration, setter):
