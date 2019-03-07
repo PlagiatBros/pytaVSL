@@ -312,7 +312,7 @@ class Text(Strobe, Animable):
         self.set_text('')
         self.stop_animate()
 
-    def get_animate_value(self, name):
+    def get_param_getter(self, name):
         """
         Getters for animations
         """
@@ -340,7 +340,7 @@ class Text(Strobe, Animable):
 
         return val
 
-    def get_animate_setter(self, name):
+    def get_param_setter(self, name):
         """
         Setters for one-arg animations
         """
