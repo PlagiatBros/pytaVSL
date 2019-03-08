@@ -12,7 +12,8 @@ LOGGER = logging.getLogger(__name__)
 
 class Animation():
 
-    def __init__(self, start, end, duration, setter):
+    def __init__(self, name, start, end, duration, setter):
+        self.name = name
         self.start = start
         self.duration = duration
         self.start_date = Display.INSTANCE.time
@@ -57,16 +58,15 @@ class Animable(object):
             LOGGER.error('ERROR: Attempting to animate non-animable property "%s" on %s' % (name, self))
             return
 
-        self.animations[name] = Animation(_start, _end, duration, setter)
+        self.animations[name] = Animation(name, _start, _end, duration, setter)
 
     def animate_next_frame(self):
         delete = []
-        for name in self.animations:
-            self.animations[name].play()
-            if self.animations[name].done:
-                delete.append(name)
-        for n in delete:
-            del self.animations[n]
+        anims = self.animations.values()
+        for anim in anims:
+            anim.play()
+            if anim.done:
+                self.stop_animate(anim.name)
 
     def stop_animate(self, name=None):
         """
