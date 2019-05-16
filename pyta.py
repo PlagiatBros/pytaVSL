@@ -477,6 +477,14 @@ class PytaVSL(object):
         for slide in slides:
             slide.gif_reset()
 
+    @liblo.make_method('/pyta/slide/speed', 'sf')
+    def set_slide_gif_speed(self, path, args):
+        slides = self.get_slide(args[0])
+        if args[1] == 0:
+            args[1] = 1.0
+        for slide in slides:
+            slide.gif_speed = float(args[1])
+
     @liblo.make_method('/pyta/slide/duration', 'sf')
     def set_slide_gif_duration(self, path, args):
         slides = self.get_slide(args[0])
