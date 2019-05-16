@@ -6,6 +6,8 @@ import time
 import pi3d
 import liblo
 
+from pi3d.Display import Display
+
 import random
 from utils import KillableThread as Thread
 from strobe import Strobe
@@ -41,8 +43,33 @@ class Slide(Strobe, Animable, pi3d.Plane):
         self.ay = 0.0
         self.az = 0.0
 
+        # gif
+        self.gif = None
+        self.gif_index = -1
+        self.gif_changed_time = 0
+        self.gif_duration = 0
+
         self.unloading = False
         self.loaded = False
+
+    def gif_reset(self):
+        self.gif_index = -1
+
+    def gif_next_frame(self):
+        now = Display.INSTANCE.time
+
+        if self.gif_changed_time is 0:
+            self.gif_changed_time = now
+
+        current_frame = self.gif[self.gif_index]
+        duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
+
+        if now - self.gif_changed_time >= duration:
+            self.gif_index = self.gif_index + 1
+            if self.gif_index is len(self.gif):
+                self.gif_index = 0
+            self.set_draw_details(self.shader, [self.gif[self.gif_index]])
+            self.gif_changed_time = now
 
     def unload(self):
         self.unloading = True
@@ -50,6 +77,8 @@ class Slide(Strobe, Animable, pi3d.Plane):
     def _unload(self):
         if self.loaded:
             self.loaded = False
+            for t in self.gif:
+                t.unload_opengl()
             for t in self.textures:
                 t.unload_opengl()
                 # t.__del__()
@@ -67,6 +96,9 @@ class Slide(Strobe, Animable, pi3d.Plane):
             self._unload()
 
         self.animate_next_frame()
+
+        if self.gif:
+            self.gif_next_frame()
 
         if self.color_strobe > 0:
             zero = random.randint(0, 2)

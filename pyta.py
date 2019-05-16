@@ -16,6 +16,8 @@ import sys
 from signal import signal, SIGINT, SIGTERM
 from six.moves import queue
 
+from PIL.GifImagePlugin import GifImageFile
+
 from text import Text
 from postprocess import PostProcess
 from slide import Slide
@@ -121,7 +123,7 @@ class PytaVSL(object):
             tex = pi3d.Texture(path, blend=True, mipmap=True)
             name = path.split('/')[-1].split('.')[0]
 
-            self.init_slide(name, tex)
+            self.init_slide(name, tex, path)
 
             self.fileQ.task_done()
 
@@ -130,10 +132,10 @@ class PytaVSL(object):
                 LOGGER.info("Total slides in memory: %i" % len(self.slides.values()))
                 if self.load_cb is not None:
                     self.load_cb(self)
-                    self.load_cb = None
+                return
 
 
-    def init_slide(self, name, tex):
+    def init_slide(self, name, tex, path):
 
         self.slides[name] = Slide(name, self.light, SLIDE_BASE_Z)
         self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
@@ -148,6 +150,16 @@ class PytaVSL(object):
         self.slides[name].init_h = hi
         self.slides[name].set_scale(wi, hi, 1.0)
         self.slides[name].set_draw_details(self.shader,[tex])
+
+        if '.gif' in path:
+            gif = GifImageFile(path)
+            if gif.is_animated:
+                self.slides[name].gif = []
+                for i in range(gif.n_frames):
+                    gif.seek(i)
+                    t = pi3d.Texture(gif)
+                    t.duration = gif.info['duration'] / 1000.
+                    self.slides[name].gif.append(t)
 
     def sort_slides(self):
         self.sorted_slides = sorted(self.slides.values(), key=lambda slide: slide.z(), reverse=True)
@@ -457,6 +469,19 @@ class PytaVSL(object):
             slide.set_scale(float(sc[0]), float(sc[1]), float(sc[2]))
             slide.set_angle(float(ag[0]), float(ag[1]), float(ag[2]))
             slide.set_alpha(al)
+
+
+    @liblo.make_method('/pyta/slide/play', 's')
+    def set_slide_gif_play(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.gif_reset()
+
+    @liblo.make_method('/pyta/slide/duration', 'sf')
+    def set_slide_gif_duration(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.gif_duration = args[1]
 
     @liblo.make_method('/pyta/text', 'is')
     @osc_range_method(N_TEXTS)
