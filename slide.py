@@ -83,8 +83,6 @@ class Slide(Strobe, Animable, pi3d.Plane):
     def _unload(self):
         if self.loaded:
             self.loaded = False
-            for t in self.gif:
-                t.unload_opengl()
             for t in self.textures:
                 t.unload_opengl()
                 # t.__del__()
@@ -94,6 +92,9 @@ class Slide(Strobe, Animable, pi3d.Plane):
                 for t in b.textures:
                     t.unload_opengl()
                     # t.__del__()
+            if self.gif:
+                for t in self.gif:
+                    t.unload_opengl()
 
     def draw(self, *args, **kwargs):
 
