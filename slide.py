@@ -204,6 +204,7 @@ class Slide(Strobe, Animable, pi3d.Plane):
         self.set_angle(0, 0, 0)
         self.set_visible(False)
         self.set_strobe(0, 2, 0.5)
+        self.set_tiles(1.0, 1.0)
         self.stop_animate()
 
     def get_param_getter(self, name):

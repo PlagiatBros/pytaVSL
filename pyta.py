@@ -688,6 +688,10 @@ class PytaVSL(object):
         self.post_process.set_color_invert(args[0])
 
 
+    @liblo.make_method('/pyta/post_process/tiles', 'ff')
+    def post_process_tiles(self, path, args):
+        self.post_process.set_tiles(args[0], args[1])
+
     @liblo.make_method('/pyta/post_process/reset', None)
     def post_process_reset(self, path, args):
         self.post_process.reset()

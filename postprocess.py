@@ -55,6 +55,7 @@ class PostProcess(Slide):
             self.set_color_value(1.0)
             self.set_color_invert(0.0)
             self.set_color_alpha(1.0)
+            self.set_tiles(1.0, 1.0)
 
         def set_color(self, *args):
             pass
