@@ -157,7 +157,7 @@ class PytaVSL(object):
                 self.slides[name].gif = []
                 for i in range(gif.n_frames):
                     gif.seek(i)
-                    t = pi3d.Texture(gif)
+                    t = pi3d.Texture(gif, blend=True, mipmap=True)
                     t.duration = gif.info['duration'] / 1000.
                     self.slides[name].gif.append(t)
 
