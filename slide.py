@@ -76,6 +76,7 @@ class Slide(Strobe, Animable, pi3d.Plane):
                     self.gif_index = 0
             self.set_draw_details(self.shader, [self.gif[self.gif_index]])
             self.gif_changed_time = now
+            current_frame.unload_opengl()
 
     def unload(self):
         self.unloading = True
