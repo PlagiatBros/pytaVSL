@@ -120,10 +120,9 @@ class PytaVSL(object):
         while True:
 
             path = self.fileQ.get()
-            tex = pi3d.Texture(path, blend=True, mipmap=True)
             name = path.split('/')[-1].split('.')[0]
 
-            self.init_slide(name, tex, path)
+            self.init_slide(name, path)
 
             self.fileQ.task_done()
 
@@ -135,7 +134,9 @@ class PytaVSL(object):
                 return
 
 
-    def init_slide(self, name, tex, path):
+    def init_slide(self, name, path):
+
+        tex = pi3d.Texture(path, blend=True, mipmap=True)
 
         self.slides[name] = Slide(name, self.light, SLIDE_BASE_Z)
         self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
@@ -149,7 +150,7 @@ class PytaVSL(object):
         self.slides[name].init_w = wi
         self.slides[name].init_h = hi
         self.slides[name].set_scale(wi, hi, 1.0)
-        self.slides[name].set_draw_details(self.shader,[tex])
+        self.slides[name].set_shader(self.shader)
 
         if '.gif' in path:
             gif = GifImageFile(path)
@@ -160,6 +161,9 @@ class PytaVSL(object):
                     t = pi3d.Texture(gif, blend=True, mipmap=True)
                     t.duration = gif.info['duration'] / 1000.
                     self.slides[name].gif.append(t)
+        else:
+            self.slides[name].set_textures([tex])
+
 
     def sort_slides(self):
         self.sorted_slides = sorted(self.slides.values(), key=lambda slide: slide.z(), reverse=True)
@@ -493,6 +497,14 @@ class PytaVSL(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             slide.gif_duration = args[1]
+
+    @liblo.make_method('/pyta/slide/tiles', 'iff')
+    @liblo.make_method('/pyta/slide/tiles', 'sff')
+    def set_slide_tiles(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.set_tiles(args[1], args[2])
+
 
     @liblo.make_method('/pyta/text', 'is')
     @osc_range_method(N_TEXTS)

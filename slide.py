@@ -50,6 +50,9 @@ class Slide(Strobe, Animable, pi3d.Plane):
         self.gif_duration = 0
         self.gif_speed = 1.0
 
+        # tiling
+        self.tiles = [1.0, 1.0]
+
         self.unloading = False
         self.loaded = False
 
@@ -74,7 +77,7 @@ class Slide(Strobe, Animable, pi3d.Plane):
                 self.gif_index = self.gif_index + 1
                 if abs(self.gif_index) >= len(self.gif):
                     self.gif_index = 0
-            self.set_draw_details(self.shader, [self.gif[self.gif_index]])
+            self.set_draw_details(self.shader, [self.gif[self.gif_index]], umult=self.tiles[0], vmult=self.tiles[1])
             self.gif_changed_time = now
             current_frame.unload_opengl()
 
@@ -130,6 +133,12 @@ class Slide(Strobe, Animable, pi3d.Plane):
         clone.init_w = self.init_w
         clone.init_h = self.init_h
         return clone
+
+    def set_tiles(self, x, y):
+        self.tiles = [x, y]
+        for b in self.buf:
+            b.unib[6] = x
+            b.unib[7] = y
 
     def set_visible(self, visible):
         self.visible = bool(visible)
