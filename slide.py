@@ -65,21 +65,37 @@ class Slide(Strobe, Animable, pi3d.Plane):
         if self.gif_changed_time is 0:
             self.gif_changed_time = now
 
-        current_frame = self.gif[self.gif_index]
-        duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
 
-        if now - self.gif_changed_time >= duration / abs(self.gif_speed):
-            if self.gif_speed < 0:
-                self.gif_index = self.gif_index - 1
-                if abs(self.gif_index) >= len(self.gif):
-                    self.gif_index = -1
-            else:
-                self.gif_index = self.gif_index + 1
-                if abs(self.gif_index) >= len(self.gif):
-                    self.gif_index = 0
-            self.set_draw_details(self.shader, [self.gif[self.gif_index]], umult=self.tiles[0], vmult=self.tiles[1])
-            self.gif_changed_time = now
-            current_frame.unload_opengl()
+        initial_frame = self.gif[self.gif_index]
+        current_frame = self.gif[self.gif_index]
+        elapsed = now - self.gif_changed_time
+        duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
+        duration = duration / abs(self.gif_speed)
+
+        while elapsed >= duration:
+
+            if elapsed >= duration:
+
+                elapsed = elapsed - duration
+
+                if self.gif_speed < 0:
+                    self.gif_index = self.gif_index - 1
+                    if abs(self.gif_index) >= len(self.gif):
+                        self.gif_index = -1
+                else:
+                    self.gif_index = self.gif_index + 1
+                    if abs(self.gif_index) >= len(self.gif):
+                        self.gif_index = 0
+
+                current_frame = self.gif[self.gif_index]
+                duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
+                duration = duration / abs(self.gif_speed)
+
+        if current_frame is not initial_frame:
+
+            self.set_draw_details(self.shader, [current_frame], umult=self.tiles[0], vmult=self.tiles[1])
+            initial_frame.unload_opengl()
+            self.gif_changed_time = now + elapsed
 
     def unload(self):
         self.unloading = True
