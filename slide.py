@@ -12,11 +12,12 @@ import random
 from utils import KillableThread as Thread
 from strobe import Strobe
 from animation import Animable
+from gif import Gif
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
-class Slide(Strobe, Animable, pi3d.Plane):
+class Slide(Strobe, Animable, Gif, pi3d.Plane):
 
     def __init__(self, name, light, z):
 
@@ -43,59 +44,11 @@ class Slide(Strobe, Animable, pi3d.Plane):
         self.ay = 0.0
         self.az = 0.0
 
-        # gif
-        self.gif = None
-        self.gif_index = -1
-        self.gif_changed_time = 0
-        self.gif_duration = 0
-        self.gif_speed = 1.0
-
         # tiling
         self.tiles = [1.0, 1.0]
 
         self.unloading = False
         self.loaded = False
-
-    def gif_reset(self):
-        self.gif_index = -1 if self.gif_speed > 0 else 0
-
-    def gif_next_frame(self):
-        now = Display.INSTANCE.time
-
-        if self.gif_changed_time is 0:
-            self.gif_changed_time = now
-
-
-        initial_frame = self.gif[self.gif_index]
-        current_frame = self.gif[self.gif_index]
-        elapsed = now - self.gif_changed_time
-        duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
-        duration = duration / abs(self.gif_speed)
-
-        while elapsed >= duration:
-
-            if elapsed >= duration:
-
-                elapsed = elapsed - duration
-
-                if self.gif_speed < 0:
-                    self.gif_index = self.gif_index - 1
-                    if abs(self.gif_index) >= len(self.gif):
-                        self.gif_index = -1
-                else:
-                    self.gif_index = self.gif_index + 1
-                    if abs(self.gif_index) >= len(self.gif):
-                        self.gif_index = 0
-
-                current_frame = self.gif[self.gif_index]
-                duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
-                duration = duration / abs(self.gif_speed)
-
-        if current_frame is not initial_frame:
-
-            self.set_draw_details(self.shader, [current_frame], umult=self.tiles[0], vmult=self.tiles[1])
-            initial_frame.unload_opengl()
-            self.gif_changed_time = now + elapsed
 
     def unload(self):
         self.unloading = True
@@ -112,9 +65,6 @@ class Slide(Strobe, Animable, pi3d.Plane):
                 for t in b.textures:
                     t.unload_opengl()
                     # t.__del__()
-            if self.gif:
-                for t in self.gif:
-                    t.unload_opengl()
 
     def draw(self, *args, **kwargs):
 
