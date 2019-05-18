@@ -161,6 +161,8 @@ class PytaVSL(object):
                     t = pi3d.Texture(gif, blend=True, mipmap=True)
                     t.duration = gif.info['duration'] / 1000.
                     self.slides[name].gif.append(t)
+                    if i == 0:
+                        self.slides[name].set_textures([t])
         else:
             self.slides[name].set_textures([tex])
 

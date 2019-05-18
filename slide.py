@@ -122,10 +122,10 @@ class Slide(Strobe, Animable, pi3d.Plane):
             self.unloading = False
             self._unload()
 
-        self.animate_next_frame()
-
-        if self.gif:
+        if self.gif and self.visible:
             self.gif_next_frame()
+
+        self.animate_next_frame()
 
         if self.color_strobe > 0:
             zero = random.randint(0, 2)
