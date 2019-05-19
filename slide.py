@@ -13,6 +13,7 @@ from utils import KillableThread as Thread
 from strobe import Strobe
 from animation import Animable
 from gif import Gif
+from memory import gpu_monitor
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -65,6 +66,7 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
                 for t in b.textures:
                     t.unload_opengl()
                     # t.__del__()
+            gpu_monitor.free(self)
 
     def draw(self, *args, **kwargs):
 
@@ -90,6 +92,7 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
         if self.visible and (not self.strobe or self.strobe_state.visible):
             if not self.loaded:
                 self.loaded = True
+                gpu_monitor.alloc(self)
             super(Slide, self).draw(*args, **kwargs)
 
     def clone(self, name):

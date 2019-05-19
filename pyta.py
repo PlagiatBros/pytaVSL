@@ -23,6 +23,7 @@ from postprocess import PostProcess
 from slide import Slide
 from utils import osc_range_method
 from utils import KillableThread as Thread
+from memory import gpu_monitor
 
 LOGGER = pi3d.Log(name=None, level='DEBUG' if '--debug' in sys.argv else 'CRITICAL' if '--quiet' in sys.argv else 'WARNING', file="/dev/null" if '--quiet' in sys.argv else None)
 
@@ -65,6 +66,9 @@ class PytaVSL(object):
         for i in range(N_TEXTS):
             self.text[i] = Text(self, font=TEXTS_FONTS[i])
 
+        # Memory
+        self.monitor = gpu_monitor
+        gpu_monitor.flush = self.flush
 
         # sys
         self.keyboard = pi3d.Keyboard()
@@ -184,6 +188,19 @@ class PytaVSL(object):
                 LOGGER.error("OSC ARGS ERROR: Slide \"%s\" not found" % name)
 
         return slides
+
+
+    def flush(self):
+        for name in self.slides:
+            if not self.slides[name].visible:
+                self.slides[name]._unload()
+        if self.monitor.full():
+            for name in self.slides:
+                if self.slides[name].visible:
+                    self.slides[name].set_visible(False)
+                    self.slides[name]._unload()
+                    if not self.monitor.full():
+                        return
 
     # OSC Methods
     @liblo.make_method('/pyta/slide/lock', 'si')
