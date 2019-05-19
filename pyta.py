@@ -160,8 +160,9 @@ class PytaVSL(object):
             gif = GifImageFile(path)
             if gif.is_animated:
                 self.slides[name].set_frames(gif)
-        else:
-            self.slides[name].set_textures([tex])
+                return
+
+        self.slides[name].set_textures([tex])
 
 
     def sort_slides(self):
