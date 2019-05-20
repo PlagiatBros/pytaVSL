@@ -10,9 +10,9 @@ p = None
 path = None
 
 for arg in sys.argv:
-    if arg.isdigit():
+    if arg.isdigit() or '/tmp' in arg:
         p = arg
-    if '/' in arg and arg != 'main.py':
+    elif '/' in arg and arg != 'main.py':
         if os.path.isabs(arg):
             path = arg
         else:

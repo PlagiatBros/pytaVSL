@@ -16,15 +16,15 @@ except:
     unicode = str
 
 from pi3d_font import Font
+from config import *
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
-RESOLUTION = 0.5
 CODEPOINTS = list(range(32, 126)) + list(range(160,255)) + ['ʒ', '~', 'ä']
 FONTS = {
-    "sans": Font('fonts/sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(170*RESOLUTION), offset_y=0.015, codepoints=CODEPOINTS),
-    "mono": Font('fonts/mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(200*RESOLUTION), offset_y=-0.005, codepoints=CODEPOINTS)
+    "sans": Font('fonts/sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(170*TEXT_RESOLUTION), offset_y=0.015, codepoints=CODEPOINTS),
+    "mono": Font('fonts/mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(200*TEXT_RESOLUTION), offset_y=-0.005, codepoints=CODEPOINTS)
 }
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
@@ -92,11 +92,11 @@ class Text(Strobe, Animable):
             x += self.parent.DISPLAY.width / 2.
 
         if self.v_align == 'T':
-            y = y + self.parent.DISPLAY.height / 2. - self.font.size * size * self.sy * 2 / RESOLUTION
+            y = y + self.parent.DISPLAY.height / 2. - self.font.size * size * self.sy * 2 / TEXT_RESOLUTION
         elif self.v_align == 'B':
-            y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / RESOLUTION
+            y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION
 
-        self.text = String(font=self.font, string=self.string, size=size / RESOLUTION,
+        self.text = String(font=self.font, string=self.string, size=size / TEXT_RESOLUTION,
                       camera=self.parent.CAMERA, x=x, y=y, z=0, is_3d=False,
                       justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
 
