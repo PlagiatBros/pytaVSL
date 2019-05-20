@@ -173,15 +173,10 @@ class OscServer(object):
             elif path == "/pyta/slide/rotate_z":
                 slide.set_angle(slide.ax, slide.ay, args[1])
 
-    @liblo.make_method('/pyta/slide/animate', 'ssfff')
-    @liblo.make_method('/pyta/slide/animate', 'isfff')
-    @liblo.make_method('/pyta/slide/animate', 'sssff')
-    @liblo.make_method('/pyta/slide/animate', 'issff')
-    @liblo.make_method('/pyta/slide/animate', 'ssfsf')
-    @liblo.make_method('/pyta/slide/animate', 'isfsf')
-    @liblo.make_method('/pyta/slide/animate', 'ssssf')
-    @liblo.make_method('/pyta/slide/animate', 'isssf')
+    @liblo.make_method('/pyta/slide/animate', None)
     def slide_animate(self, path, args):
+        if not 5 <= len(args) <= 6:
+            return
         slides = self.get_slide(args[0])
         for slide in slides:
             slide.animate(*args[1:])
