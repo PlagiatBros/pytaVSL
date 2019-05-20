@@ -48,8 +48,6 @@ class OscServer(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             slide.unload()
-	        # self.init_slide(slide.name)
-        # self.sort_slides()
 
     @liblo.make_method('/pyta/slide/visible', 'si')
     @liblo.make_method('/pyta/slide/visible', 'ii')
