@@ -27,6 +27,13 @@ class Gif(object):
         self.gif_duration = 0
         self.gif_speed = 1.0
 
+
+    def set_speed(self, speed):
+        self.gif_speed = float(speed)
+
+    def set_duration(self, duration):
+        self.gif_duration = float(duration)
+
     def set_frames(self, gif):
         self.gif = []
         for i in range(gif.n_frames):
@@ -87,3 +94,36 @@ class Gif(object):
             self.gif_next_frame()
 
         super(Gif, self).draw(*args, **kwargs)
+
+
+    def get_param_getter(self, name):
+        """
+        Getters for osc & animations
+        """
+        _val = super(Gif, self).get_param_getter(name)
+
+        val = 0
+        if name == 'speed':
+            val = self.gif_speed
+        elif name == 'duration':
+            val = self.gif_duration
+
+        return val if val is not 0 else _val
+
+    def get_param_setter(self, name):
+        """
+        Setters for osc & animations
+        """
+
+        _set_val = super(Gif, self).get_param_setter(name)
+
+        if name == 'speed':
+            def set_val(val):
+                self.set_speed(val)
+        elif name == 'duration':
+            def set_val(val):
+                self.set_duration(val)
+        else:
+            set_val = None
+
+        return set_val if set_val is not None else _set_val

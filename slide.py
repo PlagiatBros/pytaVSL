@@ -193,7 +193,8 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
             val = self.sx / self.init_h
         elif name == 'alpha':
             val = self.alpha()
-
+        elif name == 'tiles':
+            val = self.tiles[0]
         return val
 
     def get_param_setter(self, name):
@@ -233,6 +234,9 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
         elif name == 'alpha':
             def set_val(val):
                 self.set_alpha(val)
+        elif name == 'tiles':
+            def set_val(val):
+                self.set_tiles(val, val)
         else:
             set_val = None
 
