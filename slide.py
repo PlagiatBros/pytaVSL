@@ -172,6 +172,9 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
         """
         Getters for osc & animations
         """
+
+        _val = super(Slide, self).get_param_getter(name)
+
         val = 0
         if name == 'position_x':
             val = self.x()
@@ -197,12 +200,16 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
             val = self.alpha()
         elif name == 'tiles':
             val = self.tiles[0]
-        return val
+
+        return val if val is not 0 else _val
 
     def get_param_setter(self, name):
         """
         Setters for osc & animations
         """
+
+        _set_val = super(Slide, self).get_param_setter(name)
+
         if name == 'position_x':
             def set_val(val):
                 self.set_position(val, self.y(), self.z())
@@ -242,4 +249,4 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
         else:
             set_val = None
 
-        return set_val
+        return set_val if set_val is not None else _set_val

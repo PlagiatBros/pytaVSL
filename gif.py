@@ -100,7 +100,7 @@ class Gif(object):
         """
         Getters for osc & animations
         """
-        _val = super(Gif, self).get_param_getter(name)
+        # _val = super(Gif, self).get_param_getter(name)
 
         val = 0
         if name == 'speed':
@@ -115,7 +115,7 @@ class Gif(object):
         Setters for osc & animations
         """
 
-        _set_val = super(Gif, self).get_param_setter(name)
+        # _set_val = super(Gif, self).get_param_setter(name)
 
         if name == 'speed':
             def set_val(val):
