@@ -108,7 +108,7 @@ class Gif(object):
         elif name == 'duration':
             val = self.gif_duration
 
-        return val if val is not 0 else _val
+        return val
 
     def get_param_setter(self, name):
         """
@@ -126,4 +126,4 @@ class Gif(object):
         else:
             set_val = None
 
-        return set_val if set_val is not None else _set_val
+        return set_val
