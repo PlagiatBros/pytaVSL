@@ -191,15 +191,16 @@ class PytaVSL(object):
         return slides
 
 
-    def flush(self):
-        for name in self.slides:
-            if not self.slides[name].visible:
-                self.slides[name]._unload()
+    def flush(self, added_slide=None):
+        for slide in self.sorted_slides:
+            if not slide.visible and slide.loaded and slide not in self.locked_slides:
+                slide._unload()
         if self.monitor.full():
-            for name in self.slides:
-                if self.slides[name].visible:
-                    self.slides[name].set_visible(False)
-                    self.slides[name]._unload()
+            for slide in self.sorted_slides:
+                if slide.visible and slide is not added_slide and slide not in self.locked_slides:
+                    slide.set_visible(False)
+                    slide._unload()
+                    LOGGER.warning("GPU memory full: forced unload of slide %s" % slide.name)
                     if not self.monitor.full():
                         return
 

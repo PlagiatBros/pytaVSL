@@ -89,7 +89,8 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
         if self.visible and (not self.strobe or self.strobe_state.visible):
             if not self.loaded:
                 self.loaded = True
-                gpu_monitor.alloc(self)
+                if not gpu_monitor.alloc(self):
+                    return
             super(Slide, self).draw(*args, **kwargs)
 
     def clone(self, name):

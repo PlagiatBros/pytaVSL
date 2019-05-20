@@ -24,10 +24,13 @@ class MemoryMonitor(object):
 
     def alloc(self, slide):
         self.allocated += self.slide_size(slide)
-        if self.full() and self.flush is not None:
-            LOGGER.debug('Too much texture memory alloacted: flushing...')
-            self.flush()
         LOGGER.debug('Texture uploaded to GPU. Total allocated: %.1fMB' % (self.allocated / 1000000.))
+        if self.full() and self.flush is not None:
+            LOGGER.debug('Too much texture memory allocated: flushing...')
+            self.flush(slide)
+            return False
+            
+        return True
 
     def free(self, slide):
         self.allocated -= self.slide_size(slide)
