@@ -17,10 +17,10 @@ class MemoryMonitor(object):
         self.flush = flush
 
         for k in FONTS:
-            self.allocated += FONTS[k].image.nbytes
+            self.allocated += FONTS[k].image.nbytes * 1.33 # 1.33 = mipmap
 
     def slide_size(self, slide):
-        return slide.buf[0].textures[0].image.nbytes
+        return slide.buf[0].textures[0].image.nbytes * 1.33 # 1.33 = mipmap
 
     def alloc(self, slide):
         self.allocated += self.slide_size(slide)
