@@ -246,10 +246,12 @@ class PytaVSL(object):
             slide.set_alpha(args[1])
 
     @liblo.make_method('/pyta/slide/position', 'sfff')
+    @liblo.make_method('/pyta/slide/position', 'sff')
     @liblo.make_method('/pyta/slide/position_x', 'sf')
     @liblo.make_method('/pyta/slide/position_y', 'sf')
     @liblo.make_method('/pyta/slide/position_z', 'sf')
     @liblo.make_method('/pyta/slide/position', 'ifff')
+    @liblo.make_method('/pyta/slide/position', 'iff')
     @liblo.make_method('/pyta/slide/position_x', 'if')
     @liblo.make_method('/pyta/slide/position_y', 'if')
     @liblo.make_method('/pyta/slide/position_z', 'if')
@@ -257,7 +259,7 @@ class PytaVSL(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             if path == "/pyta/slide/position":
-                slide.set_position(args[1], args[2], args[3] + SLIDE_BASE_Z)
+                slide.set_position(args[1], args[2], (args[3] + SLIDE_BASE_Z) if len(args) == 4 else slide.z())
             elif path == "/pyta/slide/position_x":
                 slide.set_position(args[1], slide.y(), slide.z())
             elif path == "/pyta/slide/position_y":
@@ -270,10 +272,12 @@ class PytaVSL(object):
                     self.sort_slides()
 
     @liblo.make_method('/pyta/slide/translate', 'sfff')
+    @liblo.make_method('/pyta/slide/translate', 'sff')
     @liblo.make_method('/pyta/slide/translate_x', 'sf')
     @liblo.make_method('/pyta/slide/translate_y', 'sf')
     @liblo.make_method('/pyta/slide/translate_z', 'sf')
     @liblo.make_method('/pyta/slide/translate', 'ifff')
+    @liblo.make_method('/pyta/slide/translate', 'iff')
     @liblo.make_method('/pyta/slide/translate_x', 'if')
     @liblo.make_method('/pyta/slide/translate_y', 'if')
     @liblo.make_method('/pyta/slide/translate_z', 'if')
@@ -281,7 +285,7 @@ class PytaVSL(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             if path == "/pyta/slide/translate":
-                slide.set_translation(args[1], args[2], args[3])
+                slide.set_translation(args[1], args[2], args[3] if len(args) == 4 else 0.0)
             elif path == "/pyta/slide/translate_x":
                 slide.set_translation(args[1], 0.0, 0.0)
             elif path == "/pyta/slide/translate_y":
@@ -291,6 +295,7 @@ class PytaVSL(object):
                 self.sort_slides()
 
     @liblo.make_method('/pyta/slide/scale', 'sfff')
+    @liblo.make_method('/pyta/slide/scale', 'sff')
     @liblo.make_method('/pyta/slide/scale_x', 'sf')
     @liblo.make_method('/pyta/slide/scale_y', 'sf')
     @liblo.make_method('/pyta/slide/scale_z', 'sf')
@@ -298,6 +303,7 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/rsxy', 'sf')
     @liblo.make_method('/pyta/slide/zoom', 'sf')
     @liblo.make_method('/pyta/slide/scale', 'ifff')
+    @liblo.make_method('/pyta/slide/scale', 'iff')
     @liblo.make_method('/pyta/slide/scale_x', 'if')
     @liblo.make_method('/pyta/slide/scale_y', 'if')
     @liblo.make_method('/pyta/slide/scale_z', 'if')
@@ -308,7 +314,7 @@ class PytaVSL(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             if path == "/pyta/slide/scale":
-                slide.set_scale(args[1], args[2], args[3])
+                slide.set_scale(args[1], args[2], args[3] if len(args) == 4 else slide.sz)
             elif path == "/pyta/slide/scale_x":
                 slide.set_scale(args[1], slide.sy, slide.sz)
             elif path == "/pyta/slide/scale_y":
@@ -518,10 +524,8 @@ class PytaVSL(object):
     @liblo.make_method('/pyta/slide/tiles', 'sf')
     def set_slide_tiles(self, path, args):
         slides = self.get_slide(args[0])
-        x = args[1]
-        y = args[2] if len(args) == 3 else x
         for slide in slides:
-            slide.set_tiles(x, y)
+            slide.set_tiles(args[1], args[2] if len(args) == 3 else args[1])
 
 
     @liblo.make_method('/pyta/text', 'is')
@@ -707,8 +711,9 @@ class PytaVSL(object):
 
 
     @liblo.make_method('/pyta/post_process/tiles', 'ff')
+    @liblo.make_method('/pyta/post_process/tiles', 'f')
     def post_process_tiles(self, path, args):
-        self.post_process.set_tiles(args[0], args[1])
+        self.post_process.set_tiles(args[0], args[1] if len(args) == 2 else args[0])
 
     @liblo.make_method('/pyta/post_process/reset', None)
     def post_process_reset(self, path, args):
