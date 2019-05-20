@@ -10,6 +10,8 @@ This file was deeply instpired by Slideshow.py demo file of pi3d.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pi3d
+from pi3d.constants import DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT
+
 import sys
 from signal import signal, SIGINT, SIGTERM
 from six.moves import queue
@@ -30,12 +32,12 @@ class PytaVSL(OscServer):
     '''
     PytaVSL contains the screen, the , the light, and the slides containers. It's also an OSC server which contains the method to control all of its children.
     '''
-    def __init__(self, port=56418, path=None, load_cb=None, fps=25, depth=24):
+    def __init__(self, port=56418, path=None, load_cb=None, fps=25, depth=24, fullscreen=False):
 
         super(PytaVSL, self).__init__(port)
 
         # setup OpenGL
-        self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=fps, depth=depth)
+        self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=fps, depth=depth, display_config=DISPLAY_CONFIG_FULLSCREEN if fullscreen else DISPLAY_CONFIG_DEFAULT)
         self.CAMERA = pi3d.Camera(is_3d=False)
         self.CAMERA.was_moved = False
 
