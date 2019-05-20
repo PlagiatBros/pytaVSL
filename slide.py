@@ -74,9 +74,6 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
             self.unloading = False
             self._unload()
 
-        if self.gif and self.visible:
-            self.gif_next_frame()
-
         self.animate_next_frame()
 
         if self.color_strobe > 0:

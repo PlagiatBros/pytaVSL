@@ -41,11 +41,11 @@ class Gif(object):
         self.gif_index = -1 if self.gif_speed > 0 else 0
 
     def gif_next_frame(self):
+
         now = Display.INSTANCE.time
 
         if self.gif_changed_time is 0:
             self.gif_changed_time = now
-
 
         initial_frame = self.gif[self.gif_index]
         current_frame = self.gif[self.gif_index]
@@ -79,3 +79,11 @@ class Gif(object):
             self.buf[0].textures[0].update_ndarray(current_frame.ndarray)
             # initial_frame.unload_opengl()
             self.gif_changed_time = now + elapsed
+
+
+    def draw(self, *args, **kwargs):
+
+        if self.gif:
+            self.gif_next_frame()
+
+        super(Gif, self).draw(*args, **kwargs)
