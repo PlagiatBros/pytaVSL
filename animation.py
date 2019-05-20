@@ -15,23 +15,31 @@ class Animation():
     def __init__(self, name, start, end, duration, setter, loop):
         self.name = name
         self.start = start
+        self.end = end
         self.duration = duration
-        self.a = 1.0 * (end - start) / duration
+        self.forward_a = 1.0 * (end - start) / duration
+        self.backward_a = 1.0 * (start - end) / duration
         self.setter = setter
         self.loop = loop
+        self.backward = False
         self.reset()
 
     def reset(self):
         self.done = False
         self.start_date = Display.INSTANCE.time
         self.end_date = self.duration + self.start_date
+        if self.loop == -1:
+            self.backward = not self.backward
 
     def play(self):
         t = Display.INSTANCE.time - self.start_date
         if t >= self.duration:
             t = self.duration
             self.done = True
-        self.setter(self.a * t + self.start)
+        if self.backward:
+            self.setter(self.forward_a * t + self.start)
+        else:
+            self.setter(self.backward_a * t + self.end)
 
 
 class Animable(object):

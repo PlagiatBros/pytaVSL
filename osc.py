@@ -174,6 +174,7 @@ class OscServer(object):
                 slide.set_angle(slide.ax, slide.ay, args[1])
 
     @liblo.make_method('/pyta/slide/animate', None)
+    # args: slide param_name from to duration loop
     def slide_animate(self, path, args):
         if not 5 <= len(args) <= 6:
             return
@@ -468,9 +469,10 @@ class OscServer(object):
     def post_process_active(self, path, args):
         self.post_process.set_visible(args[0])
 
-    @liblo.make_method('/pyta/post_process/animate', 'sfff')
+    @liblo.make_method('/pyta/post_process/animate', None)
     def post_process_animate(self, path, args):
-        self.post_process.animate(*args)
+        if 4 <= len(args) <= 5:
+            self.post_process.animate(*args)
 
     @liblo.make_method('/pyta/post_process/animate/stop', '')
     @liblo.make_method('/pyta/post_process/animate/stop', 's')

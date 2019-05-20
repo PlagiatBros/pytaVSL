@@ -34,7 +34,7 @@ class PostProcess(Slide):
             self.hue = 0.0
             self.saturation = 0.0
             self.value = 0.0
-            self.alpha = 0.0
+            self.color_alpha = 0.0
             self.noise = 0.0
 
             self.reset()
@@ -81,7 +81,7 @@ class PostProcess(Slide):
             self.set_custom_data(50, [x])
 
         def set_color_alpha(self, x):
-            self.alpha = x
+            self.color_alpha = x
             self.set_custom_data(51, [x])
 
         def set_color_invert(self, x):
@@ -114,9 +114,9 @@ class PostProcess(Slide):
             elif name == 'color_value':
                 val = self.value
             elif name == 'alpha':
-                val = self.alpha
+                val = self.color_alpha
             elif name == 'color_alpha':
-                val = self.alpha
+                val = self.color_alpha
             elif name == 'color_invert':
                 val = self.invert
 
