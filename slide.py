@@ -45,17 +45,13 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
         self.ay = 0.0
         self.az = 0.0
 
-        # tiling
+        # texture tiling
         self.tiles = [1.0, 1.0]
 
-        self.unloading = False
         self.loaded = False
 
     def unload(self):
-        self.unloading = True
-
-    def _unload(self):
-        if self.loaded:
+        if self.loaded and not self.visible:
             self.loaded = False
             for t in self.textures:
                 t.unload_opengl()
@@ -69,10 +65,6 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
             gpu_monitor.free(self)
 
     def draw(self, *args, **kwargs):
-
-        if self.unloading:
-            self.unloading = False
-            self._unload()
 
         self.animate_next_frame()
 
