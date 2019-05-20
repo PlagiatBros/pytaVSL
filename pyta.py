@@ -514,10 +514,14 @@ class PytaVSL(object):
 
     @liblo.make_method('/pyta/slide/tiles', 'iff')
     @liblo.make_method('/pyta/slide/tiles', 'sff')
+    @liblo.make_method('/pyta/slide/tiles', 'if')
+    @liblo.make_method('/pyta/slide/tiles', 'sf')
     def set_slide_tiles(self, path, args):
         slides = self.get_slide(args[0])
+        x = args[1]
+        y = args[2] if len(args) == 3 else x
         for slide in slides:
-            slide.set_tiles(args[1], args[2])
+            slide.set_tiles(x, y)
 
 
     @liblo.make_method('/pyta/text', 'is')

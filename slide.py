@@ -99,6 +99,8 @@ class Slide(Strobe, Animable, Gif, pi3d.Plane):
             b.unib[6] = x
             b.unib[7] = y
 
+        self.set_offset(((1-x)/2.,(1-y)/2.))
+
     def set_visible(self, visible):
         self.visible = bool(visible)
 
