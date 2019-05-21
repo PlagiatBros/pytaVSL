@@ -340,10 +340,16 @@ class OscServer(object):
             slide.set_tiles(args[1], args[2] if len(args) == 3 else args[1])
 
 
-    @liblo.make_method('/pyta/text', 'is')
+    @liblo.make_method('/pyta/text', None)
     @osc_range_method(N_TEXTS)
     def set_text_string(self, path, args):
-        self.text[args[0]].set_text(args[1])
+        self.text[args[0]].set_text(*args[1:])
+
+    @liblo.make_method('/pyta/text/glitch', None)
+    @osc_range_method(N_TEXTS)
+    def set_glitch_string(self, path, args):
+        self.text[args[0]].set_glitch(*args[1:])
+
 
     @liblo.make_method('/pyta/text/reset', 'i')
     @osc_range_method(N_TEXTS)
@@ -445,13 +451,11 @@ class OscServer(object):
     def set_text_alpha(self, path, args):
         self.text[args[0]].set_alpha(args[1])
 
-    @liblo.make_method('/pyta/text/animate', 'isfff')
-    @liblo.make_method('/pyta/text/animate', 'issff')
-    @liblo.make_method('/pyta/text/animate', 'isfsf')
-    @liblo.make_method('/pyta/text/animate', 'isssf')
+    @liblo.make_method('/pyta/text/animate', None)
     @osc_range_method(N_TEXTS)
     def text_animate(self, path, args):
-        self.text[args[0]].animate(*args[1:])
+        if 5 <= len(args) <= 6:
+            self.text[args[0]].animate(*args[1:])
 
     @liblo.make_method('/pyta/text/animate/stop', 'is')
     @liblo.make_method('/pyta/text/animate/stop', 'i')

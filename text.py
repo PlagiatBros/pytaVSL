@@ -3,6 +3,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pi3d
+from pi3d.Display import Display
 import random
 
 from strobe import Strobe
@@ -21,7 +22,6 @@ from config import *
 import logging
 LOGGER = logging.getLogger(__name__)
 
-CODEPOINTS = list(range(32, 126)) + list(range(160,255)) + ['ʒ', '~', 'ä']
 FONTS = {
     "sans": Font('fonts/sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(170*TEXT_RESOLUTION), offset_y=0.015, codepoints=CODEPOINTS),
     "mono": Font('fonts/mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(200*TEXT_RESOLUTION), offset_y=-0.005, codepoints=CODEPOINTS)
@@ -76,6 +76,12 @@ class Text(Strobe, Animable):
         self.need_regen = False
         self.new_string()
 
+        # cool
+        self.glitch = False
+        self.glitch_to = None
+        self.glitch_duration = 1
+        self.glitch_start = 0
+
     def new_string(self):
         """
         Generate a new string instance and apply all options.
@@ -107,6 +113,9 @@ class Text(Strobe, Animable):
 
     def draw(self):
 
+        if self.glitch:
+            self.glitch_next()
+
         self.animate_next_frame()
 
         if self.string == '':
@@ -131,12 +140,15 @@ class Text(Strobe, Animable):
 
             self.text.draw()
 
-    def set_text(self, string):
+    def set_text(self, string, duration=None):
         """
         Set the text's string regenerate inner String instance
         if the string's length has changed, otherwise use optimized
         quick_change method (can distort some characters).
         """
+
+        if duration is not None:
+            return self.set_glitch(string, duration)
 
         # self.quick_change = len(self.string) == len(string)
         self.string = string.decode('utf8')
@@ -149,6 +161,38 @@ class Text(Strobe, Animable):
         if not self.quick_change:
             self.need_regen = True
 
+
+    def set_glitch(self, string, duration=1):
+        self.glitch = True
+        self.glitch_to = string
+        self.glitch_start = Display.INSTANCE.time
+        self.glitch_duration = max(duration, 0.01)
+
+    def glitch_next(self):
+        progress = min(1, (Display.INSTANCE.time - self.glitch_start) / self.glitch_duration)
+
+        if progress == 1.0:
+            self.set_text(self.glitch_to)
+        else:
+            if random.random()>0.75:
+                return
+
+            string = ""
+
+            for i in range(len(self.glitch_to)):
+                r = random.random() / 2
+                c = self.glitch_to[i]
+                if progress < r:
+                    c = self.string[random.randint(0, len(self.string)-1)]
+                if r > 0.75:
+                    c = c.upper()
+
+                string += c
+
+            self.set_text(string)
+
+        if progress == 1.0:
+            self.glitch = False
 
     def set_color(self, color):
         """
