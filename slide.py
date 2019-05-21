@@ -66,8 +66,6 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
 
     def draw(self, *args, **kwargs):
 
-        self.animate_next_frame()
-
         if self.color_strobe > 0:
             zero = random.randint(0, 2)
             rgb = [0,0,0]
@@ -83,6 +81,7 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
                 self.loaded = True
                 if not gpu_monitor.alloc(self):
                     return
+            self.animate_next_frame()
             super(Slide, self).draw(*args, **kwargs)
 
     def clone(self, name):

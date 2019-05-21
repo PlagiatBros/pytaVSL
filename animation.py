@@ -73,15 +73,15 @@ class Animable(object):
         self.animations[name] = Animation(name, _start, _end, duration, setter, loop)
 
     def animate_next_frame(self):
-        delete = []
-        anims = self.animations.values()
-        for anim in anims:
-            anim.play()
-            if anim.done:
-                if anim.loop:
-                    anim.reset()
-                else:
-                    self.stop_animate(anim.name)
+        if self.animations:
+            anims = self.animations.values()
+            for anim in anims:
+                anim.play()
+                if anim.done:
+                    if anim.loop:
+                        anim.reset()
+                    else:
+                        self.stop_animate(anim.name)
 
     def stop_animate(self, name=None):
         """
