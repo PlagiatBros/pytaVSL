@@ -183,8 +183,8 @@ class Text(Strobe, Animable):
                 r = random.random() / 2
                 c = self.glitch_to[i]
                 if progress < r:
-                    c = self.string[random.randint(0, len(self.string)-1)]
-                if r > 0.75:
+                    c = self.string[random.randint(0, len(self.string)-1)] if len(self.string) > 0 else " "
+                if r > 0.48:
                     c = c.upper()
 
                 string += c
