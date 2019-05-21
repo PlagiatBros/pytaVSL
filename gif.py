@@ -45,14 +45,18 @@ class Gif(object):
                 self.set_textures([t])
 
     def gif_reset(self):
+        self.gif_changed_time = 0
         self.gif_index = -1 if self.gif_speed > 0 else 0
 
     def gif_next_frame(self):
 
         now = Display.INSTANCE.time
 
-        if self.gif_changed_time is 0:
+        if self.gif_changed_time is 0 or self.gif_speed == 0:
             self.gif_changed_time = now
+
+        if self.gif_speed == 0:
+            return
 
         initial_frame = self.gif[self.gif_index]
         current_frame = self.gif[self.gif_index]

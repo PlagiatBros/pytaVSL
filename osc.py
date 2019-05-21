@@ -320,10 +320,8 @@ class OscServer(object):
     @liblo.make_method('/pyta/slide/speed', 'sf')
     def set_slide_gif_speed(self, path, args):
         slides = self.get_slide(args[0])
-        if args[1] == 0:
-            args[1] = 1.0
         for slide in slides:
-            slide.gif_speed = float(args[1])
+            slide.set_speed(args[1])
 
     @liblo.make_method('/pyta/slide/duration', 'if')
     @liblo.make_method('/pyta/slide/duration', 'sf')
