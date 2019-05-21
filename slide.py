@@ -18,7 +18,7 @@ from memory import gpu_monitor
 import logging
 LOGGER = logging.getLogger(__name__)
 
-class Slide(Strobe, Animable, Gif, pi3d.Plane):
+class Slide(Strobe, Gif, Animable, pi3d.Plane):
 
     def __init__(self, name, light, z):
 

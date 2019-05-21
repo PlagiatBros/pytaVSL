@@ -110,7 +110,7 @@ class Animable(object):
             return current
 
     @abstractmethod
-    def get_animate_value(self, name):
+    def get_param_getter(self, name):
         """
         Getters for animations
         """
@@ -119,7 +119,7 @@ class Animable(object):
         return val
 
     @abstractmethod
-    def get_animate_setter(self, name):
+    def get_param_setter(self, name):
         """
         Setters for animations
         """
