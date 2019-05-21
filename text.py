@@ -168,7 +168,8 @@ class Text(Strobe, Animable):
         self.glitch = True
         self.glitch_to = string
         self.glitch_start = Display.INSTANCE.time
-        self.glitch_duration = max(duration, 0.01)
+        if isinstance(duration, (float, int)):
+            self.glitch_duration = max(duration, 0.01)
 
     def glitch_next(self):
         progress = min(1, (Display.INSTANCE.time - self.glitch_start) / self.glitch_duration)
