@@ -37,9 +37,9 @@ class Animation():
             t = self.duration
             self.done = True
         if self.backward:
-            self.setter(self.forward_a * t + self.start)
-        else:
             self.setter(self.backward_a * t + self.end)
+        else:
+            self.setter(self.forward_a * t + self.start)
 
 
 class Animable(object):
