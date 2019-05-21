@@ -66,22 +66,20 @@ class Gif(object):
 
         while elapsed >= duration:
 
-            if elapsed >= duration:
+            elapsed = elapsed - duration
 
-                elapsed = elapsed - duration
+            if self.gif_speed < 0:
+                self.gif_index = self.gif_index - 1
+                if abs(self.gif_index) >= len(self.gif):
+                    self.gif_index = -1
+            else:
+                self.gif_index = self.gif_index + 1
+                if abs(self.gif_index) >= len(self.gif):
+                    self.gif_index = 0
 
-                if self.gif_speed < 0:
-                    self.gif_index = self.gif_index - 1
-                    if abs(self.gif_index) >= len(self.gif):
-                        self.gif_index = -1
-                else:
-                    self.gif_index = self.gif_index + 1
-                    if abs(self.gif_index) >= len(self.gif):
-                        self.gif_index = 0
-
-                current_frame = self.gif[self.gif_index]
-                duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
-                duration = max(duration / abs(self.gif_speed), 1. / Display.INSTANCE.frames_per_second / 1000)
+            current_frame = self.gif[self.gif_index]
+            duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
+            duration = max(duration / abs(self.gif_speed), 1. / Display.INSTANCE.frames_per_second / 1000)
 
 
         if current_frame is not initial_frame:
