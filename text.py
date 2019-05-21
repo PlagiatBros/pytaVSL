@@ -140,7 +140,7 @@ class Text(Strobe, Animable):
 
             self.text.draw()
 
-    def set_text(self, string, duration=None):
+    def set_text(self, string, duration=None, stop_glitch=True):
         """
         Set the text's string regenerate inner String instance
         if the string's length has changed, otherwise use optimized
@@ -149,6 +149,8 @@ class Text(Strobe, Animable):
 
         if duration is not None:
             return self.set_glitch(string, duration)
+        if stop_glitch:
+            self.glitch = False
 
         # self.quick_change = len(self.string) == len(string)
         self.string = string.decode('utf8')
@@ -189,10 +191,7 @@ class Text(Strobe, Animable):
 
                 string += c
 
-            self.set_text(string)
-
-        if progress == 1.0:
-            self.glitch = False
+            self.set_text(string, stop_glitch=False)
 
     def set_color(self, color):
         """
