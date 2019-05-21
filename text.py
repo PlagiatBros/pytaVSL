@@ -98,9 +98,9 @@ class Text(Strobe, Animable):
             x += self.parent.DISPLAY.width / 2.
 
         if self.v_align == 'T':
-            y = y + self.parent.DISPLAY.height / 2. - self.font.size * size * self.sy * 2 / TEXT_RESOLUTION
+            y = y + self.parent.DISPLAY.height / 2. - self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
         elif self.v_align == 'B':
-            y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION
+            y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
 
         self.text = String(font=self.font, string=self.string, size=size / TEXT_RESOLUTION,
                       camera=self.parent.CAMERA, x=x, y=y, z=0, is_3d=False,
