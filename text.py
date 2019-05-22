@@ -90,7 +90,7 @@ class Text(Strobe, Animable):
         x = self.x
         y = self.y
 
-        size = min(1, self.font.ratio / self.length if self.size == 'auto' else self.size)
+        size = self.font.ratio / self.length if self.size == 'auto' else self.size
 
         if self.h_align == 'L':
             x -= self.parent.DISPLAY.width / 2.
@@ -308,10 +308,12 @@ class Text(Strobe, Animable):
         Args:
             size (str|float): 'auto' or between 0.0 and 1.0. 1.0 for full height characters
         """
-        if type(size) is str or type(size) is unicode:
+        if size == 'auto':
             self.size = 'auto'
-        else:
-            self.size = min(max(float(size), 0.), 1.)
+        elif size == 'current':
+            self.size = self.font.ratio / self.length
+        elif isinstance(size, (int, float)):
+            self.size = float(size)
 
         self.need_regen = True
 
