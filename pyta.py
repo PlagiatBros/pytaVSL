@@ -99,8 +99,12 @@ class PytaVSL(OscServer):
             self.post_process.draw()
 
     def stop(self, *args):
+        """
+        Stop main loop and osc server
+        """
         self.DISPLAY.stop()
         self.DISPLAY.destroy()
+        super(PytaVSL, self).stop()
 
     def load_textures(self, path, callback=None):
         """

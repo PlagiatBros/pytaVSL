@@ -19,6 +19,10 @@ class OscServer(object):
         self.server.register_methods(self)
         LOGGER.info("Listening on OSC port: " + str(port))
 
+    def stop(self):
+
+        self.server.free()
+
     @liblo.make_method('/pyta/slide/lock', 'si')
     @liblo.make_method('/pyta/slide/lock', 'ii')
     def slide_lock_cb(self, path, args):
