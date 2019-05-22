@@ -371,7 +371,7 @@ class Text(Strobe, Animable):
         """
         val = 0
         if name == 'size':
-            val = min(1, self.font.ratio / self.length if self.size == 'auto' else self.size)
+            val = self.font.ratio / self.length if self.size == 'auto' else self.size
         elif name == 'position_x':
             val = self.x
         elif name == 'position_y':
