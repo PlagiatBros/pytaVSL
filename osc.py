@@ -3,7 +3,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import liblo
-import glob
 import logging
 
 
@@ -16,14 +15,9 @@ class OscServer(object):
 
     def __init__(self, port):
 
-        self.server = liblo.ServerThread(port)
+        self.server = liblo.Server(port)
         self.server.register_methods(self)
         LOGGER.info("Listening on OSC port: " + str(port))
-
-    def start(self):
-
-        self.server.start()
-
 
     @liblo.make_method('/pyta/slide/lock', 'si')
     @liblo.make_method('/pyta/slide/lock', 'ii')
@@ -249,12 +243,7 @@ class OscServer(object):
 
     @liblo.make_method('/pyta/slide/load_file', 's')
     def slide_load_file_cb(self, path, args):
-        files = glob.glob(args[0])
-        if len(files):
-            for file in files:
-                self.fileQ.put(file)
-        else:
-            LOGGER.info("ERROR: file \"%s\" not found" % args[0])
+        self.load_textures(args[0])
 
     @liblo.make_method('/pyta/slide/slide_info', 'si')
     @liblo.make_method('/pyta/slide/slide_info', 'ii')

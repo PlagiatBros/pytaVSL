@@ -13,6 +13,7 @@ import pi3d
 from pi3d.constants import DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT
 
 import sys
+import glob
 from signal import signal, SIGINT, SIGTERM
 from six.moves import queue
 
@@ -48,10 +49,6 @@ class PytaVSL(OscServer):
 
         self.post_process = PostProcess()
 
-        self.fileQ = queue.Queue()
-        self.path = path
-        self.load_cb = load_cb
-
         # Slides
         self.slides = {}
         self.sorted_slides = []
@@ -66,25 +63,24 @@ class PytaVSL(OscServer):
         self.monitor = gpu_monitor
         gpu_monitor.flush = self.flush
 
-        # sys
-        self.keyboard = pi3d.Keyboard()
+        # Signal
         signal(SIGINT, self.stop)
         signal(SIGTERM, self.stop)
 
+        # Init
+        self.fileQ = queue.Queue()
+        self.path = path
+        self.load_cb = load_cb
+
     def start(self):
 
-        t = Thread(target=self.tex_load)
-        t.daemon = True
-        t.start()
-
         if self.path:
-            self.slide_load_file_cb(None, [self.path])
-
-
-        super(PytaVSL, self).start()
-
+            self.load_textures(self.path, self.load_cb)
 
         while self.DISPLAY.loop_running():
+
+            while self.server.recv(0):
+                pass
 
             post_processing = self.post_process.visible
 
@@ -102,34 +98,47 @@ class PytaVSL(OscServer):
 
             self.post_process.draw()
 
-            if self.keyboard.read() == 27: #ESC
-                self.stop()
-                break
-
     def stop(self, *args):
-        self.keyboard.close()
         self.DISPLAY.stop()
         self.DISPLAY.destroy()
 
-    def tex_load(self):
-        """ Threaded function. mimap = False will make it faster.
+    def load_textures(self, path, callback=None):
         """
-        while True:
+        Load textures (threaded)
+        """
 
-            path = self.fileQ.get()
-            name = path.split('/')[-1].split('.')[0]
+        files = glob.glob(path)
+        if len(files):
+            for file in files:
+                self.fileQ.put(file)
+        else:
+            LOGGER.error("file \"%s\" not found" % path)
 
-            self.init_slide(name, path)
+        def threaded():
 
-            self.fileQ.task_done()
+            while True:
 
-            if self.fileQ.empty():
-                self.sort_slides()
-                LOGGER.info("Total slides in memory: %i" % len(self.slides.values()))
-                if self.load_cb is not None:
-                    self.load_cb(self)
-                return
+                path = self.fileQ.get()
+                name = path.split('/')[-1].split('.')[0]
 
+                self.init_slide(name, path)
+
+                self.fileQ.task_done()
+
+                if self.fileQ.empty():
+                    break
+
+            self.sort_slides()
+
+            LOGGER.info("Total slides in memory: %i" % len(self.slides.values()))
+
+            if callback is not None:
+
+                callback(self)
+
+        t = Thread(target=threaded)
+        t.daemon = True
+        t.start()
 
     def init_slide(self, name, path):
 
