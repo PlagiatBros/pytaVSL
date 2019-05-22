@@ -31,9 +31,11 @@ from config import *
 LOGGER = pi3d.Log(name=None, level='DEBUG' if '--debug' in sys.argv else 'CRITICAL' if '--quiet' in sys.argv else 'WARNING', file="/dev/null" if '--quiet' in sys.argv else None)
 
 class PytaVSL(OscServer):
-    '''
-    PytaVSL contains the screen, the , the light, and the slides containers. It's also an OSC server which contains the method to control all of its children.
-    '''
+    """
+    Main object, contains the screen, the light, and the slides.
+    It's also an OSC server which contains the method to control all of its children.
+    """
+
     def __init__(self, port=56418, path=None, load_cb=None, fps=25, depth=24, fullscreen=False):
 
         super(PytaVSL, self).__init__(port)
@@ -189,8 +191,15 @@ class PytaVSL(OscServer):
 
     def get_slide(self, name):
         """
-        Get a list of slide
+        Get a list of slides
+
+        Args:
+            name (str): - slide name
+                        - list of names separated by spaces
+                        - glob pattern
+                 (int): - -1 (equivalent to "*"), locked slides excluded
         """
+
         slides = []
 
         if type(name) is str and ' ' in name:
@@ -199,6 +208,8 @@ class PytaVSL(OscServer):
                 if n:
                     slides += self.get_slide(n)
         elif type(name) is str and '*' in name:
+            if name == '*':
+                return self.get_slide(-1)
             for n in fnmatch.filter(self.slides.keys(), name):
                 slides += self.get_slide(n)
         else:
@@ -210,15 +221,21 @@ class PytaVSL(OscServer):
                     if locked in slides:
                         slides.remove(locked)
             else:
-                LOGGER.error("OSC ARGS ERROR: Slide \"%s\" not found" % name)
+                LOGGER.error("slide \"%s\" not found" % name)
 
         return slides
 
 
     def flush(self, added_slide=None):
+        """
+        Unload hidden slides from gpu.
+        If necessary, unload visible slides too.
+        """
+
         for slide in self.sorted_slides:
             if not slide.visible and slide.loaded and slide not in self.locked_slides:
                 slide.unload()
+
         if self.monitor.full():
             for slide in self.sorted_slides:
                 if slide.visible and slide is not added_slide and slide not in self.locked_slides:
