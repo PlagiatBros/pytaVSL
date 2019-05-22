@@ -214,12 +214,12 @@ class PytaVSL(OscServer):
         Remove slide group
         """
         for group in self.get_slide(name):
-            if name in self.slides and self.slides[name].children:
-                for child in self.slides[name].children:
+            if group.children:
+                for child in group.children:
                     child.grouped = False
-                self.slides[name].set_visible(False)
-                self.slides[name].unload()
-                del self.slides[name]
+                group.set_visible(False)
+                group.unload()
+                del self.slides[group.name]
         self.sort_slides()
 
     def flush(self, added_slide=None):
