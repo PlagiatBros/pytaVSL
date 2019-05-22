@@ -14,6 +14,7 @@ from pi3d.constants import DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT
 
 import sys
 import glob
+import fnmatch
 from signal import signal, SIGINT, SIGTERM
 from six.moves import queue
 
@@ -73,12 +74,19 @@ class PytaVSL(OscServer):
         self.load_cb = load_cb
 
     def start(self):
+        """
+        - load textures
+        - run the main loop
+             - receive osc messages
+             - draw
+        """
 
         if self.path:
             self.load_textures(self.path, self.load_cb)
 
         while self.DISPLAY.loop_running():
 
+            # process osc messages
             while self.server.recv(0):
                 pass
 
@@ -145,7 +153,9 @@ class PytaVSL(OscServer):
         t.start()
 
     def init_slide(self, name, path):
-
+        """
+        Create texture / slide
+        """
         tex = pi3d.Texture(path, blend=True, mipmap=True)
 
         self.slides[name] = Slide(name, self.light, SLIDE_BASE_Z)
@@ -172,17 +182,25 @@ class PytaVSL(OscServer):
 
 
     def sort_slides(self):
+        """
+        Sort slides in drawing order (by z-index)
+        """
         self.sorted_slides = sorted(self.slides.values(), key=lambda slide: slide.z(), reverse=True)
 
     def get_slide(self, name):
-
+        """
+        Get a list of slide
+        """
         slides = []
 
-        if type(name) is str  and ' ' in name:
+        if type(name) is str and ' ' in name:
 
             for n in name.split(' '):
+                if n:
+                    slides += self.get_slide(n)
+        elif type(name) is str and '*' in name:
+            for n in fnmatch.filter(self.slides.keys(), name):
                 slides += self.get_slide(n)
-
         else:
             if name in self.slides:
                 slides += [self.slides[name]]
