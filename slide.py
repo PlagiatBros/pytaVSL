@@ -86,9 +86,7 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
             rgb[zero] = - random.random() * 1
             self.set_color(rgb, True)
 
-        if self.strobe:
-            self.strobe_state.next()
-        if self.visible and (not self.strobe or self.strobe_state.visible):
+        if self.visible and (not self.strobe or self.strobe_state.visible()):
             if not self.loaded:
                 self.loaded = True
                 if not gpu_monitor.alloc(self):

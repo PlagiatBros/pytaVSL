@@ -41,7 +41,8 @@ class PytaVSL(OscServer):
 
         self.light = pi3d.Light(lightpos=(0, 0, -1))
         self.light.ambient((0, 0, 0))
-
+        
+        self.DISPLAY.loop_running()
         self.post_process = PostProcess()
 
         # Slides

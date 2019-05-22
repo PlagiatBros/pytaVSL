@@ -125,10 +125,7 @@ class Text(Strobe, Animable):
             self.need_regen = False
             self.new_string()
 
-        if self.strobe:
-            self.strobe_state.next()
-
-        if self.visible and self.string and (not self.strobe or self.strobe_state.visible):
+        if self.visible and self.string and (not self.strobe or self.strobe_state.visible()):
 
             if self.quick_change:
                 self.text.quick_change(self.string)

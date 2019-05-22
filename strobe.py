@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import pi3d
+from pi3d.Display import Display
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -8,32 +9,26 @@ LOGGER = logging.getLogger(__name__)
 class StrobeState():
 
     def __init__(self):
-        self.period = 2.0
+        self.period = 2.0 * 0.04
         self.ratio = 0.5
-        self.cursor = 0
-        self.visble = True
-        self.regen()
+        self.reset()
 
-    def regen(self):
-        self.breakpoint = self.period * self.ratio
+    def reset(self):
+        self.date = Display.INSTANCE.time
+        self.breakpoint = self.ratio * self.period
 
     def set_period(self, l):
-        self.period = max(int(l), 0.0)
-        self.regen()
+        self.period = max(int(l), 0.001) * 0.04
+        self.reset()
 
     def set_ratio(self, r):
         self.ratio = max(float(r), 0.0)
-        self.regen()
+        self.reset()
 
-    def next(self):
-        self.cursor += 1
-        if self.cursor < self.breakpoint:
-            self.visible = True
-        elif self.cursor < self.period:
-            self.visible = False
-        else:
-            self.cursor = 0
-            self.visible = True
+    def visible(self):
+        delta = Display.INSTANCE.time - self.date
+        progress = delta % self.period
+        return progress < self.breakpoint
 
 class Strobe(object):
 
