@@ -1,12 +1,5 @@
 # encoding: utf-8
 
-"""
-This is the main file of pytaVSL.
-It aims to provide a VJing and lights-projector-virtualisation tool.
-Images are loaded as textures, which then are mapped onto slides.
-This file was deeply instpired by Slideshow.py demo file of pi3d.
-"""
-
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pi3d
