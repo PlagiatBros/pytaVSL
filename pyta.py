@@ -200,13 +200,14 @@ class PytaVSL(OscServer):
             LOGGER.error("could not create group \"%s\" (name not available)" % name)
             return
 
-        self.slides[name] = Slide(name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.shader, self.light, self.DISPLAY.width, self.DISPLAY.height)
+        group = Slide(name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.shader, self.light, self.DISPLAY.width, self.DISPLAY.height)
         for child in self.get_slide(slides):
             if not child.grouped:
                 child.grouped = name
-                self.slides[name].add_child(child)
+                group.add_child(child)
             else:
                 LOGGER.error("could add \"%s\" to group \"%s\" (slide already in group \"%s\")" % (child.name, name, child.grouped))
+        self.slides[name] = group
         self.sort_slides()
 
     def remove_group(self, name):
@@ -217,6 +218,7 @@ class PytaVSL(OscServer):
             if group.children:
                 for child in group.children:
                     child.grouped = False
+                group.children = []
                 group.set_visible(False)
                 group.unload()
                 del self.slides[group.name]

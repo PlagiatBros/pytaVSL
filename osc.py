@@ -335,6 +335,7 @@ class OscServer(object):
             slide.set_tiles(args[1], args[2] if len(args) == 3 else args[1])
 
     @liblo.make_method('/pyta/slide/group', 'ss')
+    @liblo.make_method('/pyta/slide/group', 'si')
     def create_group_cb(self, path, args):
         self.create_group(*args)
 
