@@ -51,6 +51,7 @@ class PytaVSL(OscServer):
 
         # Texts
         self.text = {}
+        self.text['debug'] = Text(self, font=TEXTS_FONTS[2])
         for i in range(N_TEXTS):
             self.text[i] = Text(self, font=TEXTS_FONTS[i])
 
@@ -115,25 +116,26 @@ class PytaVSL(OscServer):
         """
 
         files = glob.glob(path)
-        if len(files):
-            for file in files:
-                self.fileQ.put(file)
-        else:
+        if len(files) == 0:
             LOGGER.error("file \"%s\" not found" % path)
 
         def threaded():
 
-            while True:
+            size = len(files)
 
-                path = self.fileQ.get()
+            self.text['debug'].reset()
+            self.text['debug'].set_visible(True)
+            self.text['debug'].set_size(0.025)
+            self.text['debug'].set_align('top', 'right')
+            self.text['debug'].set_text('0/' + str(size))
+
+            for i in range(size):
+                path = files[i]
                 name = path.split('/')[-1].split('.')[0]
-
                 self.slides[name] = Slide(name, path, self.shader, self.light)
+                self.text['debug'].set_text(str(i + 1) + '/' + str(size))
 
-                self.fileQ.task_done()
-
-                if self.fileQ.empty():
-                    break
+            self.text['debug'].reset()
 
             self.sort_slides()
 
@@ -194,7 +196,7 @@ class PytaVSL(OscServer):
         """
         Create slide group
         """
-        if name in self.slides and :
+        if name in self.slides:
             LOGGER.error("could not create group \"%s\" (name not available)" % name)
             return
 
