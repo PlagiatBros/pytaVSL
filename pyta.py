@@ -72,7 +72,7 @@ class PytaVSL(OscServer):
         - load textures
         - run the main loop
              - receive osc messages
-             - draw
+             - draw slides, skip grouped slides (drawn by their parents)
         """
 
         if self.path:
@@ -191,12 +191,35 @@ class PytaVSL(OscServer):
 
 
     def create_group(self, name, slides):
+        """
+        Create slide group
+        """
+        if name in self.slides and :
+            LOGGER.error("could not create group \"%s\" (name not available)" % name)
+            return
+
         self.slides[name] = Slide(name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.shader, self.light, self.DISPLAY.width, self.DISPLAY.height)
-        for s in self.get_slide(slides):
-            s.grouped = True
-            self.slides[name].add_child(s)
-            self.slides[name].set_shader(self.shader)
+        for child in self.get_slide(slides):
+            if not child.grouped:
+                child.grouped = name
+                self.slides[name].add_child(child)
+            else:
+                LOGGER.error("could add \"%s\" to group \"%s\" (slide already in group \"%s\")" % (child.name, name, child.grouped))
         self.sort_slides()
+
+    def remove_group(self, name):
+        """
+        Remove slide group
+        """
+        for group in self.get_slide(name):
+            if name in self.slides and self.slides[name].children:
+                for child in self.slides[name].children:
+                    child.grouped = False
+                self.slides[name].set_visible(False)
+                self.slides[name].unload()
+                del self.slides[name]
+        self.sort_slides()
+
     def flush(self, added_slide=None):
         """
         Unload hidden slides from gpu.

@@ -244,6 +244,8 @@ class OscServer(object):
             if args[1] not in self.slides:
                 self.slides[args[1]] = slides[0].clone(args[1])
                 self.sort_slides()
+            else:
+                LOGGER.error("could not create clone \"%s\" (name not available)" % args[1])
 
     @liblo.make_method('/pyta/slide/load_file', 's')
     def slide_load_file_cb(self, path, args):
@@ -333,8 +335,13 @@ class OscServer(object):
             slide.set_tiles(args[1], args[2] if len(args) == 3 else args[1])
 
     @liblo.make_method('/pyta/slide/group', 'ss')
-    def set_group_cb(self, path, args):
+    def create_group_cb(self, path, args):
         self.create_group(*args)
+
+    @liblo.make_method('/pyta/slide/ungroup', 's')
+    @liblo.make_method('/pyta/slide/ungroup', 'i')
+    def remove_group_cb(self, path, args):
+        self.remove_group(args[0])
 
     @liblo.make_method('/pyta/text', None)
     @osc_range_method(N_TEXTS)
