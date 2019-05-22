@@ -332,6 +332,9 @@ class OscServer(object):
         for slide in slides:
             slide.set_tiles(args[1], args[2] if len(args) == 3 else args[1])
 
+    @liblo.make_method('/pyta/slide/group', 'ss')
+    def set_group_cb(self, path, args):
+        self.create_group(*args)
 
     @liblo.make_method('/pyta/text', None)
     @osc_range_method(N_TEXTS)

@@ -6,6 +6,8 @@ import pi3d
 
 from pi3d.Display import Display
 
+from PIL.GifImagePlugin import GifImageFile
+
 import logging
 LOGGER = logging.getLogger(__name__)
 
@@ -15,11 +17,12 @@ class Frame(object):
         self.ndarray = ndarray
         self.duration = duration
 
+
 class Gif(object):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, texture, *args, **kwargs):
 
-        super(Gif, self).__init__()
+        super(Gif, self).__init__(*args, **kwargs)
 
         self.gif = None
         self.gif_index = -1
@@ -27,6 +30,10 @@ class Gif(object):
         self.gif_duration = 0
         self.gif_speed = 1.0
 
+        if isinstance(texture, pi3d.Texture) and  type(texture.file_string) is str and '.gif' in texture.file_string:
+            gif = GifImageFile(texture.file_string)
+            if gif.is_animated:
+                self.set_frames(gif)
 
     def set_speed(self, speed):
         self.gif_speed = float(speed)
@@ -42,6 +49,7 @@ class Gif(object):
             d = gif.info['duration'] / 1000.
             self.gif.append(Frame(t.image, d))
             if i == 0:
+                self.texture = t
                 self.set_textures([t])
 
     def gif_reset(self):

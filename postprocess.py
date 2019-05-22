@@ -9,6 +9,7 @@ import liblo
 import random
 from slide import Slide
 from pi3d.util.OffScreenTexture import OffScreenTexture
+from pi3d.Display import Display
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -17,18 +18,14 @@ class PostProcess(Slide):
 
         def __init__(self):
 
-            super(PostProcess, self).__init__("postprocessing", None, 1)
+            texture = OffScreenTexture("postprocess")
+            shader = pi3d.Shader("shaders/glitcher")
 
-            self.texture = OffScreenTexture("postprocess")
-            self.shader = pi3d.Shader("shaders/glitcher")
-            self.set_draw_details(self.shader, [self.texture])
+            super(PostProcess, self).__init__("postprocessing", texture, shader, None, Display.INSTANCE.width, Display.INSTANCE.height)
 
-            self.init_w = 800
-            self.init_h = 600
-            self.set_scale(800, 600, 1.0)
+            self.texture = texture
 
             self.rand = 0.0
-
             self.strength = 0.0
             self.noise = 0.0
             self.hue = 0.0

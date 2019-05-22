@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import time
 import pi3d
 import liblo
+import copy
 
 from pi3d.Display import Display
 
@@ -14,31 +15,39 @@ from strobe import Strobe
 from animation import Animable
 from gif import Gif
 from memory import gpu_monitor
+from config import *
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
 class Slide(Strobe, Gif, Animable, pi3d.Plane):
 
-    def __init__(self, name, light, z):
+    def __init__(self, name, texture, shader, light, width=0, height=0):
 
-        super(Slide, self).__init__(w=1.0, h=1.0, light=light)
+        if type(texture) is str:
 
-        self.visible = False
+            texture = pi3d.Texture(texture, blend=True, mipmap=True)
+            width = texture.ix
+            height = texture.iy
+
+        super(Slide, self).__init__(texture=texture, w=width, h=height, light=light)
 
         self.name = name
+        self.visible = False
+        self.set_shader(shader)
+
+        if texture:
+            self.set_textures([texture])
+
+        # Color
         self.light = light
         self.color = (0,0,0)
         self.color_strobe = 0
 
-        # Scales
+        # Scale
+        self.init_scale = min(Display.INSTANCE.width / width, Display.INSTANCE.height / height)
         self.sx = 1.0
         self.sy = 1.0
-        self.sz = 1.0
-
-        self.init_w = 1.0
-        self.init_h = 1.0
-        self.init_z = z
 
         # Angle
         self.ax = 0.0
@@ -49,6 +58,9 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         self.tiles = [1.0, 1.0]
 
         self.loaded = False
+        self.grouped = False
+
+        self.set_zoom(1.0)
 
     def unload(self):
         if self.loaded and not self.visible:
@@ -85,11 +97,8 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
             super(Slide, self).draw(*args, **kwargs)
 
     def clone(self, name):
-        state = self.__getstate__()
-        clone = Slide(name, self.light, self.z())
-        clone.__setstate__(state)
-        clone.init_w = self.init_w
-        clone.init_h = self.init_h
+        clone = Slide(name, pi3d.Texture(self.buf[0].textures[0].image), self.shader, self.light, self.width, self.height)
+        clone.gif = self.gif
         return clone
 
     def set_tiles(self, x, y):
@@ -126,20 +135,19 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         """
         self.translate(dx, dy, dz)
 
-    def set_scale(self, sx, sy, sz):
+    def set_scale(self, sx, sy):
         """
         set_scale sets the scale of the slides and keeps track of it
         """
         self.sx = sx
         self.sy = sy
-        self.sz = sz
-        self.scale(sx, sy, sz)
+        self.scale(sx * self.init_scale, sy * self.init_scale, 1.0)
 
     def set_zoom(self, zoom):
         """
         Scaling relative to initial size, aka zoom
         """
-        self.set_scale(zoom * self.init_w, zoom * self.init_h, self.z())
+        self.set_scale(zoom, zoom)
 
     def set_angle(self, ax, ay, az):
         # set angle (absolute)
@@ -154,11 +162,8 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         self.rotateToZ(az)
 
     def reset(self):
-        self.sx = self.init_w
-        self.sy = self.init_h
-        self.sz = 1.0
-        self.scale(self.sx, self.sy, self.sz)
-        self.set_position(0, 0, self.init_z)
+        self.set_scale(1.0, 1.0)
+        self.set_position(0, 0, SLIDE_BASE_Z)
         self.set_color((0,0,0))
         self.set_color_strobe(0)
         self.set_angle(0, 0, 0)
@@ -191,10 +196,8 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
             val = self.sx
         elif name == 'scale_y':
             val = self.sy
-        elif name == 'scale_z':
-            val = self.sz
         elif name == 'zoom' or name == 'rsxy':
-            val = self.sx / self.init_h
+            val = self.sx
         elif name == 'alpha':
             val = self.alpha()
         elif name == 'tiles':
@@ -229,13 +232,10 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
                 self.set_angle(self.ax, self.ay, val)
         elif name == 'scale_x':
             def set_val(val):
-                self.set_scale(val, self.sy, self.sz)
+                self.set_scale(val, self.sy)
         elif name == 'scale_y':
             def set_val(val):
-                self.set_scale(self.sx, val, self.sz)
-        elif name == 'scale_z':
-            def set_val(val):
-                self.set_scale(self.sx, self.sy, val)
+                self.set_scale(self.sx, val)
         elif name == 'zoom' or name == 'rsxy':
             def set_val(val):
                 self.set_zoom(val)

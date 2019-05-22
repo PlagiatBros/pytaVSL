@@ -8,10 +8,9 @@ from pi3d.constants import DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT
 import sys
 import glob
 import fnmatch
+import numpy
 from signal import signal, SIGINT, SIGTERM
 from six.moves import queue
-
-from PIL.GifImagePlugin import GifImageFile
 
 from text import Text
 from postprocess import PostProcess
@@ -91,7 +90,8 @@ class PytaVSL(OscServer):
                 self.post_process.capture_start()
 
             for slide in self.sorted_slides:
-                slide.draw()
+                if not slide.grouped:
+                    slide.draw()
 
             for i in self.text:
                 self.text[i].draw()
@@ -128,7 +128,7 @@ class PytaVSL(OscServer):
                 path = self.fileQ.get()
                 name = path.split('/')[-1].split('.')[0]
 
-                self.init_slide(name, path)
+                self.slides[name] = Slide(name, path, self.shader, self.light)
 
                 self.fileQ.task_done()
 
@@ -146,35 +146,6 @@ class PytaVSL(OscServer):
         t = Thread(target=threaded)
         t.daemon = True
         t.start()
-
-    def init_slide(self, name, path):
-        """
-        Create texture / slide
-        """
-        tex = pi3d.Texture(path, blend=True, mipmap=True)
-
-        self.slides[name] = Slide(name, self.light, SLIDE_BASE_Z)
-        self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), SLIDE_BASE_Z)
-
-        xrat = self.DISPLAY.width/tex.ix
-        yrat = self.DISPLAY.height/tex.iy
-        if yrat < xrat:
-            xrat = yrat
-        wi, hi = tex.ix * xrat, tex.iy * xrat
-
-        self.slides[name].init_w = wi
-        self.slides[name].init_h = hi
-        self.slides[name].set_scale(wi, hi, 1.0)
-        self.slides[name].set_shader(self.shader)
-
-        if '.gif' in path:
-            gif = GifImageFile(path)
-            if gif.is_animated:
-                self.slides[name].set_frames(gif)
-                return
-
-        self.slides[name].set_textures([tex])
-
 
     def sort_slides(self):
         """
@@ -219,6 +190,13 @@ class PytaVSL(OscServer):
         return slides
 
 
+    def create_group(self, name, slides):
+        self.slides[name] = Slide(name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.shader, self.light, self.DISPLAY.width, self.DISPLAY.height)
+        for s in self.get_slide(slides):
+            s.grouped = True
+            self.slides[name].add_child(s)
+            self.slides[name].set_shader(self.shader)
+        self.sort_slides()
     def flush(self, added_slide=None):
         """
         Unload hidden slides from gpu.

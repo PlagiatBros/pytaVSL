@@ -46,7 +46,7 @@ class Animable(object):
 
     def __init__(self, *args, **kwargs):
 
-        super(Animable, self).__init__()
+        super(Animable, self).__init__(*args, **kwargs)
 
         self.animations = {}
 

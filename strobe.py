@@ -39,7 +39,7 @@ class Strobe(object):
 
     def __init__(self, *args, **kwargs):
 
-        super(Strobe, self).__init__()
+        super(Strobe, self).__init__(*args, **kwargs)
 
         self.strobe = False
         self.strobe_state = StrobeState()
