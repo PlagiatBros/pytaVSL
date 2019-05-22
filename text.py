@@ -165,6 +165,13 @@ class Text(Strobe, Animable):
 
 
     def set_glitch(self, string, duration=1):
+        """
+        Glitch from current string to another
+
+        Args:
+            string  (string): destination string
+            duration (float): glitch duration
+        """
         self.glitch = True
         self.glitch_to = string
         self.glitch_start = Display.INSTANCE.time
@@ -172,6 +179,9 @@ class Text(Strobe, Animable):
             self.glitch_duration = max(duration, 0.01)
 
     def glitch_next(self):
+        """
+        Compute current glitched text
+        """
         progress = min(1, (Display.INSTANCE.time - self.glitch_start) / self.glitch_duration)
 
         if progress == 1.0:
