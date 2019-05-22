@@ -78,6 +78,7 @@ class Text(Strobe, Animable):
 
         # cool
         self.glitch = False
+        self.glitch_from = None
         self.glitch_to = None
         self.glitch_duration = 1
         self.glitch_start = 0
@@ -170,6 +171,7 @@ class Text(Strobe, Animable):
             duration (float): glitch duration
         """
         self.glitch = True
+        self.glitch_from = self.string
         self.glitch_to = string
         self.glitch_start = Display.INSTANCE.time
         if isinstance(duration, (float, int)):
@@ -192,8 +194,9 @@ class Text(Strobe, Animable):
             for i in range(len(self.glitch_to)):
                 r = random.random() / 2
                 c = self.glitch_to[i]
+                str_from = self.glitch_from if random.random() > 0.5 else self.string
                 if progress < r:
-                    c = self.string[random.randint(0, len(self.string)-1)] if len(self.string) > 0 else " "
+                    c = str_from[random.randint(0, len(str_from)-1)] if len(str_from) > 0 else " "
                 if r > 0.48:
                     c = c.upper()
 
