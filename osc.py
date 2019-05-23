@@ -448,6 +448,7 @@ class OscServer(object):
             self.text[args[0]].set_alpha(args[4] / 255.)
 
     @liblo.make_method('/pyta/text/rgb/strobe', 'ii')
+    @liblo.make_method('/pyta/text/rgb/strobe', 'if')
     @osc_range_method(N_TEXTS)
     def set_text_color_strobe(self, path, args):
         self.text[args[0]].set_color_strobe(args[1])

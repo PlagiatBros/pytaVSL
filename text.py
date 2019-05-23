@@ -119,8 +119,13 @@ class Text(Strobe, Animable, pi3d.Shape):
 
         if self.visible and self.string and (not self.strobe or self.strobe_state.visible()):
 
-            if self.color_strobe:
-                self.text.set_material((random.random(),random.random(),random.random()))
+            if self.color_strobe > 0:
+                zero = random.randint(0, 2)
+                rgb = [0,0,0]
+                rgb[(zero + 1) % 3] = -random.random() * self.color_strobe / 2
+                rgb[(zero - 1) % 3] = random.random() * self.color_strobe
+                rgb[zero] = random.random() * 1
+                self.text.set_material(rgb)
             else:
                 self.text.set_material(self.color)
 
@@ -209,7 +214,7 @@ class Text(Strobe, Animable, pi3d.Shape):
             self.text.set_alpha(self.alpha)
 
     def set_color_strobe(self, strobe):
-        self.color_strobe = bool(strobe)
+        self.color_strobe = strobe
 
     def set_align(self, h, v):
         """
