@@ -161,7 +161,7 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
 
     def reset(self):
         self.set_scale(1.0, 1.0)
-        self.set_position(0, 0, SLIDE_BASE_Z)
+        self.set_position(0, 0, 0)
         self.set_color((0,0,0))
         self.set_color_strobe(0)
         self.set_angle(0, 0, 0)

@@ -75,14 +75,16 @@ class OscServer(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             if path == "/pyta/slide/position":
-                slide.set_position(args[1], args[2], (args[3] + SLIDE_BASE_Z) if len(args) == 4 else slide.z())
+                slide.set_position(args[1], args[2], args[3] if len(args) == 4 else slide.z())
+                if len(args) == 4:
+                    self.sort_slides()
             elif path == "/pyta/slide/position_x":
                 slide.set_position(args[1], slide.y(), slide.z())
             elif path == "/pyta/slide/position_y":
                 slide.set_position(slide.x(), args[1], slide.z())
             elif path == "/pyta/slide/position_z":
                 z = slide.z()
-                nz = args[1] + SLIDE_BASE_Z
+                nz = args[1]
                 if z != nz:
                     slide.set_position(slide.x(), slide.y(), nz)
                     self.sort_slides()

@@ -34,14 +34,14 @@ class PytaVSL(OscServer):
 
         # setup OpenGL
         self.DISPLAY = pi3d.Display.create(w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=fps, depth=depth, display_config=DISPLAY_CONFIG_FULLSCREEN if fullscreen else DISPLAY_CONFIG_DEFAULT)
-        self.CAMERA = pi3d.Camera(is_3d=False)
+        self.CAMERA = pi3d.Camera(is_3d=False, eye=(0, 0, -100))
         self.CAMERA.was_moved = False
 
         self.shader = pi3d.Shader("uv_light")
 
         self.light = pi3d.Light(lightpos=(0, 0, -1))
         self.light.ambient((0, 0, 0))
-        
+
         self.DISPLAY.loop_running()
         self.post_process = PostProcess()
 

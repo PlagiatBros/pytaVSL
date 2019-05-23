@@ -104,7 +104,7 @@ class Text(Strobe, Animable):
             y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
 
         self.text = String(font=self.font, string=self.string, size=size / TEXT_RESOLUTION,
-                      camera=self.parent.CAMERA, x=x, y=y, z=0, is_3d=False,
+                      camera=self.parent.CAMERA, x=x, y=y, z=-100, is_3d=False,
                       justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
 
         self.text.set_shader(self.shader)
