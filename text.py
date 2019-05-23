@@ -29,7 +29,7 @@ FONTS = {
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
 
-class Text(Strobe, Animable):
+class Text(Strobe, Animable, pi3d.Shape):
     """
     Dynamic text
     """
@@ -41,7 +41,9 @@ class Text(Strobe, Animable):
             font (str): "sans" or "mono" (see FONTS global)
         """
 
-        super(Text, self).__init__()
+        super(Text, self).__init__(camera=None, light=None, name="",
+                                   x=0, y=0, z=0, rx=0, ry=0, rz=0,
+                                   sx=1.0, sy=1.0, sz=1.0, cx=0, cy=0, cz=0)
 
         self.parent = parent
 
@@ -64,6 +66,7 @@ class Text(Strobe, Animable):
 
         self.x = 0
         self.y = 0
+        self.align_offset = [0, 0]
 
         self.sx = 1
         self.sy = 1
@@ -72,7 +75,6 @@ class Text(Strobe, Animable):
         self.ry = 0
         self.rz = 0
 
-        self.quick_change = False
         self.need_regen = False
         self.new_string()
 
@@ -88,26 +90,15 @@ class Text(Strobe, Animable):
         Generate a new string instance and apply all options.
         """
 
-        x = self.x
-        y = self.y
-
         size = self.font.ratio / self.length if self.size == 'auto' else self.size
 
-        if self.h_align == 'L':
-            x -= self.parent.DISPLAY.width / 2.
-        elif self.h_align == 'R':
-            x += self.parent.DISPLAY.width / 2.
-
-        if self.v_align == 'T':
-            y = y + self.parent.DISPLAY.height / 2. - self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
-        elif self.v_align == 'B':
-            y = y - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
-
         self.text = String(font=self.font, string=self.string, size=size / TEXT_RESOLUTION,
-                      camera=self.parent.CAMERA, x=x, y=y, z=-100, is_3d=False,
+                      camera=self.parent.CAMERA, x=0, y=0, z=-100, is_3d=False,
                       justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
 
         self.text.set_shader(self.shader)
+
+        self.set_v_align(self.v_align)
 
         self.text.scale(self.sx, self.sy, 1)
 
@@ -117,10 +108,10 @@ class Text(Strobe, Animable):
         if self.glitch:
             self.glitch_next()
 
-        self.animate_next_frame()
-
         if self.string == '':
             return
+
+        self.animate_next_frame()
 
         if self.need_regen:
             self.need_regen = False
@@ -128,21 +119,17 @@ class Text(Strobe, Animable):
 
         if self.visible and self.string and (not self.strobe or self.strobe_state.visible()):
 
-            if self.quick_change:
-                self.text.quick_change(self.string)
-
             if self.color_strobe:
                 self.text.set_material((random.random(),random.random(),random.random()))
             else:
                 self.text.set_material(self.color)
 
-            self.text.draw()
+            self.children = [self.text]
+            super(Text, self).draw()
 
     def set_text(self, string, duration=None, stop_glitch=True):
         """
-        Set the text's string regenerate inner String instance
-        if the string's length has changed, otherwise use optimized
-        quick_change method (can distort some characters).
+        Set the text's string
         """
 
         if duration is not None:
@@ -150,7 +137,6 @@ class Text(Strobe, Animable):
         if stop_glitch:
             self.glitch = False
 
-        # self.quick_change = len(self.string) == len(string)
         self.string = string.decode('utf8')
 
         if '\n' in self.string:
@@ -158,9 +144,7 @@ class Text(Strobe, Animable):
         else:
             self.length = max(len(self.string), 1)
 
-        if not self.quick_change:
-            self.need_regen = True
-
+        self.need_regen = True
 
     def set_glitch(self, string, duration=1):
         """
@@ -212,7 +196,6 @@ class Text(Strobe, Animable):
             color (tuple): rgb float values between 0.0 and 1.0
         """
         self.color = color
-        self.need_regen = True
 
     def set_alpha(self, alpha):
         """
@@ -252,9 +235,9 @@ class Text(Strobe, Animable):
             v = h
             h = a
 
-        if h in H_ALIGN:
+        if h in H_ALIGN and h != self.h_align:
             self.set_h_align(h)
-        if v in V_ALIGN:
+        if v in V_ALIGN and v != self.v_align:
             self.set_v_align(v)
 
     def set_h_align(self, align):
@@ -265,6 +248,16 @@ class Text(Strobe, Animable):
             align (str): C, L or R
         """
         self.h_align = align
+
+        x = 0
+
+        if self.h_align == 'L':
+            x = - self.parent.DISPLAY.width / 2.
+        elif self.h_align == 'R':
+            x = self.parent.DISPLAY.width / 2.
+
+        self.align_offset[0] = x
+        self.set_position(self.x, self.y)
         self.need_regen = True
 
     def set_v_align(self, align):
@@ -275,7 +268,18 @@ class Text(Strobe, Animable):
             align (str): C, T or B
         """
         self.v_align = align
-        self.need_regen = True
+
+        size = self.font.ratio / self.length if self.size == 'auto' else self.size
+
+        y = 0
+
+        if self.v_align == 'T':
+            y = self.parent.DISPLAY.height / 2. - self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
+        elif self.v_align == 'B':
+            y = - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
+
+        self.align_offset[1] = y
+        self.set_position(self.x, self.y)
 
     def set_position(self, x, y):
         """
@@ -285,12 +289,9 @@ class Text(Strobe, Animable):
             x (int): horizontal offset in pixels
             y (int): vertical offset in pixels
         """
-        if x is not None:
-            self.x = x
-        if y is not None:
-            self.y = y
-
-        self.need_regen = True
+        self.x = x
+        self.y = y
+        self.position(self.x + self.align_offset[0], self.y + self.align_offset[1], self.z())
 
     def set_rotation(self, rx, ry, rz):
         """
@@ -376,9 +377,9 @@ class Text(Strobe, Animable):
         if name == 'size':
             val = self.font.ratio / self.length if self.size == 'auto' else self.size
         elif name == 'position_x':
-            val = self.x
+            val = self.x()
         elif name == 'position_y':
-            val = self.y
+            val = self.y()
         elif name == 'rotate_x':
             val = self.rx
         elif name == 'rotate_y':
