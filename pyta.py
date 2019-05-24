@@ -52,9 +52,11 @@ class PytaVSL(OscServer):
 
         # Texts
         self.text = {}
-        self.text['debug'] = Text(self, font=TEXTS_FONTS[2])
+        self.text['debug'] = Text(shader=self.shader, font=TEXTS_FONTS[2], z=-99)
         for i in range(N_TEXTS):
-            self.text[i] = Text(self, font=TEXTS_FONTS[i])
+            self.text[i] = Text(shader=self.shader, font=TEXTS_FONTS[i], z=i-98)
+        self.sorted_texts = sorted(self.text.values(), key=lambda text: text.z, reverse=True)
+
 
         # Memory
         self.monitor = gpu_monitor
@@ -95,8 +97,8 @@ class PytaVSL(OscServer):
                 if not slide.grouped:
                     slide.draw()
 
-            for i in self.text:
-                self.text[i].draw()
+            for text in self.sorted_texts:
+                text.draw()
 
             if post_processing:
                 self.post_process.capture_end()

@@ -33,7 +33,7 @@ class Text(Strobe, Animable):
     """
     Dynamic text
     """
-    def __init__(self, parent, font="mono"):
+    def __init__(self, shader, font="mono", z=-100):
         """
         Text constructur
 
@@ -43,11 +43,8 @@ class Text(Strobe, Animable):
 
         super(Text, self).__init__()
 
-        self.parent = parent
-
         self.font = FONTS[font]
-
-        self.shader = pi3d.Shader("uv_flat")
+        self.shader = shader
 
         self.visible = True
 
@@ -63,6 +60,7 @@ class Text(Strobe, Animable):
 
         self.x = 0
         self.y = 0
+        self.z = z
         self.align_offset = [0, 0]
 
         self.sx = 1
@@ -88,9 +86,9 @@ class Text(Strobe, Animable):
         """
 
         size = self.font.ratio / self.length if self.size == 'auto' else self.size
-
+        print(self.z)
         self.text = String(font=self.font, string=self.string, size=size / TEXT_RESOLUTION,
-                      camera=self.parent.CAMERA, x=0, y=0, z=-100, is_3d=False,
+                      x=0, y=0, z=self.z, is_3d=False,
                       justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
 
         self.text.set_shader(self.shader)
@@ -253,9 +251,9 @@ class Text(Strobe, Animable):
         x = 0
 
         if self.h_align == 'L':
-            x = - self.parent.DISPLAY.width / 2.
+            x = - Display.INSTANCE.width / 2.
         elif self.h_align == 'R':
-            x = self.parent.DISPLAY.width / 2.
+            x = Display.INSTANCE.width / 2.
 
         self.align_offset[0] = x
         self.set_position(self.x, self.y)
@@ -275,9 +273,9 @@ class Text(Strobe, Animable):
         y = 0
 
         if self.v_align == 'T':
-            y = self.parent.DISPLAY.height / 2. - self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
+            y = Display.INSTANCE.height / 2. - self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
         elif self.v_align == 'B':
-            y = - self.parent.DISPLAY.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
+            y = - Display.INSTANCE.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
 
         self.align_offset[1] = y
         self.set_position(self.x, self.y)
