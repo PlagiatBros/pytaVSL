@@ -38,7 +38,7 @@ class PytaVSL(OscServer):
         self.CAMERA = pi3d.Camera(is_3d=False, eye=(0, 0, -100))
         self.CAMERA.was_moved = False
 
-        self.shader = pi3d.Shader("uv_light")
+        self.shader = pi3d.Shader("uv_flat")
 
         self.light = pi3d.Light(lightpos=(0, 0, -1))
         self.light.ambient((0, 0, 0))

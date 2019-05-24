@@ -198,8 +198,8 @@ class OscServer(object):
         for slide in slides:
             slide.set_color((args[1], args[2], args[3]))
 
-    @liblo.make_method('/pyta/slide/rgb/strobe', 'ii')
-    @liblo.make_method('/pyta/slide/rgb/strobe', 'si')
+    @liblo.make_method('/pyta/slide/rgb/strobe', 'if')
+    @liblo.make_method('/pyta/slide/rgb/strobe', 'sf')
     def set_slide_color_strobe(self, path, args):
         '''
         Enable color shit show

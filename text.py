@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pi3d
 from pi3d.Display import Display
 import random
+import colorsys
 
 from strobe import Strobe
 from animation import Animable
@@ -94,6 +95,7 @@ class Text(Strobe, Animable):
         self.text.set_shader(self.shader)
 
         self.set_v_align(self.v_align)
+        self.set_color(self.color)
 
         self.text.scale(self.sx, self.sy, 1)
 
@@ -115,18 +117,11 @@ class Text(Strobe, Animable):
         if self.visible and self.string and (not self.strobe or self.strobe_state.visible()):
 
             if self.color_strobe > 0:
-                zero = random.randint(0, 2)
-                rgb = [0,0,0]
-                rgb[(zero + 1) % 3] = -random.random() * self.color_strobe / 2
-                rgb[(zero - 1) % 3] = random.random() * self.color_strobe
-                rgb[zero] = random.random() * 1
+                rgb = list(colorsys.hsv_to_rgb(random.random(), 1.0, 1.0))
+                rgb[random.randint(0,2)] *= self.color_strobe
                 self.text.set_material(rgb)
-            else:
-                self.text.set_material(self.color)
 
             self.text.draw()
-            # self.children = [self.text]
-            # super(Text, self).draw()
 
     def set_text(self, string, duration=None, stop_glitch=True):
         """
@@ -189,14 +184,16 @@ class Text(Strobe, Animable):
 
             self.set_text(string, stop_glitch=False)
 
-    def set_color(self, color):
+    def set_color(self, color, tmp=False):
         """
         Set the text's color. Triggers String regeneration.
 
         Args:
             color (tuple): rgb float values between 0.0 and 1.0
         """
-        self.color = color
+        if not tmp:
+            self.color = color
+        self.text.set_material(color)
 
     def set_alpha(self, alpha):
         """
@@ -209,6 +206,8 @@ class Text(Strobe, Animable):
 
     def set_color_strobe(self, strobe):
         self.color_strobe = strobe
+        if strobe <= 0:
+            self.set_color(self.color)
 
     def set_align(self, h, v):
         """

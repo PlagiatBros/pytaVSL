@@ -6,6 +6,7 @@ import time
 import pi3d
 import liblo
 import copy
+import colorsys
 
 from pi3d.Display import Display
 
@@ -80,12 +81,9 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
     def draw(self, *args, **kwargs):
 
         if self.color_strobe > 0:
-            zero = random.randint(0, 2)
-            rgb = [0,0,0]
-            rgb[(zero + 1) % 3] = -random.random() * self.color_strobe / 2
-            rgb[(zero - 1) % 3] = random.random() * self.color_strobe
-            rgb[zero] = - random.random() * 1
-            self.set_color(rgb, True)
+            rgb = list(colorsys.hsv_to_rgb(random.random(), 1.0, 1.0))
+            rgb[random.randint(0,2)] *= self.color_strobe
+            self.set_material(rgb)
 
         if self.visible and (not self.strobe or self.strobe_state.visible()):
             if not self.loaded:
@@ -129,17 +127,15 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         """
         set color
         """
-        if tmp is False:
-            self.color = color
-        self.light.ambient(color)
-        self.set_light(self.light)
+        self.color = color
+        self.set_material(color)
 
     def set_color_strobe(self, strobe):
         """
         set color strobing strength
         """
         self.color_strobe = strobe
-        if strobe == 0:
+        if strobe <= 0:
             self.set_color(self.color)
 
     def set_position(self, x, y, z):
