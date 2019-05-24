@@ -9,6 +9,7 @@ import sys
 import glob
 import fnmatch
 import numpy
+import random
 from signal import signal, SIGINT, SIGTERM
 from six.moves import queue
 
@@ -172,26 +173,34 @@ class PytaVSL(OscServer):
 
         slides = []
 
-        if type(name) is str and ' ' in name:
+        if type(name) is str:
 
-            for n in name.split(' '):
-                if n:
+            if ' ' in name:
+
+                for n in name.split(' '):
+                    if n:
+                        slides += self.get_slide(n)
+
+            if '*' in name:
+                if name == '*':
+                    return self.get_slide(-1)
+                for n in fnmatch.filter(self.slides.keys(), name):
                     slides += self.get_slide(n)
-        elif type(name) is str and '*' in name:
-            if name == '*':
-                return self.get_slide(-1)
-            for n in fnmatch.filter(self.slides.keys(), name):
-                slides += self.get_slide(n)
-        else:
-            if name in self.slides:
+
+            elif name  == '?':
+                slides += [random.choice(self.sorted_slides)]
+
+            elif name in self.slides:
                 slides += [self.slides[name]]
-            elif name == -1:
-                slides += self.slides.values()
-                for locked in self.locked_slides:
-                    if locked in slides:
-                        slides.remove(locked)
-            else:
-                LOGGER.error("slide \"%s\" not found" % name)
+
+        elif name == -1:
+            slides += self.slides.values()
+            for locked in self.locked_slides:
+                if locked in slides:
+                    slides.remove(locked)
+
+        if not slides:
+            LOGGER.error("slide \"%s\" not found" % name)
 
         return slides
 
