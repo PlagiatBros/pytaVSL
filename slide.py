@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Slide(Strobe, Gif, Animable, pi3d.Plane):
 
-    def __init__(self, name, texture, shader, light, width=0, height=0):
+    def __init__(self, name, texture, shader, width=0, height=0):
 
         if type(texture) is str:
 
@@ -31,7 +31,7 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
             width = texture.ix
             height = texture.iy
 
-        super(Slide, self).__init__(texture=texture, w=width, h=height, light=light)
+        super(Slide, self).__init__(texture=texture, w=width, h=height)
 
         self.name = name
         self.visible = False
@@ -41,7 +41,6 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
             self.set_textures([texture])
 
         # Color
-        self.light = light
         self.color = (0,0,0)
         self.color_strobe = 0
 

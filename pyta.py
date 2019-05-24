@@ -25,7 +25,7 @@ LOGGER = pi3d.Log(name=None, level='DEBUG' if '--debug' in sys.argv else 'CRITIC
 
 class PytaVSL(OscServer):
     """
-    Main object, contains the screen, the light, and the slides.
+    Main object, contains the screen and the slides.
     It's also an OSC server which contains the method to control all of its children.
     """
 
@@ -39,9 +39,6 @@ class PytaVSL(OscServer):
         self.CAMERA.was_moved = False
 
         self.shader = pi3d.Shader("uv_flat")
-
-        self.light = pi3d.Light(lightpos=(0, 0, -1))
-        self.light.ambient((0, 0, 0))
 
         self.DISPLAY.loop_running()
         self.post_process = PostProcess()
@@ -136,7 +133,7 @@ class PytaVSL(OscServer):
             for i in range(size):
                 path = files[i]
                 name = path.split('/')[-1].split('.')[0]
-                self.slides[name] = Slide(name, path, self.shader, self.light)
+                self.slides[name] = Slide(name, path, self.shader)
                 self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), i / 1000.)
                 self.text['debug'].set_text(str(i + 1) + '/' + str(size))
 
@@ -213,7 +210,7 @@ class PytaVSL(OscServer):
             LOGGER.error("could not create group \"%s\" (name not available)" % name)
             return
 
-        group = Slide(name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.shader, self.light, self.DISPLAY.width, self.DISPLAY.height)
+        group = Slide(name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.shader, self.DISPLAY.width, self.DISPLAY.height)
         for child in self.get_slide(slides):
             if not child.grouped:
                 child.grouped = name
