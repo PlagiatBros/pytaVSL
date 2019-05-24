@@ -17,6 +17,7 @@ from text import Text
 from postprocess import PostProcess
 from slide import Slide
 from utils import KillableThread as Thread
+from utils import unicode
 from memory import gpu_monitor
 from osc import OscServer
 from config import *
@@ -92,7 +93,7 @@ class PytaVSL(OscServer):
                 self.post_process.capture_start()
 
             for slide in self.sorted_slides:
-                if not slide.grouped:
+                if not slide.parent_slide:
                     slide.draw()
 
             for text in self.sorted_texts:
@@ -133,8 +134,8 @@ class PytaVSL(OscServer):
             for i in range(size):
                 path = files[i]
                 name = path.split('/')[-1].split('.')[0]
-                self.slides[name] = Slide(name, path, self.shader)
-                self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), i / 1000.)
+                self.slides[name] = Slide(self, name, path, self.shader)
+                self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), i / 1000., True)
                 self.text['debug'].set_text(str(i + 1) + '/' + str(size))
 
             self.text['debug'].reset()
@@ -170,10 +171,9 @@ class PytaVSL(OscServer):
 
         slides = []
 
-        if type(name) is str:
+        if isinstance(name, (str, unicode)):
 
             if ' ' in name:
-
                 for n in name.split(' '):
                     if n:
                         slides += self.get_slide(n)
@@ -210,13 +210,13 @@ class PytaVSL(OscServer):
             LOGGER.error("could not create group \"%s\" (name not available)" % name)
             return
 
-        group = Slide(name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.shader, self.DISPLAY.width, self.DISPLAY.height)
+        group = Slide(self, name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.shader, self.DISPLAY.width, self.DISPLAY.height)
         for child in self.get_slide(slides):
-            if not child.grouped:
-                child.grouped = name
+            if not child.parent_slide:
+                child.parent_slide = group
                 group.add_child(child)
             else:
-                LOGGER.error("could add \"%s\" to group \"%s\" (slide already in group \"%s\")" % (child.name, name, child.grouped))
+                LOGGER.error("could add \"%s\" to group \"%s\" (slide already in group \"%s\")" % (child.name, name, child.parent_slide.name))
         self.slides[name] = group
         self.sort_slides()
 
@@ -227,7 +227,7 @@ class PytaVSL(OscServer):
         for group in self.get_slide(name):
             if group.children:
                 for child in group.children:
-                    child.grouped = False
+                    child.parent_slide = False
                 group.children = []
                 group.set_visible(False)
                 group.unload()

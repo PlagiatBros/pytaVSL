@@ -10,12 +10,7 @@ import colorsys
 from strobe import Strobe
 from animation import Animable
 from pi3d_string import String
-
-try:
-    # python3 compat
-    unicode
-except:
-    unicode = str
+from utils import unicode
 
 from pi3d_font import Font
 from config import *
@@ -133,7 +128,12 @@ class Text(Strobe, Animable):
         if stop_glitch:
             self.glitch = False
 
-        self.string = string.decode('utf8')
+        if unicode is str:
+            self.string = string
+        else:
+            self.string = string.decode('utf8')
+
+
 
         if '\n' in self.string:
             self.length = max(max(map(lambda line: len(line), self.string.split('\n'))), 1)

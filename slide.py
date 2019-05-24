@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Slide(Strobe, Gif, Animable, pi3d.Plane):
 
-    def __init__(self, name, texture, shader, width=0, height=0):
+    def __init__(self, parent, name, texture, shader, width=0, height=0):
 
         if type(texture) is str:
 
@@ -36,6 +36,8 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         self.name = name
         self.visible = False
         self.set_shader(shader)
+        self.parent = parent
+        self.parent_slide = None
 
         if texture:
             self.set_textures([texture])
@@ -137,11 +139,15 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         if strobe <= 0:
             self.set_color(self.color)
 
-    def set_position(self, x, y, z):
+    def set_position(self, x, y, z, prevent_sorting=False):
         """
         set_position aims to set the position of the slides and to keep a trace of it
         """
+        sort_parent = z != self.z() and not prevent_sorting
         self.position(x, y, z)
+        if sort_parent:
+            parent = self.parent_slide if self.parent_slide is not None else self.parent
+            parent.sort_slides()
 
     def set_translation(self, dx, dy, dz):
         """
@@ -174,6 +180,13 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         self.rotateToX(ax)
         self.rotateToY(ay)
         self.rotateToZ(az)
+
+
+    def sort_slides(self):
+        """
+        Sort slides in drawing order (by z-index)
+        """
+        self.children = sorted(self.children, key=lambda slide: slide.z(), reverse=True)
 
     def reset(self):
         self.set_scale(1.0, 1.0)

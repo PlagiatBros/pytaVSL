@@ -5,7 +5,8 @@ from abc import abstractmethod
 import pi3d
 from pi3d.Display import Display
 
-from utils import KillableThread as Thread
+from utils import unicode
+
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -96,7 +97,7 @@ class Animable(object):
 
     def parse_animate_value(self, val, current):
 
-        if type(val) is str and len(val) > 1:
+        if isinstance(val, (str, unicode)) and len(val) > 1:
             operator = val[0]
             if operator == '+' or operator == '-':
                 return current + float(val)
@@ -105,8 +106,6 @@ class Animable(object):
             elif operator == '/':
                 return current / float(val[1:])
 
-        if type(val) is not str:
-            return val
         else:
             LOGGER.error('ERROR: failed to parse animate value %s (%s)' % (val, type(val)))
             return current

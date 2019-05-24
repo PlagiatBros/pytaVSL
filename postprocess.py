@@ -21,7 +21,7 @@ class PostProcess(Slide):
             texture = OffScreenTexture("postprocess")
             shader = pi3d.Shader("shaders/glitcher")
 
-            super(PostProcess, self).__init__("postprocessing", texture, shader, Display.INSTANCE.width, Display.INSTANCE.height)
+            super(PostProcess, self).__init__(None, "postprocessing", texture, shader, Display.INSTANCE.width, Display.INSTANCE.height)
 
             self.texture = texture
 

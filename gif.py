@@ -6,6 +6,8 @@ import pi3d
 
 from pi3d.Display import Display
 
+from utils import unicode
+
 from PIL.GifImagePlugin import GifImageFile
 
 import logging
@@ -30,7 +32,7 @@ class Gif(object):
         self.gif_duration = 0
         self.gif_speed = 1.0
 
-        if isinstance(texture, pi3d.Texture) and  type(texture.file_string) is str and '.gif' in texture.file_string:
+        if isinstance(texture, pi3d.Texture) and  isinstance(texture.file_string, (str, unicode)) and '.gif' in texture.file_string:
             gif = GifImageFile(texture.file_string)
             if gif.is_animated:
                 self.set_frames(gif)

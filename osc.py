@@ -76,8 +76,6 @@ class OscServer(object):
         for slide in slides:
             if path == "/pyta/slide/position":
                 slide.set_position(args[1], args[2], args[3] if len(args) == 4 else slide.z())
-                if len(args) == 4:
-                    self.sort_slides()
             elif path == "/pyta/slide/position_x":
                 slide.set_position(args[1], slide.y(), slide.z())
             elif path == "/pyta/slide/position_y":
@@ -87,7 +85,6 @@ class OscServer(object):
                 nz = args[1]
                 if z != nz:
                     slide.set_position(slide.x(), slide.y(), nz)
-                    self.sort_slides()
 
     @liblo.make_method('/pyta/slide/translate', 'sfff')
     @liblo.make_method('/pyta/slide/translate', 'sff')
@@ -110,7 +107,6 @@ class OscServer(object):
                 slide.set_translation(0.0, args[1], 0.0)
             elif path == "/pyta/slide/translate_z":
                 slide.set_translation(0.0, 0.0, args[1])
-                self.sort_slides()
 
     @liblo.make_method('/pyta/slide/scale', 'sfff')
     @liblo.make_method('/pyta/slide/scale', 'sff')
