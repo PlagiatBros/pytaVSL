@@ -47,6 +47,8 @@ class Gif(object):
             gif.seek(i)
             t = pi3d.Texture(gif, blend=True, mipmap=True)
             d = gif.info['duration'] / 1000.
+            if d == 0:
+                d = 1. / Display.INSTANCE.frames_per_second
             self.gif.append(Frame(t.image, d))
             if i == 0:
                 self.texture = t
