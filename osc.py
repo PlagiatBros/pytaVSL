@@ -132,13 +132,11 @@ class OscServer(object):
         slides = self.get_slide(args[0])
         for slide in slides:
             if path == "/pyta/slide/scale":
-                slide.set_scale(args[1], args[2], args[3] if len(args) == 4 else slide.sz)
+                slide.set_scale(args[1], args[2])
             elif path == "/pyta/slide/scale_x":
-                slide.set_scale(args[1], slide.sy, slide.sz)
+                slide.set_scale(args[1], slide.sy)
             elif path == "/pyta/slide/scale_y":
-                slide.set_scale(slide.sx, args[1], slide.sz)
-            elif path == "/pyta/slide/scale_z":
-                slide.set_scale(slide.sx, slide.sy, args[1])
+                slide.set_scale(slide.sx, args[1])
             elif path == "/pyta/slide/relative_scale_xy" or path == "/pyta/slide/rsxy" or path == "/pyta/slide/zoom":
                 slide.set_zoom(args[1])
 

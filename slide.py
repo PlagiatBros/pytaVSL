@@ -56,6 +56,7 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
 
         # texture tiling
         self.tiles = [1.0, 1.0]
+        self.offset= [0.0, 0.0]
 
         self.loaded = False
         self.grouped = False
@@ -100,23 +101,42 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         return clone
 
     def set_tiles(self, x, y):
-        self.tiles = [x, y]
-        for b in self.buf:
-            b.unib[6] = x
-            b.unib[7] = y
+        if x is not None:
+            self.tiles[0] = x
+        if y is not None:
+            self.tiles[1] = y
 
-        self.set_offset(((1-x)/2.,(1-y)/2.))
+        for b in self.buf:
+            b.unib[6:7] = self.tiles[0:1]
+
+        self.set_offset()
+
+    def set_offset(self, x=None, y=None):
+        if x is not None:
+            self.offset[0] = x
+        if y is not None:
+            self.offset[1] = y
+        super(Slide, self).set_offset((self.offset[0] + (1-self.tiles[0])/2, self.offset[1] + (1-self.tiles[1])/2.))
 
     def set_visible(self, visible):
+        """
+        set visibility
+        """
         self.visible = bool(visible)
 
     def set_color(self, color, tmp = False):
+        """
+        set color
+        """
         if tmp is False:
             self.color = color
         self.light.ambient(color)
         self.set_light(self.light)
 
     def set_color_strobe(self, strobe):
+        """
+        set color strobing strength
+        """
         self.color_strobe = strobe
         if strobe == 0:
             self.set_color(self.color)
@@ -200,6 +220,14 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
             val = self.alpha()
         elif name == 'tiles':
             val = self.tiles[0]
+        elif name == 'tiles_x':
+            val = self.tiles[0]
+        elif name == 'tiles_y':
+            val = self.tiles[1]
+        elif name == 'offset_x':
+            val = self.offset[0]
+        elif name == 'offset_y':
+            val = self.offset[1]
 
         return val if val is not 0 else _val
 
@@ -243,6 +271,18 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         elif name == 'tiles':
             def set_val(val):
                 self.set_tiles(val, val)
+        elif name == 'tiles_x':
+            def set_val(val):
+                self.set_tiles(val, None)
+        elif name == 'tiles_y':
+            def set_val(val):
+                self.set_tiles(None, val)
+        elif name == 'offset_x':
+            def set_val(val):
+                self.set_offset(val, None)
+        elif name == 'offset_y':
+            def set_val(val):
+                self.set_offset(None, val)
         else:
             set_val = None
 
