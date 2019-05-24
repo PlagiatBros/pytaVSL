@@ -33,6 +33,7 @@ class Animation():
 
     def play(self):
         t = Display.INSTANCE.time - self.start_date
+        t += 1. / Display.INSTANCE.frames_per_second # always 1 frame early for smooth anims
         if t >= self.duration:
             t = self.duration
             self.done = True
@@ -80,6 +81,7 @@ class Animable(object):
                 if anim.done:
                     if anim.loop:
                         anim.reset()
+                        anim.play()
                     else:
                         self.stop_animate(anim.name)
 
