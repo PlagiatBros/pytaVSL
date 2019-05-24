@@ -29,7 +29,7 @@ FONTS = {
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
 
-class Text(Strobe, Animable, pi3d.Shape):
+class Text(Strobe, Animable):
     """
     Dynamic text
     """
@@ -41,9 +41,7 @@ class Text(Strobe, Animable, pi3d.Shape):
             font (str): "sans" or "mono" (see FONTS global)
         """
 
-        super(Text, self).__init__(camera=None, light=None, name="",
-                                   x=0, y=0, z=0, rx=0, ry=0, rz=0,
-                                   sx=1.0, sy=1.0, sz=1.0, cx=0, cy=0, cz=0)
+        super(Text, self).__init__()
 
         self.parent = parent
 
@@ -57,7 +55,6 @@ class Text(Strobe, Animable, pi3d.Shape):
         self.length = max(len(self.string), 1)
         self.color = (1.0, 1.0, 1.0)
         self.color_strobe = False
-        self.alpha = 1.0
 
         self.size = 'auto'
 
@@ -129,8 +126,9 @@ class Text(Strobe, Animable, pi3d.Shape):
             else:
                 self.text.set_material(self.color)
 
-            self.children = [self.text]
-            super(Text, self).draw()
+            self.text.draw()
+            # self.children = [self.text]
+            # super(Text, self).draw()
 
     def set_text(self, string, duration=None, stop_glitch=True):
         """
@@ -209,9 +207,7 @@ class Text(Strobe, Animable, pi3d.Shape):
         Args:
             alpha (tuple): alpha float values between 0.0 and 1.0
         """
-        if alpha != self.alpha:
-            self.alpha = alpha
-            self.text.set_alpha(self.alpha)
+        self.text.set_alpha(alpha)
 
     def set_color_strobe(self, strobe):
         self.color_strobe = strobe
@@ -296,7 +292,7 @@ class Text(Strobe, Animable, pi3d.Shape):
         """
         self.x = x
         self.y = y
-        self.position(self.x + self.align_offset[0], self.y + self.align_offset[1], self.z())
+        self.text.position(self.x + self.align_offset[0], self.y + self.align_offset[1], self.text.z())
 
     def set_rotation(self, rx, ry, rz):
         """
@@ -382,9 +378,9 @@ class Text(Strobe, Animable, pi3d.Shape):
         if name == 'size':
             val = self.font.ratio / self.length if self.size == 'auto' else self.size
         elif name == 'position_x':
-            val = self.x()
+            val = self.x
         elif name == 'position_y':
-            val = self.y()
+            val = self.y
         elif name == 'rotate_x':
             val = self.rx
         elif name == 'rotate_y':
@@ -398,7 +394,7 @@ class Text(Strobe, Animable, pi3d.Shape):
         elif name == 'zoom':
             val = self.sx
         elif name == 'alpha':
-            val = self.alpha
+            val = self.text.alpha()
 
         return val
 
