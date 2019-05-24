@@ -76,6 +76,6 @@ class KillableThread(Thread):
 
 try:
     # python3 compat
-    unicode
+    unicode = unicode
 except:
     unicode = str

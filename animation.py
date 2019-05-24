@@ -106,6 +106,8 @@ class Animable(object):
             elif operator == '/':
                 return current / float(val[1:])
 
+        if not isinstance(val, (str, unicode)):
+            return val
         else:
             LOGGER.error('ERROR: failed to parse animate value %s (%s)' % (val, type(val)))
             return current
