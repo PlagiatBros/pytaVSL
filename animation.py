@@ -75,7 +75,7 @@ class Animable(object):
 
     def animate_next_frame(self):
         if self.animations:
-            anims = self.animations.values()
+            anims = list(self.animations.values())
             for anim in anims:
                 anim.play()
                 if anim.done:
