@@ -107,7 +107,8 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
             self.tiles[1] = y
 
         for b in self.buf:
-            b.unib[6:7] = self.tiles[0:1]
+            b.unib[6] = self.tiles[0]
+            b.unib[7] = self.tiles[1]
 
         self.set_offset()
 
