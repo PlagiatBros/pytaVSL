@@ -86,7 +86,7 @@ class Text(Strobe, Animable):
         """
 
         size = self.font.ratio / self.length if self.size == 'auto' else self.size
-        print(self.z)
+
         self.text = String(font=self.font, string=self.string, size=size / TEXT_RESOLUTION,
                       x=0, y=0, z=self.z, is_3d=False,
                       justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
