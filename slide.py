@@ -43,7 +43,7 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
             self.set_textures([texture])
 
         # Color
-        self.color = (0,0,0)
+        self.color = (0.5,0.5,0.5)
         self.color_strobe = 0
 
         # Scale
@@ -191,7 +191,7 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
     def reset(self):
         self.set_scale(1.0, 1.0)
         self.set_position(0, 0, 0)
-        self.set_color((0,0,0))
+        self.set_color((0.5,0.5,0.5))
         self.set_color_strobe(0)
         self.set_angle(0, 0, 0)
         self.set_visible(False)

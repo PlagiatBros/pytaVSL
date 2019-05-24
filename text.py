@@ -19,8 +19,8 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 FONTS = {
-    "sans": Font('fonts/sans.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(170*TEXT_RESOLUTION), offset_y=0.015, codepoints=CODEPOINTS),
-    "mono": Font('fonts/mono.ttf', color=(127,127,127,255), background_color=(0,0,0,0), font_size=int(200*TEXT_RESOLUTION), offset_y=-0.005, codepoints=CODEPOINTS)
+    "sans": Font('fonts/sans.ttf', color=(127,127,127,255), shadow=(0,0,0,127), shadow_radius=0, background_color=(0,0,0,0), font_size=int(170*TEXT_RESOLUTION), offset_y=0.015, codepoints=CODEPOINTS),
+    "mono": Font('fonts/mono.ttf', color=(127,127,127,255), shadow=(0,0,0,127), shadow_radius=0, background_color=(0,0,0,0), font_size=int(200*TEXT_RESOLUTION), offset_y=-0.005, codepoints=CODEPOINTS)
 }
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
