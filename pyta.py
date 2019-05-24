@@ -136,6 +136,7 @@ class PytaVSL(OscServer):
                 path = files[i]
                 name = path.split('/')[-1].split('.')[0]
                 self.slides[name] = Slide(name, path, self.shader, self.light)
+                self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), i / 1000.)
                 self.text['debug'].set_text(str(i + 1) + '/' + str(size))
 
             self.text['debug'].reset()
