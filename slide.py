@@ -13,6 +13,7 @@ from pi3d.Display import Display
 import random
 from utils import KillableThread as Thread
 from strobe import Strobe
+from effect import Effect
 from animation import Animable
 from gif import Gif
 from memory import gpu_monitor
@@ -21,9 +22,9 @@ from config import *
 import logging
 LOGGER = logging.getLogger(__name__)
 
-class Slide(Strobe, Gif, Animable, pi3d.Plane):
+class Slide(Effect, Strobe, Gif, Animable, pi3d.Plane):
 
-    def __init__(self, parent, name, texture, shader, width=0, height=0):
+    def __init__(self, parent, name, texture, width=0, height=0):
 
         if type(texture) is str:
 
@@ -35,7 +36,6 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
 
         self.name = name
         self.visible = False
-        self.set_shader(shader)
         self.parent = parent
         self.parent_slide = None
 
@@ -84,7 +84,7 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         if self.color_strobe > 0:
             rgb = list(colorsys.hsv_to_rgb(random.random(), 1.0, 1.0))
             rgb[random.randint(0,2)] *= self.color_strobe
-            self.set_material(rgb)
+            self.set_color(rgb, True)
 
         if self.visible and (not self.strobe or self.strobe_state.visible()):
             if not self.loaded:
@@ -92,10 +92,11 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
                 if not gpu_monitor.alloc(self):
                     return
             self.animate_next_frame()
+
             super(Slide, self).draw(*args, **kwargs)
 
     def clone(self, name):
-        clone = Slide(name, pi3d.Texture(self.buf[0].textures[0].image), self.shader, self.light, self.width, self.height)
+        clone = Slide(name, pi3d.Texture(self.buf[0].textures[0].image), self.light, self.width, self.height)
         clone.gif = self.gif
         return clone
 
@@ -128,8 +129,10 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         """
         set color
         """
-        self.color = color
+        if not tmp:
+            self.color = color
         self.set_material(color)
+
 
     def set_color_strobe(self, strobe):
         """
@@ -180,7 +183,6 @@ class Slide(Strobe, Gif, Animable, pi3d.Plane):
         self.rotateToX(ax)
         self.rotateToY(ay)
         self.rotateToZ(az)
-
 
     def sort_slides(self):
         """

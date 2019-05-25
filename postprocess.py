@@ -19,11 +19,11 @@ class PostProcess(Slide):
         def __init__(self):
 
             texture = OffScreenTexture("postprocess")
-            shader = pi3d.Shader("shaders/glitcher")
 
-            super(PostProcess, self).__init__(None, "postprocessing", texture, shader, Display.INSTANCE.width, Display.INSTANCE.height)
+            super(PostProcess, self).__init__(None, "postprocessing", texture, Display.INSTANCE.width, Display.INSTANCE.height)
 
             self.texture = texture
+            self.set_base_effect('rgbwave')
 
             self.rand = 0.0
             self.strength = 0.0
@@ -45,13 +45,13 @@ class PostProcess(Slide):
         def reset(self):
             super(PostProcess, self).reset()
             self.set_visible(False)
-            self.set_glitch_strength(0.0)
-            self.set_glitch_noise(0.0)
-            self.set_color_hue(0.0)
-            self.set_color_saturation(1.0)
-            self.set_color_value(1.0)
-            self.set_color_invert(0.0)
-            self.set_color_alpha(1.0)
+            # self.set_glitch_strength(0.0)
+            # self.set_glitch_noise(0.0)
+            # self.set_color_hue(0.0)
+            # self.set_color_saturation(1.0)
+            # self.set_color_value(1.0)
+            # self.set_color_invert(0.0)
+            # self.set_color_alpha(1.0)
             self.set_tiles(1.0, 1.0)
 
         def set_color(self, *args):
@@ -84,14 +84,6 @@ class PostProcess(Slide):
         def set_color_invert(self, x):
             self.invert = x
             self.set_custom_data(52, [x])
-
-        def draw(self, *args, **kwargs):
-            rand = random.random()
-            mean = (self.rand*49+rand)/50.0
-            self.set_custom_data(45, [mean])
-            self.rand = rand
-            super(PostProcess, self).draw(*args, **kwargs)
-
 
         def get_param_getter(self, name):
             """

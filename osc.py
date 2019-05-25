@@ -340,6 +340,13 @@ class OscServer(object):
     def remove_group_cb(self, path, args):
         self.remove_group(args[0])
 
+    @liblo.make_method('/pyta/slide/effect', 'ss')
+    @liblo.make_method('/pyta/slide/effect', 's')
+    def set_slide_effect(self, path, args):
+        slides = self.get_slide(args[0])
+        for slide in slides:
+            slide.set_effect(args[1] if len(args) == 2 else None)
+
     @liblo.make_method('/pyta/text', None)
     @osc_range_method(N_TEXTS)
     def set_text_string(self, path, args):

@@ -21,6 +21,7 @@ from utils import unicode
 from memory import gpu_monitor
 from osc import OscServer
 from config import *
+from shaders import init_shaders
 
 LOGGER = pi3d.Log(name=None, level='DEBUG' if '--debug' in sys.argv else 'CRITICAL' if '--quiet' in sys.argv else 'WARNING', file="/dev/null" if '--quiet' in sys.argv else None)
 
@@ -39,7 +40,7 @@ class PytaVSL(OscServer):
         self.CAMERA = pi3d.Camera(is_3d=False, eye=(0, 0, -100))
         self.CAMERA.was_moved = False
 
-        self.shader = pi3d.Shader("uv_flat")
+        init_shaders()
 
         self.DISPLAY.loop_running()
         self.post_process = PostProcess()
@@ -51,9 +52,10 @@ class PytaVSL(OscServer):
 
         # Texts
         self.text = {}
-        self.text['debug'] = Text(shader=self.shader, font=TEXTS_FONTS[2], z=-99)
+        self.text['debug'] = Text(font=TEXTS_FONTS[2], z=-99)
         for i in range(N_TEXTS):
-            self.text[i] = Text(shader=self.shader, font=TEXTS_FONTS[i], z=i-98)
+            self.text[i] = Text(font=TEXTS_FONTS[i], z=i-98)
+
         self.sorted_texts = sorted(self.text.values(), key=lambda text: text.z, reverse=True)
 
 
@@ -134,7 +136,7 @@ class PytaVSL(OscServer):
             for i in range(size):
                 path = files[i]
                 name = path.split('/')[-1].split('.')[0]
-                self.slides[name] = Slide(self, name, path, self.shader)
+                self.slides[name] = Slide(self, name, path)
                 self.slides[name].set_position(self.slides[name].x(), self.slides[name].y(), i / 1000., True)
                 self.text['debug'].set_text(str(i + 1) + '/' + str(size))
 
@@ -210,7 +212,7 @@ class PytaVSL(OscServer):
             LOGGER.error("could not create group \"%s\" (name not available)" % name)
             return
 
-        group = Slide(self, name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.shader, self.DISPLAY.width, self.DISPLAY.height)
+        group = Slide(self, name, pi3d.Texture(numpy.array([[[0,0,0]]])), self.DISPLAY.width, self.DISPLAY.height)
         for child in self.get_slide(slides):
             if not child.parent_slide:
                 child.parent_slide = group

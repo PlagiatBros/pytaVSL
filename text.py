@@ -14,6 +14,7 @@ from utils import unicode
 
 from pi3d_font import Font
 from config import *
+from shaders import SHADERS
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class Text(Strobe, Animable):
     """
     Dynamic text
     """
-    def __init__(self, shader, font="mono", z=-100):
+    def __init__(self, font="mono", z=-100):
         """
         Text constructur
 
@@ -40,7 +41,7 @@ class Text(Strobe, Animable):
         super(Text, self).__init__()
 
         self.font = FONTS[font]
-        self.shader = shader
+        self.shader = SHADERS['default']
 
         self.visible = True
 

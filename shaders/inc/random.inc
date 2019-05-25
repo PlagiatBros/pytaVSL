@@ -2,6 +2,10 @@ float random(vec2 seed){
   return fract(sin(dot(seed ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
+float noise(vec2 p) {
+  return fract(sin(p.x + p.y * 10000.0) * 10000.0);
+}
+
 
 // Description : Array and textureless GLSL 2D simplex noise function.
 //      Author : Ian McEwan, Ashima Arts.
