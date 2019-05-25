@@ -24,7 +24,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Slide(Effect, Strobe, Gif, Animable, pi3d.Plane):
 
-    def __init__(self, parent, name, texture, width=0, height=0):
+    def __init__(self, parent, name, texture, width=1, height=1):
 
         if type(texture) is str:
 
@@ -96,7 +96,7 @@ class Slide(Effect, Strobe, Gif, Animable, pi3d.Plane):
             super(Slide, self).draw(*args, **kwargs)
 
     def clone(self, name):
-        clone = Slide(name, pi3d.Texture(self.buf[0].textures[0].image), self.light, self.width, self.height)
+        clone = Slide(self.parent, name, pi3d.Texture(self.buf[0].textures[0].image), self.width, self.height)
         clone.gif = self.gif
         return clone
 
