@@ -3,12 +3,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pi3d
-
 from pi3d.Display import Display
+from PIL.GifImagePlugin import GifImageFile
 
 from utils import unicode
-
-from PIL.GifImagePlugin import GifImageFile
+from osc import osc_property
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -24,7 +23,7 @@ class Gif(object):
 
     def __init__(self, texture, *args, **kwargs):
 
-        super(Gif, self).__init__(*args, **kwargs)
+        super(Gif, self).__init__(texture=texture, *args, **kwargs)
 
         self.gif = None
         self.gif_index = -1
@@ -36,12 +35,6 @@ class Gif(object):
             gif = GifImageFile(texture.file_string)
             if gif.is_animated:
                 self.set_frames(gif)
-
-    def set_speed(self, speed):
-        self.gif_speed = float(speed)
-
-    def set_duration(self, duration):
-        self.gif_duration = float(duration)
 
     def set_frames(self, gif):
         self.gif = []
@@ -55,10 +48,6 @@ class Gif(object):
             if i == 0:
                 self.texture = t
                 self.set_textures([t])
-
-    def gif_reset(self):
-        self.gif_changed_time = 0
-        self.gif_index = -1 if self.gif_speed > 0 else 0
 
     def gif_next_frame(self):
 
@@ -96,48 +85,32 @@ class Gif(object):
 
         if current_frame is not initial_frame:
 
-            # self.set_textures([current_frame])
             self.buf[0].textures[0].update_ndarray(current_frame.ndarray)
-            # initial_frame.unload_opengl()
             self.gif_changed_time = now + elapsed
 
 
     def draw(self, *args, **kwargs):
 
-        if self.gif:
+        if self.gif and self.visible:
             self.gif_next_frame()
 
         super(Gif, self).draw(*args, **kwargs)
 
-
-    def get_param_getter(self, name):
-        """
-        Getters for osc & animations
-        """
-        _val = super(Gif, self).get_param_getter(name)
-
-        val = 0
-        if name == 'speed':
-            val = self.gif_speed
-        elif name == 'duration':
-            val = self.gif_duration
-
-        return val if val is not 0 else _val
-
-    def get_param_setter(self, name):
-        """
-        Setters for osc & animations
-        """
-
-        _set_val = super(Gif, self).get_param_setter(name)
-
-        if name == 'speed':
-            def set_val(val):
-                self.set_speed(val)
-        elif name == 'duration':
-            def set_val(val):
-                self.set_duration(val)
+    @osc_property('frame', 'gif_index')
+    def set_frame(self, frame):
+        self.gif_changed_time = 0
+        frame = int(frame)
+        if self.gif_speed < 0:
+            frame += 1
         else:
-            set_val = None
+            frame -= 1
+        self.gif_index = frame
+        self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray)
 
-        return set_val if set_val is not None else _set_val
+    @osc_property('speed', 'gif_speed')
+    def set_speed(self, speed):
+        self.gif_speed = float(speed)
+
+    @osc_property('duration', 'gif_duration')
+    def set_duration(self, duration):
+        self.gif_duration = float(duration)

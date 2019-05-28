@@ -2,27 +2,23 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import time
 import pi3d
-import liblo
-import copy
 import colorsys
+import random
 
 from pi3d.Display import Display
 
-import random
-from utils import KillableThread as Thread
-from strobe import Strobe
 from effect import Effect
 from animation import Animable
 from gif import Gif
+from osc import OscNode, osc_property
 from memory import gpu_monitor
 from config import *
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
-class Slide(Effect, Strobe, Gif, Animable, pi3d.Plane):
+class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
     def __init__(self, parent, name, texture, width=1, height=1):
 
@@ -32,29 +28,39 @@ class Slide(Effect, Strobe, Gif, Animable, pi3d.Plane):
             width = texture.ix
             height = texture.iy
 
-        super(Slide, self).__init__(texture=texture, w=width, h=height)
+        super(SlideBase, self).__init__(w=width, h=height)
 
         self.name = name
-        self.visible = False
         self.parent = parent
         self.parent_slide = None
+        self.is_group = False
+        self.children_need_sorting = False
+        self.is_clone = False
 
         if texture:
             self.set_textures([texture])
 
+        self.visible = 0
+
         # Color
-        self.color = (0.5,0.5,0.5)
+        self.color = [0.5,0.5,0.5]
         self.color_strobe = 0
+        self.color_alpha = 1.0
+
+        # Position
+        self.pos_x = 0.0
+        self.pos_y = 0.0
+        self.pos_z = 0.0
 
         # Scale
         self.init_scale = min(Display.INSTANCE.width / width, Display.INSTANCE.height / height)
         self.sx = 1.0
         self.sy = 1.0
 
-        # Angle
-        self.ax = 0.0
-        self.ay = 0.0
-        self.az = 0.0
+        # Rotate
+        self.rx = 0.0
+        self.ry = 0.0
+        self.rz = 0.0
 
         # texture tiling
         self.tiles = [1.0, 1.0]
@@ -65,236 +71,187 @@ class Slide(Effect, Strobe, Gif, Animable, pi3d.Plane):
 
         self.set_zoom(1.0)
 
+    def draw(self, *args, **kwargs):
+
+        if self.visible:
+
+            if self.color_strobe > 0:
+                rgb = list(colorsys.hsv_to_rgb(random.random(), 1.0, 1.0))
+                rgb[random.randint(0,2)] *= self.color_strobe
+                self.set_material(rgb)
+
+            if not self.loaded:
+                self.loaded = True
+                if not gpu_monitor.alloc(self):
+                    return
+
+            if self.children_need_sorting:
+                self.children = sorted(self.children, key=lambda slide: slide.z(), reverse=True)
+                self.children_need_sorting = False
+
+            super(SlideBase, self).draw(*args, **kwargs)
+
+
+    def quit_group(self):
+        if self.parent_slide:
+            self.parent_slide.children.remove(self)
+            self.parent_slide.sort_slides()
+            self.parent_slide = None
+
+    def sort_slides(self):
+        """
+        Sort children in drawing order (by z-index)
+        """
+        self.children_need_sorting = True
+
     def unload(self):
         if self.loaded and not self.visible:
             self.loaded = False
             for t in self.textures:
                 t.unload_opengl()
-                # t.__del__()
             for b in self.buf:
                 b.unload_opengl()
-                # b.__del__()
                 for t in b.textures:
                     t.unload_opengl()
-                    # t.__del__()
             gpu_monitor.free(self)
 
-    def draw(self, *args, **kwargs):
-
-        if self.color_strobe > 0:
-            rgb = list(colorsys.hsv_to_rgb(random.random(), 1.0, 1.0))
-            rgb[random.randint(0,2)] *= self.color_strobe
-            self.set_color(rgb, True)
-
-        if self.visible and (not self.strobe or self.strobe_state.visible()):
-            if not self.loaded:
-                self.loaded = True
-                if not gpu_monitor.alloc(self):
-                    return
-            self.animate_next_frame()
-
-            super(Slide, self).draw(*args, **kwargs)
-
-    def clone(self, name):
-        clone = Slide(self.parent, name, pi3d.Texture(self.buf[0].textures[0].image), self.width, self.height)
-        clone.gif = self.gif
-        return clone
-
+    @osc_property('tiles', 'tiles')
     def set_tiles(self, x, y):
         if x is not None:
-            self.tiles[0] = x
+            self.tiles[0] = float(x)
         if y is not None:
-            self.tiles[1] = y
+            self.tiles[1] = float(y)
 
         for b in self.buf:
             b.unib[6] = self.tiles[0]
             b.unib[7] = self.tiles[1]
 
-        self.set_offset()
+        self.set_offset(None, None)
 
-    def set_offset(self, x=None, y=None):
+    @osc_property('offset', 'offset')
+    def set_offset(self, x, y):
         if x is not None:
-            self.offset[0] = x
+            self.offset[0] = float(x)
         if y is not None:
-            self.offset[1] = y
-        super(Slide, self).set_offset((self.offset[0] + (1-self.tiles[0])/2, self.offset[1] + (1-self.tiles[1])/2.))
+            self.offset[1] = float(y)
+        super(SlideBase, self).set_offset((self.offset[0] + (1-self.tiles[0])/2, self.offset[1] + (1-self.tiles[1])/2.))
 
+    @osc_property('visible', 'visible')
     def set_visible(self, visible):
         """
         set visibility
         """
-        self.visible = bool(visible)
+        self.visible = int(bool(visible))
 
-    def set_color(self, color, tmp = False):
+    @osc_property('color', 'color')
+    def set_color(self, r, g, b):
         """
         set color
         """
-        if not tmp:
-            self.color = color
-        self.set_material(color)
+        self.color = [float(r), float(g), float(b)]
+        self.set_material(self.color)
+
+    @osc_property('alpha', 'color_alpha')
+    def set_color_alpha(self, alpha):
+        self.color_alpha = float(alpha)
+        self.set_alpha(self.color_alpha)
 
 
+    @osc_property('color_strobe', 'color_strobe')
     def set_color_strobe(self, strobe):
         """
         set color strobing strength
         """
-        self.color_strobe = strobe
+        self.color_strobe = float(strobe)
         if strobe <= 0:
             self.set_color(self.color)
 
-    def set_position(self, x, y, z, prevent_sorting=False):
-        """
-        set_position aims to set the position of the slides and to keep a trace of it
-        """
-        sort_parent = z != self.z() and not prevent_sorting
-        self.position(x, y, z)
+    @osc_property('position', 'pos_x', 'pos_y', 'pos_z')
+    def set_position(self, x, y, z):
+        if x is not None:
+            self.pos_x = float(x)
+        if y is not None:
+            self.pos_y = float(y)
+        if z is not None:
+            self.pos_z = float(z)
+        sort_parent = self.pos_z != self.z()
+        self.position(self.pos_x, self.pos_y, self.pos_z)
         if sort_parent:
             parent = self.parent_slide if self.parent_slide is not None else self.parent
             parent.sort_slides()
 
-    def set_translation(self, dx, dy, dz):
-        """
-        set_translation does a translation operation on the slide
-        """
-        self.translate(dx, dy, dz)
+    @osc_property('position_x', 'pos_x')
+    def set_position_x(self, x):
+        self.set_position(x, None, None)
 
+    @osc_property('position_y', 'pos_y')
+    def set_position_y(self, y):
+        self.set_position(None, y, None)
+
+    @osc_property('position_z', 'pos_z')
+    def set_position_z(self, z):
+        self.set_position(None, None, z)
+
+    @osc_property('scale', 'sx', 'sy')
     def set_scale(self, sx, sy):
         """
-        set_scale sets the scale of the slides and keeps track of it
+        Scaling
         """
-        self.sx = sx
-        self.sy = sy
+        self.sx = float(sx)
+        self.sy = float(sy)
         self.scale(sx * self.init_scale, sy * self.init_scale, 1.0)
 
+    @osc_property('zoom', 'sx')
     def set_zoom(self, zoom):
         """
         Scaling relative to initial size, aka zoom
         """
         self.set_scale(zoom, zoom)
 
-    def set_angle(self, ax, ay, az):
-        # set angle (absolute)
+    @osc_property('rotate', 'rx', 'ry', 'rz')
+    def set_rotate(self, rx, ry, rz):
         """
-        set_angle sets the rotation of the slide and keeps track of it. It's an absolute angle, not a rotation one.
+        Set the rotation of the slide
         """
-        self.ax = ax
-        self.ay = ay
-        self.az = az
-        self.rotateToX(ax)
-        self.rotateToY(ay)
-        self.rotateToZ(az)
 
-    def sort_slides(self):
-        """
-        Sort slides in drawing order (by z-index)
-        """
-        self.children = sorted(self.children, key=lambda slide: slide.z(), reverse=True)
+        if rx is not None:
+            self.rx = float(rx)
+            self.rotateToX(self.rx)
+        if ry is not None:
+            self.ry = float(ry)
+            self.rotateToY(self.ry)
+        if rz is not None:
+            self.rz = float(rz)
+            self.rotateToZ(self.rz)
+
+    @osc_property('rotate_x', 'rx')
+    def set_rotate_x(self, rx):
+        self.set_rotate(rx, None, None)
+
+    @osc_property('rotate_y', 'ry')
+    def set_rotate_y(self, ry):
+        self.set_rotate(None, ry, None)
+
+    @osc_property('rotate_z', 'rz')
+    def set_rotate_z(self, rz):
+        self.set_rotate(None, None, rz)
 
     def reset(self):
-        self.set_scale(1.0, 1.0)
-        self.set_position(0, 0, 0)
-        self.set_color((0.5,0.5,0.5))
-        self.set_color_strobe(0)
-        self.set_angle(0, 0, 0)
-        self.set_visible(False)
-        self.set_strobe(0, 2, 0.5)
-        self.set_tiles(1.0, 1.0)
-        self.stop_animate()
+        pass
+        # self.set_scale(1.0, 1.0)
+        # self.set_position(0, 0, 0)
+        # self.set_color((0.5,0.5,0.5))
+        # self.set_color_strobe(0)
+        # self.set_angle(0, 0, 0)
+        # self.set_visible(False)
+        # self.set_strobe(0, 2, 0.5)
+        # self.set_tiles(1.0, 1.0)
+        # self.stop_animate()
+        # super(Slide, self).reset()
 
-    def get_param_getter(self, name):
-        """
-        Getters for osc & animations
-        """
 
-        _val = super(Slide, self).get_param_getter(name)
+class Slide(Gif, SlideBase):
 
-        val = 0
-        if name == 'position_x':
-            val = self.x()
-        elif name == 'position_y':
-            val = self.y()
-        elif name == 'position_z':
-            val = self.z()
-        elif name == 'rotate_x':
-            val = self.ax
-        elif name == 'rotate_y':
-            val = self.ay
-        elif name == 'rotate_z':
-            val = self.az
-        elif name == 'scale_x':
-            val = self.sx
-        elif name == 'scale_y':
-            val = self.sy
-        elif name == 'zoom' or name == 'rsxy':
-            val = self.sx
-        elif name == 'alpha':
-            val = self.alpha()
-        elif name == 'tiles':
-            val = self.tiles[0]
-        elif name == 'tiles_x':
-            val = self.tiles[0]
-        elif name == 'tiles_y':
-            val = self.tiles[1]
-        elif name == 'offset_x':
-            val = self.offset[0]
-        elif name == 'offset_y':
-            val = self.offset[1]
+    def __init__(self, *args, **kwargs):
 
-        return val if val is not 0 else _val
-
-    def get_param_setter(self, name):
-        """
-        Setters for osc & animations
-        """
-
-        _set_val = super(Slide, self).get_param_setter(name)
-
-        if name == 'position_x':
-            def set_val(val):
-                self.set_position(val, self.y(), self.z())
-        elif name == 'position_y':
-            def set_val(val):
-                self.set_position(self.x(), val, self.z())
-        elif name == 'position_z':
-            def set_val(val):
-                self.set_position(self.x(), self.y(), val)
-        elif name == 'rotate_x':
-            def set_val(val):
-                self.set_angle(val, self.ay, self.az)
-        elif name == 'rotate_y':
-            def set_val(val):
-                self.set_angle(self.ax, val, self.az)
-        elif name == 'rotate_z':
-            def set_val(val):
-                self.set_angle(self.ax, self.ay, val)
-        elif name == 'scale_x':
-            def set_val(val):
-                self.set_scale(val, self.sy)
-        elif name == 'scale_y':
-            def set_val(val):
-                self.set_scale(self.sx, val)
-        elif name == 'zoom' or name == 'rsxy':
-            def set_val(val):
-                self.set_zoom(val)
-        elif name == 'alpha':
-            def set_val(val):
-                self.set_alpha(val)
-        elif name == 'tiles':
-            def set_val(val):
-                self.set_tiles(val, val)
-        elif name == 'tiles_x':
-            def set_val(val):
-                self.set_tiles(val, None)
-        elif name == 'tiles_y':
-            def set_val(val):
-                self.set_tiles(None, val)
-        elif name == 'offset_x':
-            def set_val(val):
-                self.set_offset(val, None)
-        elif name == 'offset_y':
-            def set_val(val):
-                self.set_offset(None, val)
-        else:
-            set_val = None
-
-        return set_val if set_val is not None else _set_val
+        super(Slide, self).__init__(*args, **kwargs)

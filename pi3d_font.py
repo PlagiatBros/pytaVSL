@@ -12,13 +12,13 @@ if sys.version_info[0] == 3:
 from PIL import Image, ImageDraw, ImageFont
 
 from pi3d.constants import *
-from pi3d.Texture import Texture
+import pi3d
 
 from math import sqrt, ceil
 
 MAX_SIZE = 1920
 
-class Font(Texture):
+class Font(pi3d.Texture):
   """
   A Font contains a TrueType font ready to be rendered in OpenGL.
 

@@ -1,25 +1,24 @@
 # encoding: utf-8
 
-from math import floor
-from abc import abstractmethod
 import pi3d
 from pi3d.Display import Display
 
 from utils import unicode
-
+from osc import osc_method
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
 class Animation():
 
-    def __init__(self, name, start, end, duration, setter, loop):
+    def __init__(self, name, start, end, duration, loop, setter):
         self.name = name
         self.start = start
         self.end = end
         self.duration = duration
-        self.forward_a = 1.0 * (end - start) / duration
-        self.backward_a = 1.0 * (start - end) / duration
+        self.nargs = len(start)
+        self.forward_a = [1.0 * (end[i] - start[i]) / duration for i in range(self.nargs)]
+        self.backward_a = [1.0 * (start[i] - end[i]) / duration for i in range(self.nargs)]
         self.setter = setter
         self.loop = loop
         self.backward = False
@@ -39,9 +38,30 @@ class Animation():
             t = self.duration
             self.done = True
         if self.backward:
-            self.setter(self.backward_a * t + self.end)
+            value = [self.backward_a[i] * t + self.end[i] for i in range(self.nargs)]
+            self.setter(*value)
         else:
-            self.setter(self.forward_a * t + self.start)
+            value = [self.forward_a[i] * t + self.start[i] for i in range(self.nargs)]
+            self.setter(*value)
+
+
+class Strobe():
+
+    def __init__(self, name, start, end, duration, ratio, setter):
+
+        self.duration = max(int(duration), 0.001) * 0.04
+        self.date = Display.INSTANCE.time
+        self.breakpoint = max(float(ratio), 0.0) * self.duration
+        self.start = start
+        self.end = end
+        self.setter = setter
+
+    def play(self):
+        t = Display.INSTANCE.time + 1. / Display.INSTANCE.frames_per_second # always 1 frame early for smooth anims
+        delta = t - self.date
+        progress = delta % self.duration
+        value = self.start if progress < self.breakpoint else self.end
+        self.setter(*value)
 
 
 class Animable(object):
@@ -51,30 +71,107 @@ class Animable(object):
         super(Animable, self).__init__(*args, **kwargs)
 
         self.animations = {}
+        self.strobes = {}
 
-
-    def animate(self, name, start, end, duration, loop=False):
+    @osc_method('animate')
+    def animate(self, property, *args):
         """
         Animate a property
-
-        Args:
-            name  (str):
-            start (int):
-            end   (int):
-            duration (float):
         """
-        current = self.get_param_getter(name)
-        _start = self.parse_animate_value(start, current)
-        _end = self.parse_animate_value(end, current)
-        setter = self.get_param_setter(name)
+        attribute = property.lower()
 
-        if setter is None:
-            LOGGER.error('ERROR: Attempting to animate non-animable property "%s" on %s' % (name, self))
+        if attribute == 'visible':
+            LOGGER.error('invalid property argument "%s" for /%s/animate' % (attribute, self.name))
             return
 
-        self.animations[name] = Animation(name, _start, _end, duration, setter, loop)
+        if attribute in self.osc_attributes:
+            method = self.osc_attributes[attribute]
+            argcount = method.osc_argcount_min
 
-    def animate_next_frame(self):
+            if len(args) < argcount * 2 + 1 or len(args) > argcount * 2 + 2:
+                LOGGER.error('bad number of argument for /%s/animate %s (%i or %i expected, %i provided)' % (self.name, attribute, argcount * 2 + 1, argcount * 2 + 2, len(args)))
+                return
+
+            loop = 0
+            duration = args[-1]
+            if len(args) == (argcount * 2 + 2):
+                loop = args[-1]
+                duration = args[-2]
+
+            current = self.osc_get_value(attribute)
+            if current is not None:
+                args = [self.osc_parse_value(args[i], current[i % argcount]) for i in range(argcount * 2)]
+
+            start = [args[i] for i in range(argcount)]
+            end = [args[i + argcount] for i in range(argcount)]
+
+            self.animations[attribute] = Animation(attribute, start, end, duration, loop, method)
+
+        else:
+            LOGGER.error('invalid property argument "%s" for /%s/animate' % (attribute, self.name))
+
+    @osc_method('animate_stop')
+    def stop_animate(self, *properties):
+        """
+        Stop animations
+        """
+        for name in properties:
+            if name in self.animations:
+                del self.animations[name]
+
+        if len(properties) == 0:
+            self.animations = {}
+
+    @osc_method('strobe')
+    def strobe(self, property, *args):
+        """
+        Strobe a property
+        """
+        attribute = property[0].lower()
+
+        if attribute == 'visible':
+            LOGGER.error('invalid property argument "%s" for /%s/strobe' % (attribute, self.name))
+            return
+
+        if attribute in self.osc_attributes:
+            method = self.osc_attributes[attribute]
+            argcount = method.osc_argcount_min
+
+            if len(args) != argcount * 2 + 2:
+                LOGGER.error('bad number of argument for /%s/animate %s (%i expected, %i provided)' % (self.name, attribute, argcount * 2 + 2, len(args)))
+                return
+
+            duration = args[-2]
+            ratio = args[-1]
+
+            current = self.osc_get_value(attribute)
+            if current is not None:
+                args = [self.osc_parse_value(args[i], current[i % argcount]) for i in range(argcount * 2)]
+
+                start = [args[i] for i in range(argcount)]
+                end = [args[i + argcount] for i in range(argcount)]
+
+                self.strobes[attribute] = Strobe(attribute, start, end, duration, ratio, method)
+
+        else:
+            LOGGER.error('invalid property argument "%s" for /%s/strobe' % (attribute, self.name))
+
+    @osc_method('strobe_stop')
+    def stop_strobe(self, *properties):
+        """
+        Stop strobes
+        """
+        for name in properties:
+            if name in self.strobes:
+                del self.strobes[name]
+
+        if len(properties) == 0:
+            self.strobes = {}
+
+    def draw(self, *args, **kwargs):
+        """
+        Compute current state of animations
+        """
         if self.animations:
             anims = list(self.animations.values())
             for anim in anims:
@@ -85,48 +182,8 @@ class Animable(object):
                         anim.play()
                     else:
                         self.stop_animate(anim.name)
+        if self.strobes:
+            for name in self.strobes:
+                self.strobes[name].play()
 
-    def stop_animate(self, name=None):
-        """
-        Stop animations
-        """
-        if name is not None and name in self.animations:
-            del self.animations[name]
-        elif name is None:
-            self.animations = {}
-
-    def parse_animate_value(self, val, current):
-
-        if isinstance(val, (str, unicode)) and len(val) > 1:
-            operator = val[0]
-            if operator == '+' or operator == '-':
-                return current + float(val)
-            elif operator == '*':
-                return current * float(val[1:])
-            elif operator == '/':
-                return current / float(val[1:])
-
-        if not isinstance(val, (str, unicode)):
-            return val
-        else:
-            LOGGER.error('ERROR: failed to parse animate value %s (%s)' % (val, type(val)))
-            return current
-
-    @abstractmethod
-    def get_param_getter(self, name):
-        """
-        Getters for animations
-        """
-        val = 0
-
-        return val
-
-    @abstractmethod
-    def get_param_setter(self, name):
-        """
-        Setters for animations
-        """
-        def set_val(val):
-            pass
-
-        return set_val
+        super(Animable, self).draw(*args, **kwargs)

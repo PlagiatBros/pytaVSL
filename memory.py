@@ -2,11 +2,10 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from config import *
+
 import logging
 LOGGER = logging.getLogger(__name__)
-import sys
-
-from text import FONTS
 
 class MemoryMonitor(object):
 

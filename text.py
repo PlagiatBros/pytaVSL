@@ -5,70 +5,40 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pi3d
 from pi3d.Display import Display
 import random
-import colorsys
 
-from strobe import Strobe
-from animation import Animable
-from pi3d_string import String
-from utils import unicode
-
+from slide import SlideBase
+from utils import unicode, unichr
+from osc import osc_property
 from pi3d_font import Font
 from config import *
-from shaders import SHADERS
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
-FONTS = {
-    "sans": Font('fonts/sans.ttf', color=(127,127,127,255), shadow=(0,0,0,127), shadow_radius=0, background_color=(0,0,0,0), font_size=int(170*TEXT_RESOLUTION), offset_y=0.015, codepoints=CODEPOINTS),
-    "mono": Font('fonts/mono.ttf', color=(127,127,127,255), shadow=(0,0,0,127), shadow_radius=0, background_color=(0,0,0,0), font_size=int(200*TEXT_RESOLUTION), offset_y=-0.005, codepoints=CODEPOINTS)
-}
 V_ALIGN = ['C', 'B', 'T']
 H_ALIGN = ['C', 'L', 'R']
+_NORMALS = [[0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0]]
+GAP = 1
 
-class Text(Strobe, Animable):
+class Text(SlideBase):
     """
     Dynamic text
     """
-    def __init__(self, font="mono", z=-100):
-        """
-        Text constructur
-
-        Args:
-            font (str): "sans" or "mono" (see FONTS global)
-        """
-
-        super(Text, self).__init__()
+    def __init__(self, parent, name, font="mono"):
 
         self.font = FONTS[font]
-        self.shader = SHADERS['default']
-
-        self.visible = True
 
         self.string = ' '
         self.length = max(len(self.string), 1)
-        self.color = (1.0, 1.0, 1.0)
-        self.color_strobe = False
 
         self.size = 'auto'
 
         self.h_align = 'C'
         self.v_align = 'C'
 
-        self.x = 0
-        self.y = 0
-        self.z = z
         self.align_offset = [0, 0]
 
-        self.sx = 1
-        self.sy = 1
-
-        self.rx = 0
-        self.ry = 0
-        self.rz = 0
-
         self.need_regen = False
-        self.new_string()
 
         # cool
         self.glitch = False
@@ -77,47 +47,120 @@ class Text(Strobe, Animable):
         self.glitch_duration = 1
         self.glitch_start = 0
 
+        super(Text, self).__init__(parent, name, self.font, Display.INSTANCE.width, Display.INSTANCE.height)
+
+        self.color = [1.0, 1.0, 1.0]
+
+        self.new_string() # remove ?
+
+
     def new_string(self):
         """
-        Generate a new string instance and apply all options.
+        Update string buffer. Mostly copied from pi3d.String
         """
-
         size = self.font.ratio / self.length if self.size == 'auto' else self.size
+        size /= TEXT_RESOLUTION
 
-        self.text = String(font=self.font, string=self.string, size=size / TEXT_RESOLUTION,
-                      x=0, y=0, z=self.z, is_3d=False,
-                      justify=self.h_align, rx=self.rx, ry=self.ry, rz=self.rz)
+        justify = self.h_align
+        string = self.string
+        font = self.font
 
-        self.text.set_shader(self.shader)
+        sy = sx = size * 4.0
+
+        sy *= self.sy
+        sx *= self.sx
+
+        self.verts = []
+        self.texcoords = []
+        self.norms = []
+        self.inds = []
+        temp_verts = []
+
+        xoff = 0.0
+        yoff = 0.0
+        lines = 0
+        nlines = string.count("\n") + 1
+
+        def make_verts(): #local function to justify each line
+            if justify.upper() == "C":
+                cx = xoff / 2.0
+            elif justify.upper() == "L":
+                cx = 0.0
+            else:
+                cx = xoff
+            for j in temp_verts:
+                self.verts.append([(j[0] - cx) * sx,
+                                 (j[1] + nlines * font.height * GAP / 2.0 - yoff) * sy,
+                                 j[2]])
+
+        default = font.glyph_table.get(unichr(0), None)
+        for i, c in enumerate(string):
+            if c == '\n':
+                make_verts()
+                yoff += font.height * GAP
+                xoff = 0.0
+                temp_verts = []
+                lines += 1
+                continue #don't attempt to draw this character!
+
+            glyph = font.glyph_table.get(c, default)
+            if not glyph:
+                continue
+            w, h, texc, verts = glyph[0:4]
+            for j in verts:
+                temp_verts.append((j[0]+xoff, j[1], j[2]))
+            xoff += w
+            for j in texc:
+                self.texcoords.append(j)
+            self.norms.extend(_NORMALS)
+
+            # Take Into account unprinted \n characters
+            stv = 4 * (i - lines)
+            self.inds.extend([[stv, stv + 2, stv + 1], [stv, stv + 3, stv + 2]])
+
+        make_verts()
+
+        self.buf = []
+        self.buf.append(pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms))
+        self.buf[0].textures = [font]
 
         self.set_v_align(self.v_align)
-        self.set_color(self.color)
+        self.set_h_align(self.h_align)
+        self.set_shader(self.shader)
+        self.set_scale(self.sx, self.sy)
+        self.set_material(self.color)
+        self.set_tiles(*self.tiles)
 
-        self.text.scale(self.sx, self.sy, 1)
+    def draw(self, *args, **kwargs):
 
+        if self.visible:
 
-    def draw(self):
+            if self.glitch:
+                self.glitch_next()
 
-        if self.glitch:
-            self.glitch_next()
+            if self.string == '':
+                return
 
-        if self.string == '':
-            return
+            if self.need_regen:
+                self.need_regen = False
+                self.new_string()
 
-        self.animate_next_frame()
+            super(Text, self).draw(*args, **kwargs)
 
-        if self.need_regen:
-            self.need_regen = False
-            self.new_string()
+    def scale(self, sx, sy, sz):
+        """
+        Override Slide.scale to trigger string regeneration when needed
+        """
+        super(Text, self).scale(sx, sy, sz)
+        if self.v_align != 'C':
+            self.need_regen = True
 
-        if self.visible and self.string and (not self.strobe or self.strobe_state.visible()):
+    def position(self, x, y, z):
+        """
+        Override Shape.position to take text alignment into account
+        """
+        super(Text, self).position(x + self.align_offset[0], y + self.align_offset[1], z)
 
-            if self.color_strobe > 0:
-                rgb = list(colorsys.hsv_to_rgb(random.random(), 1.0, 1.0))
-                rgb[random.randint(0,2)] *= self.color_strobe
-                self.text.set_material(rgb)
-
-            self.text.draw()
 
     def set_text(self, string, duration=None, stop_glitch=True):
         """
@@ -133,8 +176,6 @@ class Text(Strobe, Animable):
             self.string = string
         else:
             self.string = string.decode('utf8')
-
-
 
         if '\n' in self.string:
             self.length = max(max(map(lambda line: len(line), self.string.split('\n'))), 1)
@@ -183,33 +224,14 @@ class Text(Strobe, Animable):
 
                 string += c
 
-            self.set_text(string, stop_glitch=False)
+            self.set_text(string, None, False)
 
-    def set_color(self, color, tmp=False):
-        """
-        Set the text's color. Triggers String regeneration.
 
-        Args:
-            color (tuple): rgb float values between 0.0 and 1.0
-        """
-        if not tmp:
-            self.color = color
-        self.text.set_material(color)
+    @osc_property('text', 'string')
+    def set_text_osc(self, text, glitch_duration=None):
+        self.set_text(text, glitch_duration)
 
-    def set_alpha(self, alpha):
-        """
-        Set the text's opacity.
-
-        Args:
-            alpha (tuple): alpha float values between 0.0 and 1.0
-        """
-        self.text.set_alpha(alpha)
-
-    def set_color_strobe(self, strobe):
-        self.color_strobe = strobe
-        if strobe <= 0:
-            self.set_color(self.color)
-
+    @osc_property('align', 'h_align', 'v_align')
     def set_align(self, h, v):
         """
         Set horizontal and vertical alignments with support for inverted args.
@@ -239,6 +261,7 @@ class Text(Strobe, Animable):
         if v in V_ALIGN and v != self.v_align:
             self.set_v_align(v)
 
+    @osc_property('align_h', 'h_align')
     def set_h_align(self, align):
         """
         Set heorizontal alignment. Triggers String regeneration.
@@ -247,7 +270,6 @@ class Text(Strobe, Animable):
             align (str): C, L or R
         """
         self.h_align = align
-
         x = 0
 
         if self.h_align == 'L':
@@ -256,9 +278,10 @@ class Text(Strobe, Animable):
             x = Display.INSTANCE.width / 2.
 
         self.align_offset[0] = x
-        self.set_position(self.x, self.y)
+        self.set_position(self.pos_x, self.pos_y, None)
         self.need_regen = True
 
+    @osc_property('align_v', 'v_align')
     def set_v_align(self, align):
         """
         Set vertical alignment. Triggers String regeneration.
@@ -278,39 +301,10 @@ class Text(Strobe, Animable):
             y = - Display.INSTANCE.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
 
         self.align_offset[1] = y
-        self.set_position(self.x, self.y)
+        self.set_position(self.pos_x, self.pos_y, None)
 
-    def set_position(self, x, y):
-        """
-        Set position (relative to alignment). Triggers String regeneration.
 
-        Args:
-            x (int): horizontal offset in pixels
-            y (int): vertical offset in pixels
-        """
-        self.x = x
-        self.y = y
-        self.text.position(self.x + self.align_offset[0], self.y + self.align_offset[1], self.text.z())
-
-    def set_rotation(self, rx, ry, rz):
-        """
-        Set rotation. Triggers String regeneration.
-
-        Args:
-            rx (float):
-            ry (float):
-            rz (float):
-        """
-        if rx is not None:
-            self.rx = rx
-            self.text.rotateToX(self.rx)
-        if ry is not None:
-            self.ry = ry
-            self.text.rotateToY(self.ry)
-        if rz is not None:
-            self.rz = rz
-            self.text.rotateToZ(self.rz)
-
+    @osc_property('size', 'size')
     def set_size(self, size):
         """
         Set size. Triggers String regeneration.
@@ -327,110 +321,17 @@ class Text(Strobe, Animable):
 
         self.need_regen = True
 
-    def set_scale(self, sx, sy):
-        """
-        set_scale sets the scale of the text
-        """
-        self.sx = sx
-        self.sy = sy
-
-        if self.v_align != 'C':
-            self.need_regen = True
-        else:
-            self.text.scale(sx, sy, 1)
-
-    def set_zoom(self, zoom):
-        """
-        Scaling relative to initial size, aka zoom
-        """
-        self.set_scale(zoom, zoom)
-
-    def set_visible(self, visible):
-        """
-        Set visibility.
-
-        Args:
-            visible (bool): True to show, False to hide
-        """
-        self.visible = bool(visible)
 
     def reset(self):
-        self.set_size('auto')
-        self.set_scale(1, 1)
-        self.set_strobe(0, 2, 0.5)
-        self.set_rotation(0, 0, 0)
-        self.set_position(0, 0)
-        self.set_align('c', 'c')
-        self.set_alpha(1)
-        self.set_color((1, 1, 1))
-        self.set_color_strobe(False)
-        self.set_visible(0)
-        self.set_text('')
-        self.stop_animate()
-
-    def get_param_getter(self, name):
-        """
-        Getters for animations
-        """
-        val = 0
-        if name == 'size':
-            val = self.font.ratio / self.length if self.size == 'auto' else self.size
-        elif name == 'position_x':
-            val = self.x
-        elif name == 'position_y':
-            val = self.y
-        elif name == 'rotate_x':
-            val = self.rx
-        elif name == 'rotate_y':
-            val = self.ry
-        elif name == 'rotate_z':
-            val = self.rz
-        elif name == 'scale_x':
-            val = self.sx
-        elif name == 'scale_y':
-            val = self.sy
-        elif name == 'zoom':
-            val = self.sx
-        elif name == 'alpha':
-            val = self.text.alpha()
-
-        return val
-
-    def get_param_setter(self, name):
-        """
-        Setters for one-arg animations
-        """
-        if name == 'size':
-            def set_val(val):
-                self.set_size(val)
-        elif name == 'rotate_x':
-            def set_val(val):
-                self.set_rotation(val, None, None)
-        elif name == 'rotate_y':
-            def set_val(val):
-                self.set_rotation(None, val, None)
-        elif name == 'rotate_z':
-            def set_val(val):
-                self.set_rotation(None, None, val)
-        elif name == 'scale_x':
-            def set_val(val):
-                self.set_scale(val, self.sy)
-        elif name == 'scale_y':
-            def set_val(val):
-                self.set_scale(self.sx, val)
-        elif name == 'zoom':
-            def set_val(val):
-                self.set_zoom(val)
-        elif name == 'position_x':
-            def set_val(val):
-                self.set_position(val, None)
-        elif name == 'position_y':
-            def set_val(val):
-                self.set_position(None, val)
-        elif name == 'alpha':
-            def set_val(val):
-                self.set_alpha(val)
-        else:
-            set_val = None
-
-        return set_val
+        pass
+        # self.set_size('auto')
+        # self.set_scale(1, 1)
+        # self.set_rotation(0, 0, 0)
+        # self.set_position(0, 0)
+        # self.set_align('c', 'c')
+        # self.set_alpha(1)
+        # self.set_color((1, 1, 1))
+        # self.set_color_strobe(False)
+        # self.set_visible(0)
+        # self.set_text('')
+        # self.stop_animate()
