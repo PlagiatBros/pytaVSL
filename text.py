@@ -6,6 +6,7 @@ import pi3d
 from pi3d.Display import Display
 import random
 
+from state import State
 from slide import SlideBase
 from utils import unicode, unichr
 from osc import osc_property
@@ -20,7 +21,7 @@ H_ALIGN = ['C', 'L', 'R']
 _NORMALS = [[0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0]]
 GAP = 1
 
-class Text(SlideBase):
+class Text(State, SlideBase):
     """
     Dynamic text
     """
@@ -320,18 +321,3 @@ class Text(SlideBase):
             self.size = float(size)
 
         self.need_regen = True
-
-
-    def reset(self):
-        pass
-        # self.set_size('auto')
-        # self.set_scale(1, 1)
-        # self.set_rotation(0, 0, 0)
-        # self.set_position(0, 0)
-        # self.set_align('c', 'c')
-        # self.set_alpha(1)
-        # self.set_color((1, 1, 1))
-        # self.set_color_strobe(False)
-        # self.set_visible(0)
-        # self.set_text('')
-        # self.stop_animate()

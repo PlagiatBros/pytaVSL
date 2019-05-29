@@ -8,6 +8,7 @@ import random
 
 from pi3d.Display import Display
 
+from state import State
 from effect import Effect
 from animation import Animable
 from gif import Gif
@@ -163,7 +164,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
         """
         self.color_strobe = float(strobe)
         if strobe <= 0:
-            self.set_color(self.color)
+            self.set_color(*self.color)
 
     @osc_property('position', 'pos_x', 'pos_y', 'pos_z')
     def set_position(self, x, y, z):
@@ -235,21 +236,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
     def set_rotate_z(self, rz):
         self.set_rotate(None, None, rz)
 
-    def reset(self):
-        pass
-        # self.set_scale(1.0, 1.0)
-        # self.set_position(0, 0, 0)
-        # self.set_color((0.5,0.5,0.5))
-        # self.set_color_strobe(0)
-        # self.set_angle(0, 0, 0)
-        # self.set_visible(False)
-        # self.set_strobe(0, 2, 0.5)
-        # self.set_tiles(1.0, 1.0)
-        # self.stop_animate()
-        # super(Slide, self).reset()
-
-
-class Slide(Gif, SlideBase):
+class Slide(State, Gif, SlideBase):
 
     def __init__(self, *args, **kwargs):
 

@@ -63,6 +63,7 @@ class OscNode(object):
 
         self.osc_methods = {}
         self.osc_attributes = {}
+        self.osc_state = {}
 
         for name, method in getmembers(self):
 

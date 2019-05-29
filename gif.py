@@ -105,7 +105,8 @@ class Gif(object):
         else:
             frame -= 1
         self.gif_index = frame
-        self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray)
+        if self.gif:
+            self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray)
 
     @osc_property('speed', 'gif_speed')
     def set_speed(self, speed):

@@ -120,7 +120,7 @@ class PytaVSL(OscServer):
 
             size = len(files)
 
-            self.texts['debug'].reset()
+            self.texts['debug'].state_save()
             self.texts['debug'].set_visible(1)
             self.texts['debug'].set_size(0.025)
             self.texts['debug'].set_align('top', 'right')
@@ -137,7 +137,7 @@ class PytaVSL(OscServer):
                     LOGGER.error('could not load file %s' %path)
                 self.texts['debug'].set_text(str(i + 1) + '/' + str(size))
 
-            self.texts['debug'].set_visible(0)
+            self.texts['debug'].state_recall()
 
             LOGGER.info("total slides in memory: %i" % len(self.slides.values()))
 
