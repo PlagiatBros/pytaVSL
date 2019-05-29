@@ -113,9 +113,9 @@ class OscNode(object):
 
             if len(value) > argcount or len(value) < argcount_min:
                 if method.osc_argcount_min == argcount:
-                    LOGGER.error('bad number of argument for /%s/set %s (%i expected, %i provided)' % (self.name, attribute, argcount, len(args)))
+                    LOGGER.error('bad number of argument for /%s/set %s (%i expected, %i provided)' % (self.name, attribute, argcount, len(value)))
                 else:
-                    LOGGER.error('bad number of argument for /%s/set %s (%i to %i, expected, %i provided)' % (self.name, attribute, argcount_min, argcount, len(args)))
+                    LOGGER.error('bad number of argument for /%s/set %s (%i to %i, expected, %i provided)' % (self.name, attribute, argcount_min, argcount, len(value)))
                 return
 
             current = self.osc_get_value(attribute)
@@ -335,7 +335,7 @@ class OscServer(OscNode):
         print_properties(self.post_process)
 
         print('\nSlides')
-        self.create_group('api', '')
+        self.create_group('', 'api')
         print_methods('  /%s/slide/<name>/' % self.name, self.slides['api'])
         print_properties(self.slides['api'])
 

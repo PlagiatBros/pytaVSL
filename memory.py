@@ -51,6 +51,3 @@ class MemoryMonitor(object):
 
     def full(self):
         return self.allocated >= self.max
-
-
-gpu_monitor = MemoryMonitor(64)

@@ -12,7 +12,6 @@ from effect import Effect
 from animation import Animable
 from gif import Gif
 from osc import OscNode, osc_property
-from memory import gpu_monitor
 from config import *
 
 import logging
@@ -82,7 +81,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
             if not self.loaded:
                 self.loaded = True
-                if not gpu_monitor.alloc(self):
+                if not self.parent.monitor.alloc(self):
                     return
 
             if self.children_need_sorting:
@@ -113,7 +112,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
                 b.unload_opengl()
                 for t in b.textures:
                     t.unload_opengl()
-            gpu_monitor.free(self)
+            self.parent.monitor.free(self)
 
     @osc_property('tiles', 'tiles')
     def set_tiles(self, x, y):
