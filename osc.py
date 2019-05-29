@@ -105,14 +105,13 @@ class OscNode(object):
 
     @osc_method('set')
     def osc_set(self, property, *value):
-        attribute = args[0].lower()
+        attribute = property.lower()
         if attribute in self.osc_attributes:
             method = self.osc_attributes[attribute]
             argcount = method.osc_argcount
             argcount_min = method.osc_argcount_min
-            args = args[1:]
 
-            if len(args) > argcount or len(args) < argcount_min:
+            if len(value) > argcount or len(value) < argcount_min:
                 if method.osc_argcount_min == argcount:
                     LOGGER.error('bad number of argument for /%s/set %s (%i expected, %i provided)' % (self.name, attribute, argcount, len(args)))
                 else:
@@ -121,10 +120,10 @@ class OscNode(object):
 
             current = self.osc_get_value(attribute)
             if current is not None:
-                args = list(args)
-                args[:argcount_min] = [self.osc_parse_value(args[i], current[i]) for i in range(argcount_min)]
+                value = list(value)
+                value[:argcount_min] = [self.osc_parse_value(value[i], current[i]) for i in range(argcount_min)]
 
-            method(*args)
+            method(*value)
 
         else:
             LOGGER.error('invalid property argument "%s" for /%s/set' % (attribute, self.name))
