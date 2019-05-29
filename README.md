@@ -1,19 +1,36 @@
-pytaVSL
-=======
+**pytaVSL** (python tiny approximative Virtual Stage Light)
 
-pytaVSL stands for python tiny alpproximative VSL.
-It's a VJing and lights-projector virtualization program using pi3d, and aimed to reproduce some of the features one could find in the pd-patches set called VSL. The final destination arch of pytaVSL is the Raspberry PI.
 
-Dependencies
-============
+### Requirements
 
+- python
 - python-liblo
-- pi3d
+- [pi3d](http://pi3d.github.io)
 
-License
-=========
 
-Copyleft © 2018 Plagiat Brother; Original Code © Aurélien Roux; based upon Virtual Stage Light by Gregory David.
+### Usage
+
+```
+usage: pytaVSL.py [-h] [--name NAME] [--port PORT] [--load FILES [FILES ...]]
+                  [--fps FPS] [--fullscreen] [--api]
+                  [--log {debug,info,warning,error,critical}]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --name NAME           osc namespace (default: pyta)
+  --port PORT           udp port or unix socket path (default: 5555)
+  --load FILES [FILES ...]
+                        image files to load (default: None)
+  --fps FPS             maximum framerate (default: 25)
+  --fullscreen          launch in fullscreen (default: False)
+  --api                 print osc api and exit (default: False)
+  --log {debug,info,warning,error,critical}
+                        verbosity level (default: warning)
+```
+
+### License
+
+Copyleft © 2019 Plagiat Brother; Original Code © Aurélien Roux; based upon Virtual Stage Light by Gregory David.
 This program is a free software released under the [GNU/GPL3](https://github.com/PlagiatBros/pytaVSL/blob/master/LICENSE) license.
 
 Included fonts: leaguegothic (sans), freemono (mono)
