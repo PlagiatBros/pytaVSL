@@ -14,7 +14,7 @@
 ```
 usage: python ./pytaVSL.py [-h] [--name NAME] [--port PORT]
                            [--load FILES [FILES ...]] [--fps FPS]
-                           [--fullscreen] [--api]
+                           [--max-gpu MAX_GPU] [--fullscreen] [--api]
                            [--log {debug,info,warning,error,critical}]
 
 optional arguments:
@@ -24,11 +24,11 @@ optional arguments:
   --load FILES [FILES ...]
                         image files to load (default: None)
   --fps FPS             maximum framerate (default: 25)
+  --max-gpu MAX_GPU     maximum gpu memory (in MB) (default: 64)
   --fullscreen          launch in fullscreen (default: False)
   --api                 print osc api and exit (default: False)
   --log {debug,info,warning,error,critical}
                         verbosity level (default: warning)
-
 ```
 
 ###  License
