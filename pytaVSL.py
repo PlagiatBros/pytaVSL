@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 import argparse
+from sys import argv
 
-parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser = argparse.ArgumentParser(prog="python %s" % argv[0], formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('--name', help='osc namespace', default='pyta')
 parser.add_argument('--port', help='udp port or unix socket path', default=5555)

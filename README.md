@@ -1,4 +1,5 @@
-**pytaVSL** (python tiny approximative Virtual Stage Light)
+## pytaVSL
+*python tiny approximative Virtual Stage Light*
 
 
 ### Requirements
@@ -8,12 +9,13 @@
 - [pi3d](http://pi3d.github.io)
 
 
-### Usage
+### Usage
 
 ```
-usage: pytaVSL.py [-h] [--name NAME] [--port PORT] [--load FILES [FILES ...]]
-                  [--fps FPS] [--fullscreen] [--api]
-                  [--log {debug,info,warning,error,critical}]
+usage: python ./pytaVSL.py [-h] [--name NAME] [--port PORT]
+                           [--load FILES [FILES ...]] [--fps FPS]
+                           [--fullscreen] [--api]
+                           [--log {debug,info,warning,error,critical}]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -26,9 +28,10 @@ optional arguments:
   --api                 print osc api and exit (default: False)
   --log {debug,info,warning,error,critical}
                         verbosity level (default: warning)
+
 ```
 
-### License
+###  License
 
 Copyleft © 2019 Plagiat Brother; Original Code © Aurélien Roux; based upon Virtual Stage Light by Gregory David.
 This program is a free software released under the [GNU/GPL3](https://github.com/PlagiatBros/pytaVSL/blob/master/LICENSE) license.
