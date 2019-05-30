@@ -163,12 +163,12 @@ class Text(State, SlideBase):
         super(Text, self).position(x + self.align_offset[0], y + self.align_offset[1], z)
 
 
-    def set_text(self, string, duration=None, stop_glitch=True):
+    def set_text(self, string, duration=0, stop_glitch=True):
         """
         Set the text's string
         """
 
-        if duration is not None:
+        if duration != 0:
             return self.set_glitch(string, duration)
         if stop_glitch:
             self.glitch = False
@@ -229,7 +229,7 @@ class Text(State, SlideBase):
 
 
     @osc_property('text', 'string')
-    def set_text_osc(self, text, glitch_duration=None):
+    def set_text_osc(self, text, glitch_duration=0):
         self.set_text(text, glitch_duration)
 
     @osc_property('align', 'h_align', 'v_align')

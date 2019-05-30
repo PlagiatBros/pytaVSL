@@ -54,9 +54,7 @@ class Effect(object):
         self.effect_active = False
 
     @osc_property('effect', 'current_effect')
-    def set_effect(self, effect=None):
-        if effect is None:
-            return self.set_base_effect()
+    def set_effect(self, effect='default'):
         try:
             self.set_shader(SHADERS[effect])
             self.current_effect = effect
@@ -64,7 +62,6 @@ class Effect(object):
         except:
             self.set_base_effect()
             LOGGER.error('could not load shader %s' % effect)
-
 
     @osc_property('key_color', 'effect_key_color')
     def set_effect_key_color(self, r, g, b):

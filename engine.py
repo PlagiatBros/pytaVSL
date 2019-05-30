@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pi3d
 from pi3d.constants import DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT
 
+import glob
 from threading import Thread
 from signal import signal, SIGINT, SIGTERM
 
@@ -53,7 +54,8 @@ class PytaVSL(OscServer):
 
         # Z-sorted slides
         self.sorted_slides = []
-        self.slides_need_sorting = True
+        self.slides_need_sorting = False
+        self._sort_slides()
 
         # Memory
         self.monitor = MemoryMonitor(max_gpu_memory, self.flush)
@@ -74,7 +76,7 @@ class PytaVSL(OscServer):
         """
 
         if self.files:
-            self.load_textures(self.files)
+            self.load_textures(*self.files)
 
         while self.DISPLAY.loop_running():
 
@@ -88,8 +90,7 @@ class PytaVSL(OscServer):
                 self.post_process.capture_start()
 
             if self.slides_need_sorting:
-                self.sorted_slides = sorted(list(self.slides.values()) + list(self.texts.values()), key=lambda slide: slide.z(), reverse=True)
-                self.slides_need_sorting = False
+                self._sort_slides()
 
             for slide in self.sorted_slides:
                 if not slide.parent_slide:
@@ -108,17 +109,22 @@ class PytaVSL(OscServer):
         self.DISPLAY.destroy()
         super(PytaVSL, self).stop()
 
-    def load_textures(self, files, callback=None):
+    @osc_method('load')
+    def load_textures(self, *files):
         """
         Load textures (threaded)
         """
+        print(files)
+        paths = []
+        for f in files:
+            paths += glob.glob(f)
 
         if len(files) == 0:
             LOGGER.error("file \"%s\" not found" % path)
 
         def threaded():
 
-            size = len(files)
+            size = len(paths)
 
             self.texts['debug'].state_save()
             self.texts['debug'].set_visible(1)
@@ -128,22 +134,19 @@ class PytaVSL(OscServer):
 
             for i in range(size):
                 try:
-                    path = files[i]
+                    path = paths[i]
                     name = path.split('/')[-1].split('.')[0].lower()
                     slide = Slide(parent=self, name=name, texture=path)
                     slide.set_position_z(i / 1000.)
-                    self.add_slide(slide)
+                    self.add_slide(slide, False)
                 except:
                     LOGGER.error('could not load file %s' %path)
                 self.texts['debug'].set_text(str(i + 1) + '/' + str(size))
 
+            self.sort_slides()
             self.texts['debug'].state_recall()
 
             LOGGER.info("total slides in memory: %i" % len(self.slides.values()))
-
-            if callback is not None:
-
-                callback(self)
 
         t = Thread(target=threaded)
         t.daemon = True
@@ -154,6 +157,10 @@ class PytaVSL(OscServer):
         Sort slides in drawing order (by z-index)
         """
         self.slides_need_sorting = True
+
+    def _sort_slides(self):
+        self.sorted_slides = sorted(list(self.slides.values()) + list(self.texts.values()), key=lambda slide: slide.z(), reverse=True)
+        self.slides_need_sorting = False
 
     def flush(self, added_slide=None):
         """
@@ -175,9 +182,10 @@ class PytaVSL(OscServer):
                         return
 
 
-    def add_slide(self, slide):
+    def add_slide(self, slide, sort=True):
         self.slides[slide.name] = slide
-        self.sort_slides()
+        if sort:
+            self.sort_slides()
 
     def remove_slide(self, slide):
         if slide.children:

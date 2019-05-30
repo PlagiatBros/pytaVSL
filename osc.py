@@ -32,6 +32,7 @@ class osc_method():
 
         method.osc_method_aliases.append(self.alias)
         method.osc_argcount = method.__code__.co_argcount - 1
+        method.osc_argcount_min = method.osc_argcount if not method.__defaults__ else method.osc_argcount - len(method.__defaults__)
         method.osc_varargs = getargspec(method).varargs
 
         return method
@@ -246,7 +247,9 @@ class OscServer(OscNode):
 
                 method = t.osc_methods[cmd]
                 argcount = method.osc_argcount
-                if len(args) == argcount:
+                argcount_min = method.osc_argcount_min
+
+                if len(args) >= argcount_min and len(args) <= argcount:
                     method(*args[:argcount])
                 elif method.osc_varargs:
                     method(*args)
@@ -299,7 +302,13 @@ class OscServer(OscNode):
                 for name in methods[c]:
                     method = obj.osc_methods[name]
                     spec = getargspec(method)
-                    args = " ".join(spec.args[1:])
+                    args = spec.args[1:]
+                    if spec.defaults:
+                        l = len(spec.defaults)
+                        for i in range(l):
+                            d = spec.defaults[i] if type(spec.defaults[i]) != str else '"%s"' % spec.defaults[i]
+                            args[i - l] = "%s=%s" % (args[i - l], d)
+                    args = ", ".join(args)
                     if spec.varargs:
                         args += " [%s ...]" % spec.varargs
                     print('  %s%s %s' % (prefix, name, args))
@@ -317,9 +326,13 @@ class OscServer(OscNode):
                 for name in methods[c]:
                     method = obj.osc_attributes[name]
                     spec = getargspec(method)
-                    args = ", ".join(spec.args[1:])
-                    # if spec.varargs:
-                    #     args += " [%s ...]" % spec.varargs
+                    args = spec.args[1:]
+                    if spec.defaults:
+                        l = len(spec.defaults)
+                        for i in range(l):
+                            d = spec.defaults[i] if type(spec.defaults[i]) != str else '"%s"' % spec.defaults[i]
+                            args[i - l] = "%s=%s" % (args[i - l], d)
+                    args = ", ".join(args)
                     print('    %s [%s]' % (name, args))
                 print('')
 

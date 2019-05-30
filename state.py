@@ -15,7 +15,6 @@ class State(object):
 
         super(State, self).__init__(*args, **kwargs)
 
-        self.osc_quickstate = {}
         self.osc_states = {}
 
         if type(self).__name__ not in RESET_STATES:
@@ -38,22 +37,19 @@ class State(object):
         self.stop_animate()
 
     @osc_method('save')
-    def state_save(self, name=None):
+    def state_save(self, name="quicksave"):
         if not name:
             self.osc_quickstate = self.state_get()
         else:
             self.osc_states[name] = self.state_get()
 
     @osc_method('recall')
-    def state_recall(self, name=None):
-        if name is not None:
-            if name in self.osc_states:
-                state = self.osc_states[name]
-            else:
-                LOGGER.error('no state "%s" in %s' % (name, self.name))
+    def state_recall(self, name="quicksave"):
+        if name in self.osc_states:
+            state = self.osc_states[name]
+            self.state_set(state)
+            self.stop_animate()
+            self.stop_strobe()
+            # TODO we could serialize strobes and anim to recall them ?
         else:
-            state = self.osc_quickstate
-        self.state_set(state)
-        self.stop_animate()
-        self.stop_strobe()
-        # TODO we could serialize strobes and anim to recall them ?
+            LOGGER.error('no state "%s" in %s' % (name, self.name))
