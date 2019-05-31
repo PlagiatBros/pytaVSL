@@ -31,8 +31,8 @@ class Gif(object):
         self.gif_duration = 0
         self.gif_speed = 1.0
 
-        if isinstance(texture, pi3d.Texture) and  isinstance(texture.file_string, (str, unicode)) and '.gif' in texture.file_string:
-            gif = GifImageFile(texture.file_string)
+        if isinstance(texture, (str, unicode)) and '.gif' in texture:
+            gif = GifImageFile(texture)
             if gif.is_animated:
                 self.set_frames(gif)
 
