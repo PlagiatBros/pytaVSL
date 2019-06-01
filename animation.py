@@ -127,7 +127,7 @@ class Animable(object):
         """
         Strobe a property
         """
-        attribute = property[0].lower()
+        attribute = property.lower()
 
         if attribute == 'visible':
             LOGGER.error('invalid property argument "%s" for /%s/strobe' % (attribute, self.name))
@@ -138,7 +138,7 @@ class Animable(object):
             argcount = method.osc_argcount_min
 
             if len(args) != argcount * 2 + 2:
-                LOGGER.error('bad number of argument for /%s/animate %s (%i expected, %i provided)' % (self.name, attribute, argcount * 2 + 2, len(args)))
+                LOGGER.error('bad number of argument for /%s/strobe %s (%i expected, %i provided)' % (self.name, attribute, argcount * 2 + 2, len(args)))
                 return
 
             duration = args[-2]

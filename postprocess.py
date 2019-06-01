@@ -13,11 +13,11 @@ LOGGER = logging.getLogger(__name__)
 
 class PostProcess(SlideBase):
 
-        def __init__(self):
+        def __init__(self, parent):
 
             texture = OffScreenTexture("postprocess")
 
-            super(PostProcess, self).__init__(None, "postprocessing", texture, Display.INSTANCE.width, Display.INSTANCE.height)
+            super(PostProcess, self).__init__(parent, "postprocessing", texture, Display.INSTANCE.width, Display.INSTANCE.height)
 
             self.texture = texture
             self.set_base_effect('rgbwave')

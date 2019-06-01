@@ -168,13 +168,14 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
     @osc_property('position', 'pos_x', 'pos_y', 'pos_z')
     def set_position(self, x, y, z):
+        sort_parent = False
         if x is not None:
             self.pos_x = float(x)
         if y is not None:
             self.pos_y = float(y)
         if z is not None:
+            sort_parent = self.pos_z != float(z)
             self.pos_z = float(z)
-        sort_parent = self.pos_z != self.z()
         self.position(self.pos_x, self.pos_y, self.pos_z)
         if sort_parent:
             parent = self.parent_slide if self.parent_slide is not None else self.parent

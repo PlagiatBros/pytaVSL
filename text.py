@@ -225,7 +225,7 @@ class Text(State, SlideBase):
 
                 string += c
 
-            self.set_text(string, None, False)
+            self.set_text(string, 0, False)
 
 
     @osc_property('text', 'string')

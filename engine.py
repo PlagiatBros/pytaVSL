@@ -39,7 +39,7 @@ class PytaVSL(OscServer):
         init_shaders()
 
         self.DISPLAY.loop_running()
-        self.post_process = PostProcess()
+        self.post_process = PostProcess(self)
 
         # Slides
         self.slides = {}
