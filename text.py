@@ -61,6 +61,7 @@ class Text(State, SlideBase):
         """
         size = self.font.ratio / self.length if self.size == 'auto' else self.size
         size /= TEXT_RESOLUTION
+        size /= 600. / Display.INSTANCE.height # size was calibrated on 800x600
 
         justify = self.h_align
         string = self.string
