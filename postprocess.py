@@ -20,6 +20,15 @@ class PostProcess(State, SlideBase):
 
             super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture, width=texture.ix, height=texture.iy)
 
+            # force alpha to 1.0
+            self.buf[0].unib[13] = 1.0
+
+        def scale(self, x, y, z):
+            """
+            Override pi3d.Shape.scale to prevent OffScreenTexture v-flip
+            """
+            super(PostProcess, self).scale(x, -y, z)
+
         def capture_start(self):
             self.buf[0].textures[0]._start()
 

@@ -16,7 +16,6 @@ SHADERS = {}
 
 baseFs = open('shaders/base.fs', 'r').read()
 baseVs = open('shaders/base.vs', 'r').read()
-_loader = pi3d.Shader._default_instance()
 
 def _load_shader(text):
     new_text = ''

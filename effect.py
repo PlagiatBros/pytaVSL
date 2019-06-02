@@ -32,7 +32,6 @@ class Effect(object):
             57:59 noise (density, seed1, seed2)
         """
 
-
         self.effect_key_color = [0.0, 0.0, 0.0]
         self.effect_key_threshold = -0.001
         self.effect_invert = 0.0
@@ -46,6 +45,9 @@ class Effect(object):
             self.effect_charcoal[0], self.effect_charcoal[1], self.effect_charcoal[2],
             self.effect_noise[0], self.effect_noise[1], self.effect_noise[2],
         ])
+
+        # only used in PostProcess
+        self.buf[0].unib[13] = 0.0
 
     @osc_property('effect', 'current_effect')
     def set_effect(self, effect='default'):
