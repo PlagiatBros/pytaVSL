@@ -15,7 +15,7 @@
 usage: python ./pytaVSL.py [-h] [--name NAME] [--port PORT]
                            [--load FILES [FILES ...]] [--fps FPS]
                            [--max-gpu MAX_GPU] [--fullscreen] [--api]
-                           [--log {debug,info,warning,error,critical}]
+                           [--debug] [--geometry WIDTHxHEIGHT]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -27,8 +27,10 @@ optional arguments:
   --max-gpu MAX_GPU     maximum gpu memory (in MB) (default: 64)
   --fullscreen          launch in fullscreen (default: False)
   --api                 print osc api and exit (default: False)
-  --log {debug,info,warning,error,critical}
-                        verbosity level (default: warning)
+  --debug               print debug logs (default: False)
+  --geometry WIDTHxHEIGHT
+                        output resolution (default: 800x600)
+
 ```
 
 ###  License
