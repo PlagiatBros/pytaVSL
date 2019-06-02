@@ -12,15 +12,13 @@ from state import State
 import logging
 LOGGER = logging.getLogger(__name__)
 
-class PostProcess(SlideBase):
+class PostProcess(State, SlideBase):
 
         def __init__(self, parent):
 
             texture = OffScreenTexture("post_process")
 
             super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture, width=texture.ix, height=texture.iy)
-
-            self.loaded = True
 
         def capture_start(self):
             self.buf[0].textures[0]._start()
