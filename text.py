@@ -121,8 +121,7 @@ class Text(State, SlideBase):
 
         make_verts()
 
-        self.buf = []
-        self.buf.append(pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms))
+        self.buf = [pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms)]
         self.buf[0].textures = [font]
 
         self.set_v_align(self.v_align)
@@ -143,8 +142,8 @@ class Text(State, SlideBase):
                 return
 
             if self.need_regen:
-                self.need_regen = False
                 self.new_string()
+                self.need_regen = False
 
             super(Text, self).draw(*args, **kwargs)
 
