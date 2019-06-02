@@ -13,6 +13,7 @@ parser.add_argument('--max-gpu',  help='maximum gpu memory (in MB)', type=int, d
 parser.add_argument('--fullscreen',  help='launch in fullscreen', default=False, action='store_true')
 parser.add_argument('--api',  help='print osc api and exit', default=False, action='store_true')
 parser.add_argument('--debug',  help='print debug logs', default=False, action='store_true')
+parser.add_argument('--geometry',  help='output resolution', type=str, default='800x600', metavar='WIDTHxHEIGHT')
 
 args = parser.parse_args()
 
@@ -20,7 +21,8 @@ from pi3d import Log
 Log(name=None, level='DEBUG' if args.debug else 'WARNING')
 
 from engine import PytaVSL
-pyta = PytaVSL(name=args.name, port=args.port, files=args.load, fps=args.fps, fullscreen=args.fullscreen)
+geometry = [int(x) for x in args.geometry.split('x')]
+pyta = PytaVSL(name=args.name, port=args.port, files=args.load, fps=args.fps, fullscreen=args.fullscreen, width=geometry[0], height=geometry[1])
 
 if args.api:
     pyta.print_api()

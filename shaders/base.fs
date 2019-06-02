@@ -4,7 +4,7 @@ void main(void) {
 
     #include shaders/inc/fs_main.inc
 
-    #include shaders/effects/{}.fs
+    #include shaders/effects/{EFFECT}.fs
 
     #include shaders/effects/key.fs
     #include shaders/effects/colorize.fs

@@ -27,12 +27,12 @@ class PytaVSL(OscServer):
     It's also an OSC server which contains the method to control all of its children.
     """
 
-    def __init__(self, name, port, files=[], fps=25, fullscreen=False, max_gpu_memory=64):
+    def __init__(self, name, port, files=[], fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600):
 
         super(PytaVSL, self).__init__(name, port)
 
         # setup OpenGL
-        self.DISPLAY = pi3d.Display.create(window_title="pytaVSL", w=800, h=600, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=fps, depth=24, display_config=DISPLAY_CONFIG_FULLSCREEN if fullscreen else DISPLAY_CONFIG_DEFAULT)
+        self.DISPLAY = pi3d.Display.create(window_title="pytaVSL", w=width, h=height, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=fps, depth=24, display_config=DISPLAY_CONFIG_FULLSCREEN if fullscreen else DISPLAY_CONFIG_DEFAULT)
         self.CAMERA = pi3d.Camera(is_3d=False, eye=(0, 0, -100))
         self.CAMERA.was_moved = False
 

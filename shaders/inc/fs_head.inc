@@ -9,7 +9,7 @@ uniform vec3 unif[20]; // Shape
 
 varying vec2 coords;
 
-const vec2 resolution = vec2(800.0, 600.0);
+const vec2 resolution = vec2({WIDTH}, {HEIGHT});
 
 #include shaders/inc/random.inc
 #include shaders/inc/colors.inc
