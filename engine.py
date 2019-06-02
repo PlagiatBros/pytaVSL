@@ -114,7 +114,6 @@ class PytaVSL(OscServer):
         """
         Load textures (threaded)
         """
-        print(files)
         paths = []
         for f in files:
             paths += glob.glob(f)
