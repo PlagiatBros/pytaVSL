@@ -7,6 +7,7 @@ from pi3d.util.OffScreenTexture import OffScreenTexture
 from pi3d.Display import Display
 
 from slide import SlideBase
+from state import State
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -15,15 +16,14 @@ class PostProcess(SlideBase):
 
         def __init__(self, parent):
 
-            texture = OffScreenTexture("postprocess")
+            texture = OffScreenTexture("post_process")
 
-            super(PostProcess, self).__init__(parent, "postprocessing", texture, Display.INSTANCE.width, Display.INSTANCE.height)
+            super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture, width=texture.ix, height=texture.iy)
 
-            self.texture = texture
-            self.set_base_effect('rgbwave')
+            self.loaded = True
 
         def capture_start(self):
-            self.texture._start()
+            self.buf[0].textures[0]._start()
 
         def capture_end(self):
-            self.texture._end()
+            self.buf[0].textures[0]._end()

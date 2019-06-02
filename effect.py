@@ -19,7 +19,7 @@ class Effect(object):
 
         self.effect_active = False
         self.current_effect = 'default'
-        self.set_base_effect()
+        self.set_effect()
 
         """
             uniforms:
@@ -47,12 +47,6 @@ class Effect(object):
             self.effect_noise[0], self.effect_noise[1], self.effect_noise[2],
         ])
 
-    def set_base_effect(self, effect='default'):
-        self.current_effect = effect
-        self.base_shader = SHADERS[effect]
-        self.set_shader(self.base_shader)
-        self.effect_active = False
-
     @osc_property('effect', 'current_effect')
     def set_effect(self, effect='default'):
         try:
@@ -60,7 +54,8 @@ class Effect(object):
             self.current_effect = effect
             self.effect_active = True
         except:
-            self.set_base_effect()
+            self.set_effect()
+            self.effect_active = False
             LOGGER.error('could not load shader %s' % effect)
 
     @osc_property('key_color', 'effect_key_color')

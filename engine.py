@@ -98,8 +98,7 @@ class PytaVSL(OscServer):
 
             if post_processing:
                 self.post_process.capture_end()
-
-            self.post_process.draw()
+                self.post_process.draw()
 
     def stop(self, *args):
         """
