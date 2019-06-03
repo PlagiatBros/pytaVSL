@@ -13,6 +13,7 @@ from effect import Effect
 from animation import Animable
 from perspective import Perspective
 from gif import Gif
+from video import Video
 from osc import OscNode, osc_property
 from config import *
 
@@ -26,10 +27,8 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
         if type(texture) is str:
 
             texture = pi3d.Texture(texture, blend=True, mipmap=True)
-            width = texture.ix
-            height = texture.iy
 
-        super(SlideBase, self).__init__(w=width, h=height)
+        super(SlideBase, self).__init__(w=texture.ix, h=texture.iy)
 
         self.name = name
         self.parent = parent
@@ -54,7 +53,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
         self.pos_z = init_z
 
         # Scale
-        self.init_scale = min(Display.INSTANCE.width / width, Display.INSTANCE.height / height)
+        self.init_scale = min(Display.INSTANCE.width / self.width, Display.INSTANCE.height / self.height)
         self.sx = 1.0
         self.sy = 1.0
 
@@ -240,7 +239,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
     def set_rotate_z(self, rz):
         self.set_rotate(None, None, rz)
 
-class Slide(State, Perspective, Gif, SlideBase):
+class Slide(State, Perspective, Video, Gif, SlideBase):
 
     def __init__(self, *args, **kwargs):
 
