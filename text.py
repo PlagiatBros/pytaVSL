@@ -25,7 +25,7 @@ class Text(State, SlideBase):
     """
     Dynamic text
     """
-    def __init__(self, parent, name, font="mono"):
+    def __init__(self, parent, name, font="mono", init_z=0.0):
 
         self.font = FONTS[font]
 
@@ -48,7 +48,7 @@ class Text(State, SlideBase):
         self.glitch_duration = 1
         self.glitch_start = 0
 
-        super(Text, self).__init__(parent, name, self.font, Display.INSTANCE.width, Display.INSTANCE.height)
+        super(Text, self).__init__(parent, name, self.font, Display.INSTANCE.width, Display.INSTANCE.height, init_z)
 
         self.color = [1.0, 1.0, 1.0]
 

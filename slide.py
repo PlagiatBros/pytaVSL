@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 
 class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
-    def __init__(self, parent, name, texture, width=1, height=1):
+    def __init__(self, parent, name, texture, width=1, height=1, init_z=0.0):
 
         if type(texture) is str:
 
@@ -50,7 +50,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
         # Position
         self.pos_x = 0.0
         self.pos_y = 0.0
-        self.pos_z = 0.0
+        self.pos_z = init_z
 
         # Scale
         self.init_scale = min(Display.INSTANCE.width / width, Display.INSTANCE.height / height)
@@ -62,6 +62,9 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
         self.ry = 0.0
         self.rz = 0.0
 
+        # perspective
+        self.perspective = 0.0
+
         # texture tiling
         self.tiles = [1.0, 1.0]
         self.offset= [0.0, 0.0]
@@ -69,7 +72,9 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
         self.loaded = False
         self.grouped = False
 
+        # init
         self.set_zoom(1.0)
+        self.set_position_z(self.pos_z)
 
     def draw(self, *args, **kwargs):
 
@@ -236,6 +241,18 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
     @osc_property('rotate_z', 'rz')
     def set_rotate_z(self, rz):
         self.set_rotate(None, None, rz)
+
+    @osc_property('perspective', 'perspective')
+    def set_perspective(self, perspective):
+        self.perspective = int(bool(perspective))
+        if self.perspective:
+            self._camera = self.parent.CAMERA3D
+        else:
+            self._camera = self.parent.CAMERA
+        # trigger matrix recalculation
+        self.MFlg = True
+        self.rozflg = True
+
 
 class Slide(State, Gif, SlideBase):
 

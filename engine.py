@@ -32,13 +32,15 @@ class PytaVSL(OscServer):
         super(PytaVSL, self).__init__(name, port)
 
         # setup OpenGL
+        self.height = height
         self.DISPLAY = pi3d.Display.create(window_title="pytaVSL", w=width, h=height, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=fps, depth=24, display_config=DISPLAY_CONFIG_FULLSCREEN if fullscreen else DISPLAY_CONFIG_DEFAULT)
-        self.CAMERA = pi3d.Camera(is_3d=False, eye=(0, 0, -100))
+        self.CAMERA = pi3d.Camera(is_3d=False, eye=(0, 0, -height))
+        self.CAMERA3D = pi3d.Camera(is_3d=True, eye=(0, 0, -height))
         self.CAMERA.was_moved = False
+        self.CAMERA3D.was_moved = False
 
         init_shaders()
 
-        self.DISPLAY.loop_running()
         self.post_process = PostProcess(self)
 
         # Slides
@@ -46,11 +48,9 @@ class PytaVSL(OscServer):
 
         # Texts
         self.texts = {}
-        self.texts['debug'] = Text(self, 'debug', font=TEXTS_FONTS[2])
-        self.texts['debug'].set_position_z(-99)
+        self.texts['debug'] = Text(self, 'debug', font=TEXTS_FONTS[2], init_z=1-self.height)
         for i in range(N_TEXTS):
-            self.texts[str(i)] = Text(self, str(i), font=TEXTS_FONTS[i])
-            self.texts[str(i)].set_position_z(i-99)
+            self.texts[str(i)] = Text(self, str(i), font=TEXTS_FONTS[i], init_z=i-1-self.height)
 
         # Z-sorted slides
         self.sorted_slides = []
@@ -134,8 +134,7 @@ class PytaVSL(OscServer):
                 try:
                     path = paths[i]
                     name = path.split('/')[-1].split('.')[0].lower()
-                    slide = Slide(parent=self, name=name, texture=path)
-                    slide.set_position_z(i / 1000.)
+                    slide = Slide(parent=self, name=name, texture=path, init_z=i / 1000.)
                     self.add_slide(slide, False)
                 except:
                     LOGGER.error('could not load file %s' %path)
@@ -260,8 +259,7 @@ class PytaVSL(OscServer):
 
         target = target[0]
 
-        clone = Slide(parent=self, name=clone_name, texture=pi3d.Texture(target.buf[0].textures[0].image), width=target.width, height=target.height)
-        clone.set_position_z(target.pos_z - 0.001)
+        clone = Slide(parent=self, name=clone_name, texture=pi3d.Texture(target.buf[0].textures[0].image), width=target.width, height=target.height, init_z=target.pos_z - 0.001)
         clone.gif = target.gif
         clone.is_clone = True
 
