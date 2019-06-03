@@ -30,6 +30,7 @@ class Gif(object):
         self.gif_changed_time = 0
         self.gif_duration = 0
         self.gif_speed = 1.0
+        self.gif_length = 0
 
         if isinstance(texture, (str, unicode)) and '.gif' in texture:
             gif = GifImageFile(texture)
@@ -48,6 +49,7 @@ class Gif(object):
             if i == 0:
                 self.texture = t
                 self.set_textures([t])
+        self.gif_length = len(self.gif)
 
     def gif_next_frame(self):
 
@@ -62,7 +64,7 @@ class Gif(object):
         initial_frame = self.gif[self.gif_index]
         current_frame = self.gif[self.gif_index]
         elapsed = now - self.gif_changed_time
-        duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
+        duration = self.gif_duration / self.gif_length if self.gif_duration != 0 else current_frame.duration
         duration = max(duration / abs(self.gif_speed), 1. / Display.INSTANCE.frames_per_second / 1000)
 
         while elapsed >= duration:
@@ -79,7 +81,7 @@ class Gif(object):
                     self.gif_index = 0
 
             current_frame = self.gif[self.gif_index]
-            duration = self.gif_duration if self.gif_duration != 0 else current_frame.duration
+            duration = self.gif_duration / self.gif_length if self.gif_duration != 0 else current_frame.duration
             duration = max(duration / abs(self.gif_speed), 1. / Display.INSTANCE.frames_per_second / 1000)
 
 
@@ -96,7 +98,7 @@ class Gif(object):
 
         super(Gif, self).draw(*args, **kwargs)
 
-    @osc_property('frame', 'gif_index')
+    @osc_property('gif_frame', 'gif_index')
     def set_frame(self, frame):
         self.gif_changed_time = 0
         frame = int(frame)
@@ -108,10 +110,10 @@ class Gif(object):
         if self.gif:
             self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray)
 
-    @osc_property('speed', 'gif_speed')
+    @osc_property('gif_speed', 'gif_speed')
     def set_speed(self, speed):
         self.gif_speed = float(speed)
 
-    @osc_property('duration', 'gif_duration')
+    @osc_property('gif_duration', 'gif_duration')
     def set_duration(self, duration):
         self.gif_duration = float(duration)
