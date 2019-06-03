@@ -277,6 +277,12 @@ class OscServer(OscNode):
             return getattr(meth, '__objclass__', None)  # handle special descriptor objects
 
 
+        try:
+            get_class_that_defined_method(self.print_api)
+        except:
+            LOGGER.error('python3 is required to print the API')
+            return
+
         def alpha_sort(obj):
             classes = [get_class_that_defined_method(x).__name__ for x in obj.values()]
             keys = list(obj.keys())

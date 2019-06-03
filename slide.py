@@ -11,6 +11,7 @@ from pi3d.Display import Display
 from state import State
 from effect import Effect
 from animation import Animable
+from perspective import Perspective
 from gif import Gif
 from osc import OscNode, osc_property
 from config import *
@@ -61,9 +62,6 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
         self.rx = 0.0
         self.ry = 0.0
         self.rz = 0.0
-
-        # perspective
-        self.perspective = 0.0
 
         # texture tiling
         self.tiles = [1.0, 1.0]
@@ -242,19 +240,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
     def set_rotate_z(self, rz):
         self.set_rotate(None, None, rz)
 
-    @osc_property('perspective', 'perspective')
-    def set_perspective(self, perspective):
-        self.perspective = int(bool(perspective))
-        if self.perspective:
-            self._camera = self.parent.CAMERA3D
-        else:
-            self._camera = self.parent.CAMERA
-        # trigger matrix recalculation
-        self.MFlg = True
-        self.rozflg = True
-
-
-class Slide(State, Gif, SlideBase):
+class Slide(State, Perspective, Gif, SlideBase):
 
     def __init__(self, *args, **kwargs):
 

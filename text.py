@@ -125,6 +125,9 @@ class Text(State, SlideBase):
         self.buf = [pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms)]
         self.buf[0].textures = [font]
 
+        # only used in PostProcess
+        self.buf[0].unib[13] = 0.0
+
         self.set_v_align(self.v_align)
         self.set_h_align(self.h_align)
         self.set_shader(self.shader)
