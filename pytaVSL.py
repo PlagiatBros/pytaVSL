@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+VERSION="pytaVSL v0.0.0"
+
 import argparse
 from sys import argv
 
@@ -14,6 +16,7 @@ parser.add_argument('--fullscreen',  help='launch in fullscreen', default=False,
 parser.add_argument('--api',  help='print osc api and exit', default=False, action='store_true')
 parser.add_argument('--debug',  help='print debug logs', default=False, action='store_true')
 parser.add_argument('--geometry',  help='output resolution', type=str, default='800x600', metavar='WIDTHxHEIGHT')
+parser.add_argument('--version', action='version', version=VERSION)
 
 args = parser.parse_args()
 
