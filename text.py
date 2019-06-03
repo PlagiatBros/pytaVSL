@@ -50,6 +50,7 @@ class Text(State, SlideBase):
 
         super(Text, self).__init__(parent, name, self.font, Display.INSTANCE.width, Display.INSTANCE.height, init_z)
 
+        self.init_scale = 1.0
         self.color = [1.0, 1.0, 1.0]
 
         self.new_string() # remove ?
