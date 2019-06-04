@@ -3,9 +3,7 @@
 void main(void) {
 
     #include shaders/inc/fs_main.inc
-
-    // PostProcess only
-    gl_FragColor.a += 1.0 * unib[4][1];
+    #include shaders/inc/fs_misc.inc
 
     #include shaders/effects/{EFFECT}.fs
 

@@ -48,6 +48,8 @@ class Effect(object):
 
         # only used in PostProcess
         self.buf[0].unib[13] = 0.0
+        # only used in Video
+        self.buf[0].unib[12] = 0.0
 
     @osc_property('effect', 'current_effect')
     def set_effect(self, effect='default'):

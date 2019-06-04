@@ -128,6 +128,8 @@ class Text(State, Perspective, SlideBase):
 
         # only used in PostProcess
         self.buf[0].unib[13] = 0.0
+        # only used in Video
+        self.buf[0].unib[12] = 0.0
 
         self.set_v_align(self.v_align)
         self.set_h_align(self.h_align)

@@ -48,6 +48,9 @@ class Video(object):
 
         super(Video, self).__init__(texture=texture, *args, **kwargs)
 
+        # only used in Video
+        self.buf[0].unib[12] = 1.0
+
     def draw(self, *args, **kwargs):
 
         if self.video and self.visible:
@@ -98,5 +101,4 @@ class Video(object):
     def video_load_current_frame(self):
         ok, frame = self.video_reader.retrieve()
         if ok:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             self.video_texture.update_ndarray(frame)
