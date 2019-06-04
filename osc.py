@@ -364,5 +364,5 @@ class OscServer(OscNode):
         print_properties(self.slides['api'])
 
         print('\nTexts')
-        print_methods('  /%s/text/<name>/' % self.name, self.texts['debug'])
-        print_properties(self.texts['debug'])
+        print_methods('  /%s/text/<name>/' % self.name, self.debug_text)
+        print_properties(self.debug_text)
