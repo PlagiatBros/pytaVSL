@@ -8,6 +8,7 @@ import random
 
 from state import State
 from slide import SlideBase
+from perspective import Perspective
 from utils import unicode, unichr
 from osc import osc_property
 from pi3d_font import Font
@@ -21,7 +22,7 @@ H_ALIGN = ['C', 'L', 'R']
 _NORMALS = [[0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0]]
 GAP = 1
 
-class Text(State, SlideBase):
+class Text(State, Perspective, SlideBase):
     """
     Dynamic text
     """
