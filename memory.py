@@ -16,9 +16,6 @@ class MemoryMonitor(object):
         self.flush = flush
         self.loaded = []
 
-        for k in FONTS:
-            self.allocated += FONTS[k].image.nbytes * 1.33 # 1.33 = mipmap
-
     def get_data(self, slide):
         if len(slide.buf[0].textures) > 0:
             return slide.buf[0].textures[0]
