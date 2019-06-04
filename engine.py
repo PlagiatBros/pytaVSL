@@ -50,7 +50,7 @@ class PytaVSL(OscServer):
         self.texts = {}
         self.debug_text = Text(self, 'debug', font=TEXTS_FONTS[2], init_z=1-self.height)
         for i in range(N_TEXTS):
-            self.texts[str(i)] = Text(self, str(i), font=TEXTS_FONTS[i], init_z=1-self.height-1)
+            self.texts[str(i)] = Text(self, 'text#' + str(i), font=TEXTS_FONTS[i], init_z=1-self.height-1)
 
         # Z-sorted slides
         self.sorted_slides = []

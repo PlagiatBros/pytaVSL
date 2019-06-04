@@ -27,7 +27,7 @@ class MemoryMonitor(object):
         data = self.get_data(slide)
         if data and not data in self.loaded:
             self.allocated += data.image.nbytes * 1.33 # 1.33 = mipmap
-            LOGGER.debug('Texture uploaded to GPU. Total allocated: %.1fMB' % (self.allocated / 1000000.))
+            LOGGER.debug('%s uploaded to GPU. Total allocated: %.1fMB' % (slide.name, self.allocated / 1000000.))
 
         self.loaded.append(data)
 
@@ -44,7 +44,7 @@ class MemoryMonitor(object):
             self.loaded.remove(data)
             if not data in self.loaded:
                 self.allocated -= data.image.nbytes * 1.33 # 1.33 = mipmap
-                LOGGER.debug('Texture flushed from GPU. Total allocated: %.1fMB' % (self.allocated / 1000000.))
+                LOGGER.debug('%s flushed from GPU. Total allocated: %.1fMB' % (slide.name, self.allocated / 1000000.))
 
     def full(self):
         return self.allocated >= self.max
