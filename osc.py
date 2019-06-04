@@ -346,8 +346,8 @@ class OscServer(OscNode):
                     print('    %s [%s]' % (name, args))
                 print('')
 
-        print('\nOSC API')
-        print('=======\n')
+        print('\nPytaVSL: OSC API')
+        print('================')
 
         print('\nEngine')
         print_methods('  /%s/' % self.name, self)
