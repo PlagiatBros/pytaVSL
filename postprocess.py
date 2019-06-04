@@ -19,7 +19,7 @@ class PostProcess(State, Perspective, SlideBase):
 
             texture = OffScreenTexture("post_process")
 
-            super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture, width=texture.ix, height=texture.iy)
+            super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture)
 
             # force alpha to 1.0
             self.buf[0].unib[13] = 1.0

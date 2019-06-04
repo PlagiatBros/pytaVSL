@@ -48,9 +48,8 @@ class Text(State, SlideBase):
         self.glitch_duration = 1
         self.glitch_start = 0
 
-        super(Text, self).__init__(parent, name, self.font, Display.INSTANCE.width, Display.INSTANCE.height, init_z)
+        super(Text, self).__init__(parent, name, texture=self.font, width=Display.INSTANCE.width, height=Display.INSTANCE.height, init_z=init_z)
 
-        self.init_scale = 1.0
         self.color = [1.0, 1.0, 1.0]
 
         self.new_string() # remove ?

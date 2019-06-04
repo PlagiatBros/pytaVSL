@@ -22,13 +22,13 @@ LOGGER = logging.getLogger(__name__)
 
 class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
-    def __init__(self, parent, name, texture, width=1, height=1, init_z=0.0):
+    def __init__(self, parent, name, texture, width=None, height=None, init_z=0.0):
 
         if type(texture) is str:
 
             texture = pi3d.Texture(texture, blend=True, mipmap=True)
 
-        super(SlideBase, self).__init__(w=texture.ix, h=texture.iy)
+        super(SlideBase, self).__init__(w=width if width is not None else texture.ix, h=height if height is not None else texture.iy)
 
         self.name = name
         self.parent = parent
