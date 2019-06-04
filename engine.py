@@ -48,7 +48,7 @@ class PytaVSL(OscServer):
 
         # Texts
         self.texts = {}
-        self.texts['debug'] = Text(self, 'debug', font=TEXTS_FONTS[2], init_z=1-self.height)
+        self.debug_text = Text(self, 'debug', font=TEXTS_FONTS[2], init_z=1-self.height)
         for i in range(N_TEXTS):
             self.texts[str(i)] = Text(self, str(i), font=TEXTS_FONTS[i], init_z=1-self.height-1)
 
@@ -100,6 +100,8 @@ class PytaVSL(OscServer):
                 self.post_process.capture_end()
                 self.post_process.draw()
 
+            self.debug_text.draw()
+
     def stop(self, *args):
         """
         Stop main loop and osc server
@@ -124,11 +126,11 @@ class PytaVSL(OscServer):
 
             size = len(paths)
 
-            self.texts['debug'].state_save()
-            self.texts['debug'].set_visible(1)
-            self.texts['debug'].set_size(0.025)
-            self.texts['debug'].set_align('top', 'right')
-            self.texts['debug'].set_text('0/' + str(size))
+            self.debug_text.state_save()
+            self.debug_text.set_visible(1)
+            self.debug_text.set_size(0.025)
+            self.debug_text.set_align('top', 'right')
+            self.debug_text.set_text('0/' + str(size))
 
             for i in range(size):
                 try:
@@ -138,10 +140,10 @@ class PytaVSL(OscServer):
                     self.add_slide(slide, False)
                 except:
                     LOGGER.error('could not load file %s' %path)
-                self.texts['debug'].set_text(str(i + 1) + '/' + str(size))
+                self.debug_text.set_text(str(i + 1) + '/' + str(size))
 
             self.sort_slides()
-            self.texts['debug'].state_recall()
+            self.debug_text.state_recall()
 
             LOGGER.info("total slides in memory: %i" % len(self.slides.values()))
 
