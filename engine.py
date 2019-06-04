@@ -238,8 +238,8 @@ class PytaVSL(OscServer):
         """
         Create slide clone
         """
-        clone_name = slide.lower()
-        target_name = target_name.lower()
+        clone_name = clone_name.lower()
+        target_name = slide.lower()
 
         if clone_name in self.slides:
             if self.slides[clone_name].is_clone:
@@ -259,7 +259,11 @@ class PytaVSL(OscServer):
 
         target = target[0]
 
-        clone = Slide(parent=self, name=clone_name, texture=pi3d.Texture(target.buf[0].textures[0].image), width=target.width, height=target.height, init_z=target.pos_z - 0.001)
+        clone_z = target.pos_z - 0.001
+        clone = Slide(parent=self, name=clone_name, texture=pi3d.Texture(target.buf[0].textures[0].image), width=target.width, height=target.height, init_z=clone_z)
+        clone.state_set(target.state_get())
+        clone.set_position_z(clone_z)
+
         clone.gif = target.gif
         clone.is_clone = True
 
