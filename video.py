@@ -8,7 +8,6 @@ from pi3d.constants import opengles
 from utils import unicode
 from osc import osc_method
 
-import cv2
 import numpy as np
 
 class Video(object):
@@ -19,11 +18,9 @@ class Video(object):
         self.video_start = 0
 
         if isinstance(texture, (str, unicode)) and '.mp4' in texture:
+            import cv2
             self.video = cv2.VideoCapture(texture)
-            # width = self.video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
-            # height = self.video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
             texture = pi3d.Texture(self.video.read()[1])
-            self.video.set(0,30000)
 
         super(Video, self).__init__(texture=texture, *args, **kwargs)
 
@@ -34,11 +31,10 @@ class Video(object):
 
         super(Video, self).draw(*args, **kwargs)
 
-
-    @osc_method('video_next')
     def video_next_frame(self):
-        pass
-        # if self.video and self.visible:
-        #     (ok, frame) = self.video.read()
-        #     if ok:
-        #         self.buf[0].textures[0].update_ndarray(frame)
+        if self.video and self.visible:
+            (ok, frame) = self.video.read()
+            if ok:
+                self.buf[0].textures[0].update_ndarray(frame)
+            else:
+                self.video.set(0, 0)
