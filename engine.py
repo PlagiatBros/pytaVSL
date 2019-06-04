@@ -126,7 +126,8 @@ class PytaVSL(OscServer):
     @osc_method('load')
     def load_textures(self, *files):
         """
-        Load textures (threaded)
+        Load files to slides
+            files: file path or glob patterns
         """
         paths = []
         for f in files:
@@ -195,6 +196,9 @@ class PytaVSL(OscServer):
 
 
     def add_slide(self, slide, sort=True):
+        if slide.name in self.slides:
+            LOGGER.error('could not add slide "%s" (name taken)' % slide.name)
+            return
         self.slides[slide.name] = slide
         if sort:
             self.sort_slides()
@@ -213,6 +217,8 @@ class PytaVSL(OscServer):
     def create_group(self, slides, group_name):
         """
         Create slide group
+            slides: slide name pattern
+            group_name: new group's name (replaces any previously created group with the same name)
         """
         name = group_name.lower()
         slides = slides.lower()
@@ -242,6 +248,7 @@ class PytaVSL(OscServer):
     def remove_group(self, group_name):
         """
         Remove slide group
+            group_name: group's name
         """
         name = group_name.lower()
         for group in self.get_children(self.slides, name):
@@ -251,7 +258,9 @@ class PytaVSL(OscServer):
     @osc_method('clone')
     def create_clone(self, slide, clone_name):
         """
-        Create slide clone
+        Create a clone slide
+            slide: target slide name
+            clone_name: new clone name (replaces any previously created clone with the same name)
         """
         clone_name = clone_name.lower()
         target_name = slide.lower()
@@ -287,7 +296,8 @@ class PytaVSL(OscServer):
     @osc_method('unclone')
     def remove_clone(self, clone_name):
         """
-        Remove slide clone
+        Remove clone slide
+            clone_name: clone's name
         """
         clone_name = clone_name.lower()
         for clone in self.get_children(self.slides, clone_name):

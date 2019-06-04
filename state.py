@@ -32,6 +32,9 @@ class State(object):
 
     @osc_method('reset')
     def state_reset(self):
+        """
+        Reset all properties
+        """
         self.state_set(RESET_STATES[type(self).__name__])
         self.stop_strobe()
         self.stop_animate()
@@ -39,6 +42,10 @@ class State(object):
 
     @osc_method('save')
     def state_save(self, name="quicksave"):
+        """
+        Save all properties in a save slot
+            name: slot name
+        """
         if not name:
             self.osc_quickstate = self.state_get()
         else:
@@ -46,6 +53,10 @@ class State(object):
 
     @osc_method('recall')
     def state_recall(self, name="quicksave"):
+        """
+        Restore all properties from a save slot
+            name: slot name
+        """
         if name in self.osc_states:
             state = self.osc_states[name]
             self.state_set(state)

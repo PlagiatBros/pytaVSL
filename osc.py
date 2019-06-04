@@ -107,6 +107,11 @@ class OscNode(object):
 
     @osc_method('set')
     def osc_set(self, property, *value):
+        """
+        Set a property
+            property: exposed osc property
+            value: new value (items with default values can be omitted)
+        """
         attribute = property.lower()
         if attribute in self.osc_attributes:
             method = self.osc_attributes[attribute]
@@ -132,6 +137,10 @@ class OscNode(object):
 
     @osc_method('log')
     def osc_log(self, property):
+        """
+        Print property's value in the console
+            property: exposed osc property
+        """
         if property in self.osc_attributes:
             value = self.osc_get_value(property)
             print('%s.%s: %s' % (self.name, property, value))
@@ -322,6 +331,7 @@ class OscServer(OscNode):
                     if spec.varargs:
                         args += " [%s ...]" % spec.varargs
                     print('  %s%s %s' % (prefix, name, args))
+                    print('      %s' % (method.__doc__.strip().replace('  ', ' ')))
 
         def print_properties(obj):
 
