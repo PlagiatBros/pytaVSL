@@ -22,6 +22,8 @@ class Video(object):
     def __init__(self, texture, *args, **kwargs):
 
         self.video = False
+        self.video_speed = 1.0
+        self.video_time = 0
 
         if isinstance(texture, (str, unicode)):
             match = videos_formats.match(texture)
@@ -40,9 +42,7 @@ class Video(object):
                 self.video_texture = pi3d.Texture(numpy.zeros(self.video_shape, dtype='uint8'))
 
                 self.video_frame_duration = 1. / min(self.video_reader.get(cv2.CAP_PROP_FPS), 60)
-                self.video_speed = 1.0
                 self.video_elapsed_time = 0
-                self.video_time = 0
 
                 texture = self.video_texture
 
