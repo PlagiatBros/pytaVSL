@@ -78,6 +78,19 @@ class PytaVSL(OscServer):
         if self.files:
             self.load_textures(*self.files)
 
+
+        ####### upload fonts and post_process to gpu
+        for n in self.texts:
+            self.texts[n].set_visible(1)
+            self.texts[n].draw()
+        self.post_process.set_visible(1)
+        self.post_process.draw()
+
+        for n in self.texts:
+            self.texts[n].set_visible(0)
+        self.post_process.set_visible(0)
+        #######
+
         while self.DISPLAY.loop_running():
 
             # process osc messages
