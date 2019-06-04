@@ -101,7 +101,6 @@ class Video(object):
         if self.video_speed == 0:
             return
 
-        initial_frame = self.video_frame
         current_frame = self.video_frame
         elapsed = now - self.video_changed_time
         duration = self.video_frame_duration
@@ -110,17 +109,9 @@ class Video(object):
         while elapsed >= duration:
 
             elapsed = elapsed - duration
+            current_frame = current_frame + 1
 
-            if self.video_speed < 0:
-                current_frame = current_frame - 1
-                if abs(current_frame) >= self.video_length:
-                    current_frame = self.video_length - 1
-            else:
-                current_frame = current_frame + 1
-                if abs(current_frame) >= self.video_length:
-                    current_frame = 0
-
-        if current_frame != initial_frame:
+        if current_frame != self.video_frame:
 
             self.video_changed_time = now + elapsed
             self.set_video_frame(current_frame)
