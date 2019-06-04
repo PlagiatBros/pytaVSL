@@ -51,6 +51,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
         self.pos_x = 0.0
         self.pos_y = 0.0
         self.pos_z = init_z
+        self.init_z = init_z
 
         # Scale
         self.init_scale = min(Display.INSTANCE.width / self.width, Display.INSTANCE.height / self.height)

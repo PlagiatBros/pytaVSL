@@ -132,8 +132,12 @@ class OscNode(object):
 
     @osc_method('log')
     def osc_log(self, property):
-        value = self.osc_get_value(property)
-        print('%s.%s: %s' % (self.name, property, value))
+        if property in self.osc_attributes:
+            value = self.osc_get_value(property)
+            print('%s.%s: %s' % (self.name, property, value))
+        else:
+            LOGGER.error('invalid property argument "%s" for /%s/log' % (property, self.name))
+
 
 def osc_to_regexp_transliteration(match):
     s = match.group(0)

@@ -35,6 +35,7 @@ class State(object):
         self.state_set(RESET_STATES[type(self).__name__])
         self.stop_strobe()
         self.stop_animate()
+        self.set_position_z(self.init_z)
 
     @osc_method('save')
     def state_save(self, name="quicksave"):
