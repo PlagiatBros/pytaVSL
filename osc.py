@@ -309,9 +309,26 @@ class OscServer(OscNode):
 
             return out
 
+
+        colors = {
+            'HEADER': '\033[95m',
+            'BLUE': '\033[94m',
+            'TEAL': '\033[96m',
+            'GREEN': '\033[92m',
+            'ITALIC': '\033[3m',
+            'YELLOW': '\033[93m',
+            'RED': '\033[91m',
+            'ENDC': '\033[0m',
+            'BOLD': '\033[1m',
+            'UNDERLINE': '\033[4m'
+        }
+        def printc(s, *c):
+            for line in s.split('\n'):
+                print("".join([colors[x.upper()] for x in c]) + line + colors['ENDC'])
+
         def print_methods(prefix, obj):
 
-            print('\n  Exposed methods:')
+            printc('\n  Exposed methods:\n', 'italic')
 
             if not obj.osc_methods:
                 print('    None')
@@ -327,15 +344,16 @@ class OscServer(OscNode):
                         for i in range(l):
                             d = spec.defaults[i] if type(spec.defaults[i]) != str else '"%s"' % spec.defaults[i]
                             args[i - l] = "%s=%s" % (args[i - l], d)
-                    args = ", ".join(args)
                     if spec.varargs:
-                        args += " [%s ...]" % spec.varargs
+                        args += ["[%s ...]" % spec.varargs]
+                    args = " ".join(args)
+
                     print('  %s%s %s' % (prefix, name, args))
-                    print('      %s' % (method.__doc__.strip().replace('  ', ' ')))
+                    printc('      %s' % (method.__doc__.replace('    ', '  ')), 'blue')
 
         def print_properties(obj):
 
-            print('\n  Exposed properties:')
+            printc('\n  Exposed properties:\n', 'italic')
 
             if not obj.osc_attributes:
                 print('    None\n')
@@ -356,8 +374,8 @@ class OscServer(OscNode):
                     print('    %s [%s]' % (name, args))
                 print('')
 
-        print('\nPytaVSL: OSC API')
-        print('================')
+        printc('\nPytaVSL: OSC API', 'header', 'bold')
+        printc('================', 'header', 'bold')
 
         print('\nEngine')
         print_methods('  /%s/' % self.name, self)
@@ -376,3 +394,5 @@ class OscServer(OscNode):
         print('\nTexts')
         print_methods('  /%s/text/<name>/' % self.name, self.debug_text)
         print_properties(self.debug_text)
+
+        printc('================\n', 'header', 'bold')
