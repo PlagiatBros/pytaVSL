@@ -16,63 +16,47 @@ import time
 import numpy
 import re
 
+import cv2
+
 videos_formats = re.compile('^.*\.(mov|avi|mpg|mpeg|mp4|mkv|wmv|webm)$')
 
 class Player(object):
     def __init__(self, file):
 
+
+        self.file = file
+        self.process = None
+        # self.process.set(cv2.CAP_PROP_PVAPI_PIXELFORMAT, cv2.CAP_PVAPI_PIXELFORMAT_BGR24)
+        # self.process.set(cv2.CAP_PROP_FORMAT, cv2.CAP_PVAPI_PIXELFORMAT_BGR24)
         self.resolution = self.get_video_resolution(file)
         self.depth = 8
         self.array_shape = (self.resolution[1], self.resolution[0], int(self.depth / 8))
 
         self.frame = None
-        self.new_frame = False
-        self.process = None
         self.running = False
-        self.bufsize = int(self.resolution[0] * self.resolution[1] * self.depth / 8)
-        self.command = [ 'ffmpeg', '-i', file, '-f', 'image2pipe', '-r', '25',
-                                  '-pix_fmt', 'rgb' + str(self.depth), '-vcodec', 'rawvideo', '-']
 
-        t = threading.Thread(target=self.loop)
-        t.daemon = True
-        t.start()
-
-    def loop(self):
-
-        while True:
-
-            if self.running:
-
-                self.new_frame = False
-
-                frame = self.process.stdout.read(self.bufsize)
-
-                self.process.stdout.flush()
-                self.process.stderr.flush()
-
-                if len(frame) < self.bufsize:
-                    self.start()
-                elif frame != self.frame:
-                    self.frame = frame
-                    self.new_frame = True
-
-            time.sleep(0.04)
 
     def start(self):
-        if self.process:
-            self.stop()
-        self.process = subprocess.Popen(self.command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=self.bufsize)
+        self.stop()
+        self.process = cv2.VideoCapture(self.file)
         self.running = True
 
     def stop(self):
-        self.process.terminate()
+        self.process = None
         self.running = False
         self.new_frame = False
 
-    def get_frame_array(self):
-        array = numpy.fromstring(self.frame, dtype='uint8')
-        array.shape = self.array_shape
-        return array
+    def next_frame(self):
+        if not self.running:
+            self.start()
+        ok = self.process.grab()
+        if not ok:
+            self.process.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            self.process.grab()
+        ok, frame = self.process.retrieve(0, 0)
+        self.frame = frame
+        self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GA)
+        # self.frame.shape = self.array_shape
 
     def get_video_resolution(self, file):
         out = subprocess.check_output('ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0'.split(' ') + [file])
@@ -106,7 +90,5 @@ class Video(object):
 
     def video_next_frame(self):
         if self.video and self.visible:
-            if not self.video_player.running:
-                self.video_player.start()
-            if self.video_player.new_frame:
-                self.buf[0].textures[0].update_ndarray(self.video_player.get_frame_array())
+            self.video_player.next_frame()
+            self.buf[0].textures[0].update_ndarray(self.video_player.frame)
