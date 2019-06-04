@@ -79,7 +79,7 @@ class Animable(object):
         Animate a property
             property: exposed osc property
             args: [from ...] [to ...] duration loop=0
-                from: initial value(s)
+                from: initial value(s) (items with default values must be omitted)
                 to: destination value(s) (items with default values must be omitted)
                 loop: omitted / 0 (no loop), 1 (infinte loop) or -1 (infinite back-and-forth)
         """
@@ -134,7 +134,7 @@ class Animable(object):
         Strobe a property
             property: exposed osc property
             args: [from ...] [to ...] period ratio
-                from: initial value(s)
+                from: initial value(s) (items with default values must be omitted)
                 to: destination value(s) (items with default values must be omitted)
                 period: strobe period in frames
                 ratio: time proportion spent on "from" (between 0.0 and 1.0)
