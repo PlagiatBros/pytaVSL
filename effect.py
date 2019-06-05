@@ -14,23 +14,29 @@ LOGGER = logging.getLogger(__name__)
 class Effect(object):
 
     def __init__(self, *args, **kwargs):
+        """ shader uniform variables overrides
+
+        ===== ========================================== ==== ==
+        vec3  description                                python
+        ----- ------------------------------------------ -------
+        index                                            from to
+        ===== ========================================== ==== ==
+          12  random, unused, unused                      36  38
+          13  key_color r, g, b                           39  41
+          14  key_threshold, mask, mask_strength          42  43
+          15  invert, unused, unused                      45  46
+          16  rgbwave, unused, unused                     48  50
+          17  charcoal radius, thresh, strength           51  53
+          18  noise, seed1, seed2                         54  56
+          19  unused, unused, unused                      57  59
+        ===== ========================================== ==== ==
+        """
 
         super(Effect, self).__init__(*args, **kwargs)
 
         self.effect_active = False
         self.current_effect = 'default'
         self.set_effect()
-
-        """
-            uniforms:
-            47 random float
-            48:50 key color (r, g, b)
-            51 key threshold
-            52 invert
-            53 rgbwave
-            54:56 charcoal (radius, thresh, strengh)
-            57:59 noise (density, seed1, seed2)
-        """
 
         self.effect_key_color = [0.0, 0.0, 0.0]
         self.effect_key_threshold = -0.001
@@ -39,12 +45,12 @@ class Effect(object):
         self.effect_charcoal = [2.0, 0.0, 2.0]
         self.effect_noise = [0.5, 0.0, 0.0]
 
-        self.set_custom_data(48, [
-            self.effect_key_color[0], self.effect_key_color[1], self.effect_key_color[2],
-            self.effect_key_threshold, self.effect_invert, self.effect_rgbwave,
-            self.effect_charcoal[0], self.effect_charcoal[1], self.effect_charcoal[2],
-            self.effect_noise[0], self.effect_noise[1], self.effect_noise[2],
-        ])
+        self.set_effect_key_color(*self.effect_key_color)
+        self.set_effect_key_threshold(self.effect_key_threshold)
+        self.set_effect_invert(self.effect_invert)
+        self.set_effect_rgbwave(self.effect_rgbwave)
+        self.set_effect_charcoal(*self.effect_charcoal)
+        self.set_effect_noise(*self.effect_noise)
 
         # only used in PostProcess
         self.buf[0].unib[13] = 0.0
@@ -71,9 +77,9 @@ class Effect(object):
         key rgb color (0-1)
         """
         self.effect_key_color = [r, g, b]
-        self.unif[48] = self.effect_key_color[0]
-        self.unif[49] = self.effect_key_color[1]
-        self.unif[50] = self.effect_key_color[2]
+        self.unif[39] = self.effect_key_color[0]
+        self.unif[40] = self.effect_key_color[1]
+        self.unif[41] = self.effect_key_color[2]
 
     @osc_property('key_threshold', 'effect_key_threshold')
     def set_effect_key_threshold(self, value):
@@ -81,7 +87,7 @@ class Effect(object):
         discard pixels when color distance to key_color is below this threshold (0-1)
         """
         self.effect_key_threshold = float(value) - 0.001
-        self.unif[51] = self.effect_key_threshold
+        self.unif[42] = self.effect_key_threshold
 
     @osc_property('invert', 'effect_invert')
     def set_effect_invert(self, value):
@@ -89,7 +95,7 @@ class Effect(object):
         invert colors (0|1)
         """
         self.effect_invert = float(bool(value))
-        self.unif[52] = self.effect_invert
+        self.unif[45] = self.effect_invert
 
     @osc_property('rgbwave', 'effect_rgbwave')
     def set_effect_rgbwave(self, value):
@@ -97,7 +103,7 @@ class Effect(object):
         rgbwave strength
         """
         self.effect_rgbwave = float(value)
-        self.unif[53] = self.effect_rgbwave
+        self.unif[48] = self.effect_rgbwave
 
     @osc_property('charcoal', 'effect_charcoal')
     def set_effect_charcoal(self, size, threshold, strength):
@@ -105,9 +111,9 @@ class Effect(object):
         charcoal pen size (px), edge threshold and stroke strength
         """
         self.effect_charcoal = [float(value) for value in [size, threshold, strength]]
-        self.unif[54] = self.effect_charcoal[0]
-        self.unif[55] = self.effect_charcoal[1]
-        self.unif[56] = self.effect_charcoal[2]
+        self.unif[51] = self.effect_charcoal[0]
+        self.unif[52] = self.effect_charcoal[1]
+        self.unif[53] = self.effect_charcoal[2]
 
     @osc_property('noise', 'effect_noise')
     def set_effect_noise(self, density, x, y):
@@ -115,13 +121,13 @@ class Effect(object):
         noise density (0-1) and xy chaos stretching
         """
         self.effect_noise = [float(value) for value in [density, x, y]]
-        self.unif[57] = self.effect_noise[0]
-        self.unif[58] = self.effect_noise[1]
-        self.unif[59] = self.effect_noise[2]
+        self.unif[54] = self.effect_noise[0]
+        self.unif[55] = self.effect_noise[1]
+        self.unif[56] = self.effect_noise[2]
 
     def draw(self, *args, **kwargs):
 
         if self.effect_active:
-            self.unif[47] = random.random()
+            self.unif[36] = random.random()
 
         super(Effect, self).draw(*args, **kwargs)

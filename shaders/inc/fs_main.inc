@@ -1,5 +1,5 @@
 // Custom data
-float rand = unif[15][2];
+float rand = unif[12][0];
 
 // Assign texture coords to output
 gl_FragColor = texture2D(tex0, coords);

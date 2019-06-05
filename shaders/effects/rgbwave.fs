@@ -1,4 +1,4 @@
-float waveStrength = unif[17][2];
+float waveStrength = unif[16][0];
 
 
 float relativeY = coords.y * resolution.y;
@@ -14,7 +14,7 @@ float rgbWave = waveStrength * (
       + step(0.9995, sin(relativeY * 0.005 + rand * 1.6)) * 12.0
       + step(0.9999, sin(relativeY * 0.005 + rand * 2.0)) * -18.0
   ) / resolution.x;
-float rgbDiff = waveStrength * (6.0 + sin(rand * 500.0 + coords.y * 40.0) * (20.0 * waveStrength + 1.0)) / resolution.x;
+float rgbDiff = waveStrength * 2.0 * (6.0 + sin(rand * 500.0 + coords.y * 40.0) * (20.0 * waveStrength + 1.0)) / resolution.x;
 float rgbUvX = coords.x + rgbWave;
 
 gl_FragColor.rgb = vec3(

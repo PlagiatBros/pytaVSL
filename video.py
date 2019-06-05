@@ -44,12 +44,13 @@ class Video(object):
                 self.video_frame_duration = 1. / min(self.video_reader.get(cv2.CAP_PROP_FPS), 60)
                 self.video_elapsed_time = 0
 
+                # only used in Video
+                self.buf[0].unib[12] = 1.0
+
                 texture = self.video_texture
 
         super(Video, self).__init__(texture=texture, *args, **kwargs)
 
-        # only used in Video
-        self.buf[0].unib[12] = 1.0
 
     def draw(self, *args, **kwargs):
 

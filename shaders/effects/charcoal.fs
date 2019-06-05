@@ -1,6 +1,6 @@
-vec2 charcoalRadius = unif[18][0] / resolution;
-float charcoalThresh = unif[18][1];
-float charcoalStrength = unif[18][2];
+vec2 charcoalRadius = unif[17][0] / resolution;
+float charcoalThresh = unif[17][1];
+float charcoalStrength = unif[17][2];
 
 vec4 c1 = texture2D(tex0, coords);
 vec4 c2 = texture2D(tex0, coords + vec2(charcoalRadius.x, 0));
