@@ -311,13 +311,12 @@ class OscServer(OscNode):
 
 
         colors = {
-            'HEADER': '\033[95m',
             'BLUE': '\033[94m',
-            'TEAL': '\033[96m',
             'GREEN': '\033[92m',
             'ITALIC': '\033[3m',
             'YELLOW': '\033[93m',
             'RED': '\033[91m',
+            'TEAL': '\033[36m',
             'ENDC': '\033[0m',
             'BOLD': '\033[1m',
             'UNDERLINE': '\033[4m'
@@ -372,7 +371,8 @@ class OscServer(OscNode):
                             args[i - l] = "%s=%s" % (args[i - l], d)
                     args = ", ".join(args)
                     print('    %s [%s]' % (name, args))
-                    printc(1, method.__doc__.replace('    ', '  '), 'blue')
+                    printc(3, '\n' + method.__doc__.replace('    ', '  ').strip(), 'blue')
+                    printc(3, 'init: %s\n' % str(obj.osc_get_value(name)).replace("'", '"'), 'teal')
 
         printc(0, '\nPytaVSL: OSC API', 'teal', 'bold')
         printc(0, '\nMethod paths and property names are case insensitive.', 'italic')

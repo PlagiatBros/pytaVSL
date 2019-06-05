@@ -48,7 +48,7 @@ class PytaVSL(OscServer):
 
         # Texts
         self.texts = {}
-        self.debug_text = Text(self, 'debug', font=FONTS["mono"], init_z=1-self.height)
+        self.debug_text = Text(self, 'debug', font=FONTS["mono"], init_z=-100)
 
         # Z-sorted slides
         self.sorted_slides = []
@@ -141,7 +141,7 @@ class PytaVSL(OscServer):
                 try:
                     path = paths[i]
                     name = path.split('/')[-1].split('.')[0].lower()
-                    slide = Slide(parent=self, name=name, texture=path, init_z=i / 1000.)
+                    slide = Slide(parent=self, name=name, texture=path, init_z=len(self.slides) / 1000.)
                     self.add_slide(slide)
                 except:
                     LOGGER.error('could not load file %s' %path)
@@ -219,7 +219,7 @@ class PytaVSL(OscServer):
             return
         self.texts[name] = Text(self, 'text/' + name, font=FONTS[font], init_z=-100 + len(self.texts))
         self.sort_slides()
-        
+
     @osc_method('group')
     def create_group(self, slides, group_name):
         """
