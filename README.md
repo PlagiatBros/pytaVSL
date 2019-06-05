@@ -46,4 +46,7 @@ python3 pytaVSL.py --api | less -cr
 Copyleft © 2019 Plagiat Brother; Original Code © Aurélien Roux; based upon Virtual Stage Light by Gregory David.
 This program is a free software released under the [GNU/GPL3](https://github.com/PlagiatBros/pytaVSL/blob/master/LICENSE) license.
 
-Included fonts: leaguegothic (sans), freemono (mono)
+**Included Fonts**
+
+- League Gothic © Caroline Hadilaksono, Micah Rich, & Tyler Finck / Open Font License
+- FreeMono © Free Software Foundation / GNU GPLv3

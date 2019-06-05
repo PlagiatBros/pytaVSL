@@ -27,7 +27,7 @@ class PytaVSL(OscServer):
     It's also an OSC server which contains the method to control all of its children.
     """
 
-    def __init__(self, name, port, files=[], fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600):
+    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600):
 
         super(PytaVSL, self).__init__(name, port)
 
@@ -48,9 +48,7 @@ class PytaVSL(OscServer):
 
         # Texts
         self.texts = {}
-        self.debug_text = Text(self, 'debug', font="mono", init_z=1-self.height)
-        for i in range(len(TEXTS_FONTS)):
-            self.texts[str(i)] = Text(self, 'text#' + str(i), font=TEXTS_FONTS[i], init_z=1-self.height-1)
+        self.debug_text = Text(self, 'debug', font=FONTS["mono"], init_z=1-self.height)
 
         # Z-sorted slides
         self.sorted_slides = []
@@ -64,9 +62,6 @@ class PytaVSL(OscServer):
         signal(SIGINT, self.stop)
         signal(SIGTERM, self.stop)
 
-        # Init
-        self.files = files if files else []
-
     def start(self):
         """
         - load textures
@@ -74,10 +69,6 @@ class PytaVSL(OscServer):
              - receive osc messages
              - draw slides, skip grouped slides (drawn by their parents)
         """
-
-        if self.files:
-            self.load_textures(*self.files)
-
 
         ####### upload fonts and post_process to gpu
         for n in self.texts:
@@ -151,7 +142,7 @@ class PytaVSL(OscServer):
                     path = paths[i]
                     name = path.split('/')[-1].split('.')[0].lower()
                     slide = Slide(parent=self, name=name, texture=path, init_z=i / 1000.)
-                    self.add_slide(slide, False)
+                    self.add_slide(slide)
                 except:
                     LOGGER.error('could not load file %s' %path)
                 self.debug_text.set_text(str(i + 1) + '/' + str(size))
@@ -195,13 +186,11 @@ class PytaVSL(OscServer):
                         return
 
 
-    def add_slide(self, slide, sort=True):
+    def add_slide(self, slide):
         if slide.name in self.slides:
             LOGGER.error('could not add slide "%s" (name taken)' % slide.name)
             return
         self.slides[slide.name] = slide
-        if sort:
-            self.sort_slides()
 
     def remove_slide(self, slide):
         if slide.children:
@@ -213,6 +202,24 @@ class PytaVSL(OscServer):
         del self.slides[slide.name]
         self.sort_slides()
 
+    @osc_method('text')
+    def create_text(self, name, font):
+        """
+        Create text object
+            name: text name
+            font: font name (as defined in config.py)
+        """
+        name = str(name)
+        font = str(font)
+        if name in self.texts:
+            LOGGER.error('could not add text "%s" (name taken)' % name)
+            return
+        if not font in FONTS:
+            LOGGER.error('could not add text "%s" (font "%s" not found)' % (name, font))
+            return
+        self.texts[name] = Text(self, 'text/' + name, font=FONTS[font], init_z=-100 + len(self.texts))
+        self.sort_slides()
+        
     @osc_method('group')
     def create_group(self, slides, group_name):
         """

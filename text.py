@@ -28,7 +28,7 @@ class Text(State, Perspective, SlideBase):
     """
     def __init__(self, parent, name, font="mono", init_z=0.0):
 
-        self.font = FONTS[font]
+        self.font = font
 
         self.string = ' '
         self.length = max(len(self.string), 1)
