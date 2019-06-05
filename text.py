@@ -60,7 +60,7 @@ class Text(State, Perspective, SlideBase):
         """
         Update string buffer. Mostly copied from pi3d.String
         """
-        size = self.font.ratio / self.length if self.size == 'auto' else self.size
+        size = min(1, self.font.ratio / self.length) if self.size == 'auto' else self.size
         size /= TEXT_RESOLUTION
         size /= 600. / Display.INSTANCE.height # size was calibrated on 800x600
 
@@ -301,7 +301,7 @@ class Text(State, Perspective, SlideBase):
 
         self.v_align = align
 
-        size = self.font.ratio / self.length if self.size == 'auto' else self.size
+        size = min(1, self.font.ratio / self.length) if self.size == 'auto' else self.size
 
         y = 0
 
