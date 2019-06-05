@@ -65,6 +65,9 @@ class Video(object):
         """
         current video time in seconds (cpu expensive for any value other than 0)
         """
+        if not self.video:
+            return
+
         self.video_reader.set(cv2.CAP_PROP_POS_MSEC, float(time) * 1000)
         self.video_time = self.video_reader.get(cv2.CAP_PROP_POS_MSEC) / 1000.
 
@@ -77,6 +80,9 @@ class Video(object):
         """
         video playback speed (0=paused, no reverse playback, high speed is cpu expensive)
         """
+        if not self.video:
+            return
+            
         self.video_speed = max(float(speed), 0)
 
     def video_next_frame(self):
