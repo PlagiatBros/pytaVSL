@@ -100,6 +100,9 @@ class Gif(object):
 
     @osc_property('gif_frame', 'gif_index')
     def set_frame(self, frame):
+        """
+        current gif frame
+        """
         self.gif_changed_time = 0
         frame = int(frame)
         if self.gif_speed < 0:
@@ -112,8 +115,14 @@ class Gif(object):
 
     @osc_property('gif_speed', 'gif_speed')
     def set_speed(self, speed):
+        """
+        gif playback speed (0=paused, negative=reverse)
+        """
         self.gif_speed = float(speed)
 
     @osc_property('gif_duration', 'gif_duration')
     def set_duration(self, duration):
+        """
+        gif total duration (override frames' durations)
+        """
         self.gif_duration = float(duration)

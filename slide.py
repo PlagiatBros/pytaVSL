@@ -120,6 +120,9 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
     @osc_property('tiles', 'tiles')
     def set_tiles(self, x, y):
+        """
+        texture tiling (normalized)
+        """
         if x is not None:
             self.tiles[0] = float(x)
         if y is not None:
@@ -133,6 +136,9 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
     @osc_property('offset', 'offset')
     def set_offset(self, x, y):
+        """
+        texture offset (normalized)
+        """
         if x is not None:
             self.offset[0] = float(x)
         if y is not None:
@@ -142,20 +148,23 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
     @osc_property('visible', 'visible')
     def set_visible(self, visible):
         """
-        set visibility
+        object visibility (0|1)
         """
         self.visible = int(bool(visible))
 
     @osc_property('color', 'color')
     def set_color(self, r, g, b):
         """
-        set color
+        rgb balance
         """
         self.color = [float(r), float(g), float(b)]
         self.set_material(self.color)
 
     @osc_property('alpha', 'color_alpha')
     def set_color_alpha(self, alpha):
+        """
+        object opacity (0-1)
+        """
         self.color_alpha = float(alpha)
         self.set_alpha(self.color_alpha)
 
@@ -163,7 +172,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
     @osc_property('color_strobe', 'color_strobe')
     def set_color_strobe(self, strobe):
         """
-        set color strobing strength
+        random color strobing (0|1)
         """
         self.color_strobe = float(strobe)
         if strobe <= 0:
@@ -171,6 +180,9 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
     @osc_property('position', 'pos_x', 'pos_y', 'pos_z')
     def set_position(self, x, y, z):
+        """
+        object xyz offset to center (px)
+        """
         sort_parent = False
         if x is not None:
             self.pos_x = float(x)
@@ -186,20 +198,29 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
     @osc_property('position_x', 'pos_x')
     def set_position_x(self, x):
+        """
+        object x-offset (px, bottom to top)
+        """
         self.set_position(x, None, None)
 
     @osc_property('position_y', 'pos_y')
     def set_position_y(self, y):
+        """
+        object y-offset (px, left to right)
+        """
         self.set_position(None, y, None)
 
     @osc_property('position_z', 'pos_z')
     def set_position_z(self, z):
+        """
+        object z-axis offset (px, near to far)
+        """
         self.set_position(None, None, z)
 
     @osc_property('scale', 'sx', 'sy')
     def set_scale(self, sx, sy):
         """
-        Scaling
+        object xy scaling
         """
         self.sx = float(sx)
         self.sy = float(sy)
@@ -208,16 +229,15 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
     @osc_property('zoom', 'sx')
     def set_zoom(self, zoom):
         """
-        Scaling relative to initial size, aka zoom
+        object scaling (scale shorthand)
         """
         self.set_scale(zoom, zoom)
 
     @osc_property('rotate', 'rx', 'ry', 'rz')
     def set_rotate(self, rx, ry, rz):
         """
-        Set the rotation of the slide
+        object rotation around xyz axis (deg)
         """
-
         if rx is not None:
             self.rx = float(rx)
             self.rotateToX(self.rx)
@@ -230,14 +250,23 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
     @osc_property('rotate_x', 'rx')
     def set_rotate_x(self, rx):
+        """
+        object rotation around x axis (deg)
+        """
         self.set_rotate(rx, None, None)
 
     @osc_property('rotate_y', 'ry')
     def set_rotate_y(self, ry):
+        """
+        object rotation around y axis (deg)
+        """
         self.set_rotate(None, ry, None)
 
     @osc_property('rotate_z', 'rz')
     def set_rotate_z(self, rz):
+        """
+        object rotation around z axis (deg)
+        """
         self.set_rotate(None, None, rz)
 
 class Slide(State, Perspective, Video, Gif, SlideBase):

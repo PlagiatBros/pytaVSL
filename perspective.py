@@ -15,6 +15,9 @@ class Perspective(object):
 
     @osc_property('perspective', 'perspective')
     def set_perspective(self, perspective):
+        """
+        enable perspective (0|1)
+        """
         self.perspective = int(bool(perspective))
         if self.perspective:
             self._camera = self.parent.CAMERA3D

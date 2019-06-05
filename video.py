@@ -61,6 +61,9 @@ class Video(object):
 
     @osc_property('video_time', 'video_time')
     def set_video_time(self, time):
+        """
+        current video time in seconds (cpu expensive for any value other than 0)
+        """
         self.video_reader.set(cv2.CAP_PROP_POS_MSEC, float(time) * 1000)
         self.video_time = self.video_reader.get(cv2.CAP_PROP_POS_MSEC) / 1000.
 
@@ -70,6 +73,9 @@ class Video(object):
 
     @osc_property('video_speed', 'video_speed')
     def set_video_speed(self, speed):
+        """
+        video playback speed (0=paused, no reverse playback, high speed is cpu expensive)
+        """
         self.video_speed = max(float(speed), 0)
 
     def video_next_frame(self):

@@ -15,7 +15,7 @@
 usage: python ./pytaVSL.py [-h] [--name NAME] [--port PORT]
                            [--load FILES [FILES ...]] [--fps FPS]
                            [--max-gpu MAX_GPU] [--fullscreen] [--api]
-                           [--debug] [--geometry WIDTHxHEIGHT]
+                           [--debug] [--geometry WIDTHxHEIGHT] [--version]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -30,7 +30,15 @@ optional arguments:
   --debug               print debug logs (default: False)
   --geometry WIDTHxHEIGHT
                         output resolution (default: 800x600)
+  --version             show program's version number and exit
 
+```
+
+### Documentation
+
+The osc api can be read by running the following command:
+```
+python3 pytaVSL.py --api | less -cr
 ```
 
 ###  License

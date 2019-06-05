@@ -322,13 +322,13 @@ class OscServer(OscNode):
             'BOLD': '\033[1m',
             'UNDERLINE': '\033[4m'
         }
-        def printc(s, *c):
+        def printc(indent, s, *c):
             for line in s.split('\n'):
-                print("".join([colors[x.upper()] for x in c]) + line + colors['ENDC'])
+                print("  " * indent + "".join([colors[x.upper()] for x in c]) + line + colors['ENDC'])
 
         def print_methods(prefix, obj):
 
-            printc('\n  Exposed methods:\n', 'italic')
+            printc(1, '\nExposed methods:\n', 'italic')
 
             if not obj.osc_methods:
                 print('    None')
@@ -349,11 +349,11 @@ class OscServer(OscNode):
                     args = " ".join(args)
 
                     print('  %s%s %s' % (prefix, name, args))
-                    printc('      %s' % (method.__doc__.replace('    ', '  ')), 'blue')
+                    printc(1, method.__doc__.replace('    ', '  '), 'blue')
 
         def print_properties(obj):
 
-            printc('\n  Exposed properties:\n', 'italic')
+            printc(1, '\nExposed properties:\n', 'italic')
 
             if not obj.osc_attributes:
                 print('    None\n')
@@ -372,10 +372,10 @@ class OscServer(OscNode):
                             args[i - l] = "%s=%s" % (args[i - l], d)
                     args = ", ".join(args)
                     print('    %s [%s]' % (name, args))
-                print('')
+                    printc(1, method.__doc__.replace('    ', '  '), 'blue')
 
-        printc('\nPytaVSL: OSC API', 'header', 'bold')
-        printc('================', 'header', 'bold')
+        printc(0, '\nPytaVSL: OSC API', 'teal', 'bold')
+        printc(0, '\nMethod paths and property names are case insensitive.', 'italic')
 
         print('\nEngine')
         print_methods('  /%s/' % self.name, self)
@@ -394,5 +394,3 @@ class OscServer(OscNode):
         print('\nTexts')
         print_methods('  /%s/text/<name>/' % self.name, self.debug_text)
         print_properties(self.debug_text)
-
-        printc('================\n', 'header', 'bold')

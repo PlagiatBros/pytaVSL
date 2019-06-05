@@ -53,6 +53,9 @@ class Effect(object):
 
     @osc_property('effect', 'current_effect')
     def set_effect(self, effect='default'):
+        """
+        special effect (default|rgbwave|charcoal|noise)
+        """
         try:
             self.set_shader(SHADERS[effect])
             self.current_effect = effect
@@ -64,6 +67,9 @@ class Effect(object):
 
     @osc_property('key_color', 'effect_key_color')
     def set_effect_key_color(self, r, g, b):
+        """
+        key rgb color (0-1)
+        """
         self.effect_key_color = [r, g, b]
         self.unif[48] = self.effect_key_color[0]
         self.unif[49] = self.effect_key_color[1]
@@ -71,29 +77,44 @@ class Effect(object):
 
     @osc_property('key_threshold', 'effect_key_threshold')
     def set_effect_key_threshold(self, value):
+        """
+        discard pixels when color distance to key_color is below this threshold (0-1)
+        """
         self.effect_key_threshold = float(value) - 0.001
         self.unif[51] = self.effect_key_threshold
 
     @osc_property('invert', 'effect_invert')
     def set_effect_invert(self, value):
+        """
+        invert colors (0|1)
+        """
         self.effect_invert = float(bool(value))
         self.unif[52] = self.effect_invert
 
     @osc_property('rgbwave', 'effect_rgbwave')
     def set_effect_rgbwave(self, value):
+        """
+        rgbwave strength
+        """
         self.effect_rgbwave = float(value)
         self.unif[53] = self.effect_rgbwave
 
     @osc_property('charcoal', 'effect_charcoal')
-    def set_effect_charcoal(self, radius, threshold, strength):
-        self.effect_charcoal = [float(value) for value in [radius, threshold, strength]]
+    def set_effect_charcoal(self, size, threshold, strength):
+        """
+        charcoal pen size (px), edge threshold and stroke strength
+        """
+        self.effect_charcoal = [float(value) for value in [size, threshold, strength]]
         self.unif[54] = self.effect_charcoal[0]
         self.unif[55] = self.effect_charcoal[1]
         self.unif[56] = self.effect_charcoal[2]
 
     @osc_property('noise', 'effect_noise')
-    def set_effect_noise(self, density, seed1, seed2):
-        self.effect_noise = [float(value) for value in [density, seed1, seed2]]
+    def set_effect_noise(self, density, x, y):
+        """
+        noise density (0-1) and xy chaos stretching
+        """
+        self.effect_noise = [float(value) for value in [density, x, y]]
         self.unif[57] = self.effect_noise[0]
         self.unif[58] = self.effect_noise[1]
         self.unif[59] = self.effect_noise[2]

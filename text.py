@@ -236,17 +236,15 @@ class Text(State, Perspective, SlideBase):
 
     @osc_property('text', 'string')
     def set_text_osc(self, text, glitch_duration=0):
+        """
+        text string with optional glitch duration
+        """
         self.set_text(text, glitch_duration)
 
     @osc_property('align', 'h_align', 'v_align')
     def set_align(self, h, v):
         """
-        Set horizontal and vertical alignments with support for inverted args.
-        Triggers String regeneration.
-
-        Args:
-            h (str): center, left or right (only the first letter is parsed)
-            v (str): center, top or bottom (only the first letter is parsed)
+        horizontal and vertical alignment (center|left|right, center|top|bottom)
         """
         h = h[0].upper()
         v = v[0].upper()
@@ -271,12 +269,15 @@ class Text(State, Perspective, SlideBase):
     @osc_property('align_h', 'h_align')
     def set_h_align(self, align):
         """
-        Set heorizontal alignment. Triggers String regeneration.
-
-        Args:
-            align (str): C, L or R
+        horizontal alignment (center|left|right)
         """
+        align = str(align)[0].upper()
+
+        if align == self.h_align:
+            return
+
         self.h_align = align
+
         x = 0
 
         if self.h_align == 'L':
@@ -291,11 +292,13 @@ class Text(State, Perspective, SlideBase):
     @osc_property('align_v', 'v_align')
     def set_v_align(self, align):
         """
-        Set vertical alignment. Triggers String regeneration.
-
-        Args:
-            align (str): C, T or B
+        vertical alignment (center|top|bottom)
         """
+        align = str(align)[0].upper()
+
+        if align == self.v_align:
+            return
+
         self.v_align = align
 
         size = self.font.ratio / self.length if self.size == 'auto' else self.size
@@ -314,10 +317,7 @@ class Text(State, Perspective, SlideBase):
     @osc_property('size', 'size')
     def set_size(self, size):
         """
-        Set size. Triggers String regeneration.
-
-        Args:
-            size (str|float): 'auto' or between 0.0 and 1.0. 1.0 for full height characters
+        text size (1=full height, "auto"=fit, "current"=fix current size if "auto")
         """
         if size == 'auto':
             self.size = 'auto'
