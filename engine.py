@@ -106,6 +106,7 @@ class PytaVSL(OscServer):
 
             self.debug_text.draw()
 
+
     def stop(self, *args):
         """
         Stop main loop and osc server
@@ -113,6 +114,13 @@ class PytaVSL(OscServer):
         self.DISPLAY.stop()
         self.DISPLAY.destroy()
         super(PytaVSL, self).stop()
+
+    @osc_method('stop')
+    def osc_stop(self):
+        """
+        Shutdown pytaVSL
+        """
+        self.stop()
 
     @osc_method('load')
     def load_textures(self, *files):

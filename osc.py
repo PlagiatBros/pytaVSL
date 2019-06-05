@@ -317,6 +317,7 @@ class OscServer(OscNode):
             'YELLOW': '\033[93m',
             'RED': '\033[91m',
             'TEAL': '\033[36m',
+            'BROWN': '\033[33m',
             'ENDC': '\033[0m',
             'BOLD': '\033[1m',
             'UNDERLINE': '\033[4m'
@@ -334,6 +335,8 @@ class OscServer(OscNode):
 
             methods = alpha_sort(obj.osc_methods)
             for c in methods:
+                printc(1, '(from %s)\n' % c, 'brown')
+
                 for name in methods[c]:
                     method = obj.osc_methods[name]
                     spec = getargspec(method)
@@ -360,6 +363,8 @@ class OscServer(OscNode):
 
             methods = alpha_sort(obj.osc_attributes)
             for c in methods:
+                printc(1, '(from %s)\n' % c, 'brown')
+
                 for name in methods[c]:
                     method = obj.osc_attributes[name]
                     spec = getargspec(method)
