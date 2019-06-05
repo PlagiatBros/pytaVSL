@@ -33,9 +33,9 @@ class PytaVSL(OscServer):
 
         # setup OpenGL
         self.height = height
-        self.DISPLAY = pi3d.Display.create(window_title="pytaVSL", w=width, h=height, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=fps, depth=24, display_config=DISPLAY_CONFIG_FULLSCREEN if fullscreen else DISPLAY_CONFIG_DEFAULT)
+        self.DISPLAY = pi3d.Display.create(window_title="pytaVSL", w=width, h=height, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=fps, depth=24, display_config=DISPLAY_CONFIG_FULLSCREEN if fullscreen else DISPLAY_CONFIG_DEFAULT, far=100000)
         self.CAMERA = pi3d.Camera(is_3d=False, eye=(0, 0, -height))
-        self.CAMERA3D = pi3d.Camera(is_3d=True, eye=(0, 0, -height))
+        self.CAMERA3D = pi3d.Camera(is_3d=True, eye=(0, 0, -height), scale=0.8465)
         self.CAMERA.was_moved = False
         self.CAMERA3D.was_moved = False
 
