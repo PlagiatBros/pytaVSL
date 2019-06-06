@@ -84,6 +84,7 @@ class Video(object):
             return
 
         self.video_speed = max(float(speed), 0)
+        self.video_elapsed_time = 0
 
     def video_next_frame(self):
 
