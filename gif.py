@@ -88,6 +88,8 @@ class Gif(object):
         if current_frame is not initial_frame:
 
             self.buf[0].textures[0].update_ndarray(current_frame.ndarray)
+            self.bind_mask()
+
             self.gif_changed_time = now + elapsed
 
 
@@ -112,6 +114,7 @@ class Gif(object):
         self.gif_index = frame
         if self.gif:
             self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray)
+            self.bind_mask()
 
     @osc_property('gif_speed', 'gif_speed')
     def set_speed(self, speed):

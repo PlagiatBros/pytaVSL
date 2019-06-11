@@ -8,6 +8,7 @@ uniform vec3 unib[5]; // Buffer
 uniform vec3 unif[20]; // Shape
 
 varying vec2 coords;
+varying vec2 maskCoords;
 
 const vec2 resolution = vec2({WIDTH}, {HEIGHT});
 
