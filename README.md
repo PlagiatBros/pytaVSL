@@ -12,17 +12,23 @@
 ### Usage
 
 ```
-usage: python ./pytaVSL.py [-h] [--name NAME] [--port PORT]
-                           [--load FILES [FILES ...]] [--fps FPS]
+usage: python ./pytaVSL.py [-h] [--namespace NAMESPACE] [--port PORT]
+                           [--load FILES [FILES ...]]
+                           [--text NAME:FONT [NAME:FONT ...]] [--fps FPS]
                            [--max-gpu MAX_GPU] [--fullscreen] [--api]
-                           [--debug] [--geometry WIDTHxHEIGHT] [--version]
+                           [--debug] [--geometry WIDTHxHEIGHT] [--title TITLE]
+                           [--version]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --name NAME           osc namespace (default: pyta)
+  --namespace NAMESPACE
+                        osc namespace (default: pyta)
   --port PORT           udp port or unix socket path (default: 5555)
   --load FILES [FILES ...]
                         image files to load (default: None)
+  --text NAME:FONT [NAME:FONT ...]
+                        text objects to create (default: ['0:sans', '1:sans',
+                        '2:mono', '3:mono'])
   --fps FPS             maximum framerate (default: 25)
   --max-gpu MAX_GPU     maximum gpu memory (in MB) (default: 64)
   --fullscreen          launch in fullscreen (default: False)
@@ -30,8 +36,8 @@ optional arguments:
   --debug               print debug logs (default: False)
   --geometry WIDTHxHEIGHT
                         output resolution (default: 800x600)
+  --title TITLE         window title (default: pytaVSL)
   --version             show program's version number and exit
-
 ```
 
 ### Documentation
