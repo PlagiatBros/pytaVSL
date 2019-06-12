@@ -27,7 +27,7 @@ Log(name=None, level='DEBUG' if args.debug else 'WARNING')
 
 from engine import PytaVSL
 geometry = [int(x) for x in args.geometry.split('x')]
-pyta = PytaVSL(name=args.namespace, port=args.port, fps=args.fps, fullscreen=args.fullscreen, width=geometry[0], height=geometry[1], window_title=args.title)
+pyta = PytaVSL(name=args.namespace, port=args.port, fps=args.fps, fullscreen=args.fullscreen, width=geometry[0], height=geometry[1], window_title=args.title, max_gpu_memory=args.max_gpu)
 
 if args.api:
     pyta.print_api()
