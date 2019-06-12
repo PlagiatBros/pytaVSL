@@ -40,7 +40,7 @@ class Effect(object):
         self.set_effect()
 
         self.effect_key_color = [0.0, 0.0, 0.0]
-        self.effect_key_threshold = -0.001
+        self.effect_key_threshold = 0
         self.effect_invert = 0.0
         self.effect_rgbwave = 0.0
         self.effect_charcoal = [2.0, 0.0, 2.0]
@@ -93,7 +93,7 @@ class Effect(object):
         """
         discard pixels when color distance to key_color is below this threshold (0-1)
         """
-        self.effect_key_threshold = float(value) - 0.001
+        self.effect_key_threshold = float(value)
         self.unif[42] = self.effect_key_threshold
 
     @osc_property('invert', 'effect_invert')
