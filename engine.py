@@ -88,10 +88,11 @@ class PytaVSL(OscServer):
         self.post_process.set_visible(0)
         #######
 
-        nframes = 0
-        elapsed = 0
-        start = time()
-        elapsed = 0
+        # fps counter
+        # nframes = 0
+        # elapsed = 0
+        # start = time()
+        # elapsed = 0
 
         while self.DISPLAY.loop_running():
 
@@ -117,13 +118,13 @@ class PytaVSL(OscServer):
                 self.post_process.capture_end()
                 self.post_process.draw()
 
-            if time() - start > 1.0:
-                self.debug_text.set_visible(1)
-                self.debug_text.set_text('fps: %i' % nframes)
-                start = time()
-                nframes = 0
-
-            nframes += 1
+            # fps counter
+            # if time() - start > 1.0:
+            #     self.debug_text.set_visible(1)
+            #     self.debug_text.set_text('fps: %i' % nframes)
+            #     start = time()
+            #     nframes = 0
+            # nframes += 1
 
             self.debug_text.draw()
 
