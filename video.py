@@ -38,7 +38,7 @@ class Video(object):
 
                 self.video_reader = cv2.VideoCapture(texture)
                 self.video_shape = (int(self.video_reader.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(self.video_reader.get(cv2.CAP_PROP_FRAME_WIDTH)), 3)
-                self.video_texture = pi3d.Texture(numpy.zeros(self.video_shape, dtype='uint8'))
+                self.video_texture = pi3d.Texture(numpy.zeros(self.video_shape, dtype='uint8'), mipmap=False)
 
                 self.video_frame_duration = 1. / min(self.video_reader.get(cv2.CAP_PROP_FPS), 60)
                 self.video_elapsed_time = 0

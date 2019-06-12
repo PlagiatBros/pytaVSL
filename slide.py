@@ -26,7 +26,7 @@ class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
 
         if type(texture) is str:
 
-            texture = pi3d.Texture(texture, blend=True, mipmap=True)
+            texture = pi3d.Texture(texture)
 
         super(SlideBase, self).__init__(w=width if width is not None else texture.ix, h=height if height is not None else texture.iy)
 

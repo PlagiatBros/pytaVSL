@@ -42,7 +42,7 @@ class Gif(object):
         self.gif = []
         for i in range(gif.n_frames):
             gif.seek(i)
-            t = pi3d.Texture(gif, blend=True, mipmap=True)
+            t = pi3d.Texture(gif, mipmap=False)
             d = gif.info['duration'] / 1000.
             if d == 0:
                 d = 1. / Display.INSTANCE.frames_per_second

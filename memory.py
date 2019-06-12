@@ -18,18 +18,22 @@ class MemoryMonitor(object):
 
     def get_data(self, slide):
         if len(slide.buf[0].textures) > 0:
-            return slide.buf[0].textures[0]
+            tex = slide.buf[0].textures[0]
+            size = tex.image.nbytes
+            if tex.mipmap:
+                size *= 1.33
+            return [tex, size]
         else:
-            return None
+            return [None, 0]
 
     def alloc(self, slide):
 
-        data = self.get_data(slide)
-        if data and not data in self.loaded:
-            self.allocated += data.image.nbytes * 1.33 # 1.33 = mipmap
+        tex, size = self.get_data(slide)
+        if tex and not tex in self.loaded:
+            self.allocated += size
             LOGGER.debug('%s uploaded to GPU. Total allocated: %.1fMB' % (slide.name, self.allocated / 1000000.))
 
-        self.loaded.append(data)
+        self.loaded.append(tex)
 
         if self.full() and self.flush is not None:
             LOGGER.debug('Too much texture memory allocated: flushing...')
@@ -39,11 +43,11 @@ class MemoryMonitor(object):
         return True
 
     def free(self, slide):
-        data = self.get_data(slide)
-        if data and data in self.loaded:
-            self.loaded.remove(data)
-            if not data in self.loaded:
-                self.allocated -= data.image.nbytes * 1.33 # 1.33 = mipmap
+        tex, size = self.get_data(slide)
+        if tex and tex in self.loaded:
+            self.loaded.remove(tex)
+            if not tex in self.loaded:
+                self.allocated -= size
                 LOGGER.debug('%s flushed from GPU. Total allocated: %.1fMB' % (slide.name, self.allocated / 1000000.))
 
     def full(self):
