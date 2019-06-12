@@ -45,7 +45,7 @@ class Gif(object):
             t = pi3d.Texture(gif, mipmap=False)
             d = gif.info['duration'] / 1000.
             if d == 0:
-                d = 1. / Display.INSTANCE.frames_per_second
+                d = 1. / self.parent.fps
             self.gif.append(Frame(t.image, d))
             if i == 0:
                 self.texture = t
@@ -66,7 +66,7 @@ class Gif(object):
         current_frame = self.gif[self.gif_index]
         elapsed = now - self.gif_changed_time
         duration = self.gif_duration / self.gif_length if self.gif_duration != 0 else current_frame.duration
-        duration = max(duration / abs(self.gif_speed), 1. / Display.INSTANCE.frames_per_second / 1000)
+        duration = max(duration / abs(self.gif_speed), 1. / self.parent.fps / 1000)
 
         while elapsed >= duration:
 
@@ -83,7 +83,7 @@ class Gif(object):
 
             current_frame = self.gif[self.gif_index]
             duration = self.gif_duration / self.gif_length if self.gif_duration != 0 else current_frame.duration
-            duration = max(duration / abs(self.gif_speed), 1. / Display.INSTANCE.frames_per_second / 1000)
+            duration = max(duration / abs(self.gif_speed), 1. / self.parent.fps / 1000)
 
 
         if current_frame is not initial_frame:

@@ -36,7 +36,7 @@ class Animation():
 
     def play(self):
         t = self.parent.time - self.start_date
-        t += 1. / Display.INSTANCE.frames_per_second # always 1 frame early for smooth anims
+        t += 1. / self.parent.fps # always 1 frame early for smooth anims
         if t >= self.duration:
             t = self.duration
             self.done = True
@@ -63,7 +63,7 @@ class Strobe():
         self.current = None
 
     def play(self):
-        t = self.parent.time + 1. / Display.INSTANCE.frames_per_second # always 1 frame early for smooth anims
+        t = self.parent.time + 1. / self.parent.fps # always 1 frame early for smooth anims
         delta = t - self.date
         progress = delta % self.duration
         state = progress < self.breakpoint

@@ -56,7 +56,10 @@ class PytaVSL(OscServer):
         self.debug_text = Text(self, 'debug', font=FONTS["mono"], init_z=-100)
         self.debug_text.set_size(0.025)
         self.debug_text.set_align('top', 'right')
+
+        # fps
         self.show_fps = show_fps
+        self.fps = fps or 60
 
         # Z-sorted slides
         self.sorted_slides = []
