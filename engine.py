@@ -8,6 +8,7 @@ from pi3d.constants import DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT
 import glob
 from threading import Thread
 from signal import signal, SIGINT, SIGTERM
+import traceback
 
 from text import Text
 from postprocess import PostProcess
@@ -151,8 +152,9 @@ class PytaVSL(OscServer):
                     name = path.split('/')[-1].split('.')[0].lower()
                     slide = Slide(parent=self, name=name, texture=path, init_z=len(self.slides) / 1000.)
                     self.add_slide(slide)
-                except:
-                    LOGGER.error('could not load file %s' %path)
+                except Exception as e:
+                    LOGGER.error('could not load file %s' % path)
+                    print(traceback.format_exc())
                 self.debug_text.set_text(str(i + 1) + '/' + str(size))
 
             self.sort_slides()
