@@ -116,4 +116,3 @@ class Video(object):
         ok, frame = self.video_reader.retrieve()
         if ok:
             self.video_texture.update_ndarray(frame)
-            self.bind_mask()

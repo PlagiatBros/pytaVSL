@@ -159,10 +159,6 @@ class Effect(object):
         else:
             LOGGER.error('mask "%s" not found' % (slide))
 
-    def bind_mask(self):
-        if len(self.buf[0].textures) == 2:
-            opengles.glBindTexture(GL_TEXTURE_2D, self.buf[0].textures[1]._tex)
-
     @osc_property('mask_hardness', 'effect_mask_hardness')
     def set_effect_mask_hardness(self, strength):
         """
