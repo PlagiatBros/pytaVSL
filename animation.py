@@ -23,10 +23,12 @@ class Animation():
         self.setter = setter
         self.loop = loop
         self.backward = False
+        self.current = None
         self.reset()
 
     def reset(self):
         self.done = False
+        self.current = None
         self.start_date = self.parent.time
         self.end_date = self.duration + self.start_date
         if self.loop == -1:
@@ -40,29 +42,35 @@ class Animation():
             self.done = True
         if self.backward:
             value = [self.backward_a[i] * t + self.end[i] for i in range(self.nargs)]
-            self.setter(*value)
         else:
             value = [self.forward_a[i] * t + self.start[i] for i in range(self.nargs)]
-            self.setter(*value)
 
+        if value != self.current:
+            self.setter(*value)
+            self.current = value
 
 class Strobe():
 
-    def __init__(self, name, start, end, duration, ratio, setter):
+    def __init__(self, parent, name, start, end, duration, ratio, setter):
 
+        self.parent = parent
         self.duration = max(int(duration), 0.001) * 0.04
         self.date = self.parent.time
         self.breakpoint = max(float(ratio), 0.0) * self.duration
         self.start = start
         self.end = end
         self.setter = setter
+        self.current = None
 
     def play(self):
         t = self.parent.time + 1. / Display.INSTANCE.frames_per_second # always 1 frame early for smooth anims
         delta = t - self.date
         progress = delta % self.duration
-        value = self.start if progress < self.breakpoint else self.end
-        self.setter(*value)
+        state = progress < self.breakpoint
+        if state != self.current:
+            value = self.start if state else self.end
+            self.setter(*value)
+            self.current = state
 
 
 class Animable(object):
@@ -164,7 +172,7 @@ class Animable(object):
                 start = [args[i] for i in range(argcount)]
                 end = [args[i + argcount] for i in range(argcount)]
 
-                self.strobes[attribute] = Strobe(attribute, start, end, duration, ratio, method)
+                self.strobes[attribute] = Strobe(self.parent, attribute, start, end, duration, ratio, method)
 
         else:
             LOGGER.error('invalid property argument "%s" for /%s/strobe' % (attribute, self.name))
