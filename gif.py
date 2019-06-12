@@ -53,7 +53,7 @@ class Gif(object):
 
     def gif_next_frame(self):
 
-        now = Display.INSTANCE.time
+        now = self.parent.time
 
         if self.gif_changed_time is 0 or self.gif_speed == 0:
             self.gif_changed_time = now

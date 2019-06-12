@@ -9,6 +9,7 @@ import glob
 from threading import Thread
 from signal import signal, SIGINT, SIGTERM
 import traceback
+from time import time
 
 from text import Text
 from postprocess import PostProcess
@@ -39,6 +40,8 @@ class PytaVSL(OscServer):
         self.CAMERA3D = pi3d.Camera(is_3d=True, eye=(0, 0, -height), scale=0.8465)
         self.CAMERA.was_moved = False
         self.CAMERA3D.was_moved = False
+
+        self.time = time()
 
         init_shaders()
 
@@ -84,6 +87,8 @@ class PytaVSL(OscServer):
         #######
 
         while self.DISPLAY.loop_running():
+
+            self.time = time()
 
             # process osc messages
             while self.server.recv(0):

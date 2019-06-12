@@ -3,7 +3,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pi3d
-from pi3d.Display import Display
 from utils import unicode
 from osc import osc_method, osc_property
 
@@ -72,7 +71,7 @@ class Video(object):
         self.video_time = self.video_reader.get(cv2.CAP_PROP_POS_MSEC) / 1000.
 
         if self.video_time > 0:
-            self.video_elapsed_time = Display.INSTANCE.time
+            self.video_elapsed_time = self.parent.time
 
 
     @osc_property('video_speed', 'video_speed')
@@ -88,7 +87,7 @@ class Video(object):
 
     def video_next_frame(self):
 
-        time = Display.INSTANCE.time
+        time = self.parent.time
 
         if self.video_elapsed_time is 0 or self.video_speed == 0:
             self.video_elapsed_time = time

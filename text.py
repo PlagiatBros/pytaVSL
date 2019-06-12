@@ -202,7 +202,7 @@ class Text(State, Perspective, SlideBase):
         self.glitch = True
         self.glitch_from = self.string
         self.glitch_to = string
-        self.glitch_start = Display.INSTANCE.time
+        self.glitch_start = self.parent.time
         if isinstance(duration, (float, int)):
             self.glitch_duration = max(duration, 0.01)
 
@@ -210,7 +210,7 @@ class Text(State, Perspective, SlideBase):
         """
         Compute current glitched text
         """
-        progress = min(1, (Display.INSTANCE.time - self.glitch_start) / self.glitch_duration)
+        progress = min(1, (self.parent.time - self.glitch_start) / self.glitch_duration)
 
         if progress == 1.0:
             self.set_text(self.glitch_to)

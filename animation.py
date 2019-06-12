@@ -11,7 +11,8 @@ LOGGER = logging.getLogger(__name__)
 
 class Animation():
 
-    def __init__(self, name, start, end, duration, loop, setter):
+    def __init__(self, parent, name, start, end, duration, loop, setter):
+        self.parent = parent
         self.name = name
         self.start = start
         self.end = end
@@ -26,13 +27,13 @@ class Animation():
 
     def reset(self):
         self.done = False
-        self.start_date = Display.INSTANCE.time
+        self.start_date = self.parent.time
         self.end_date = self.duration + self.start_date
         if self.loop == -1:
             self.backward = not self.backward
 
     def play(self):
-        t = Display.INSTANCE.time - self.start_date
+        t = self.parent.time - self.start_date
         t += 1. / Display.INSTANCE.frames_per_second # always 1 frame early for smooth anims
         if t >= self.duration:
             t = self.duration
@@ -50,14 +51,14 @@ class Strobe():
     def __init__(self, name, start, end, duration, ratio, setter):
 
         self.duration = max(int(duration), 0.001) * 0.04
-        self.date = Display.INSTANCE.time
+        self.date = self.parent.time
         self.breakpoint = max(float(ratio), 0.0) * self.duration
         self.start = start
         self.end = end
         self.setter = setter
 
     def play(self):
-        t = Display.INSTANCE.time + 1. / Display.INSTANCE.frames_per_second # always 1 frame early for smooth anims
+        t = self.parent.time + 1. / Display.INSTANCE.frames_per_second # always 1 frame early for smooth anims
         delta = t - self.date
         progress = delta % self.duration
         value = self.start if progress < self.breakpoint else self.end
@@ -110,7 +111,7 @@ class Animable(object):
             start = [args[i] for i in range(argcount)]
             end = [args[i + argcount] for i in range(argcount)]
 
-            self.animations[attribute] = Animation(attribute, start, end, duration, loop, method)
+            self.animations[attribute] = Animation(self.parent, attribute, start, end, duration, loop, method)
 
         else:
             LOGGER.error('invalid property argument "%s" for /%s/animate' % (attribute, self.name))
