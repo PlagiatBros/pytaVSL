@@ -53,6 +53,8 @@ class PytaVSL(OscServer):
         # Texts
         self.texts = {}
         self.debug_text = Text(self, 'debug', font=FONTS["mono"], init_z=-100)
+        self.debug_text.set_size(0.025)
+        self.debug_text.set_align('top', 'right')
 
         # Z-sorted slides
         self.sorted_slides = []
@@ -159,10 +161,7 @@ class PytaVSL(OscServer):
 
             size = len(paths)
 
-            self.debug_text.state_save()
             self.debug_text.set_visible(1)
-            self.debug_text.set_size(0.025)
-            self.debug_text.set_align('top', 'right')
             self.debug_text.set_text('0/' + str(size))
 
             for i in range(size):
@@ -177,7 +176,6 @@ class PytaVSL(OscServer):
                 self.debug_text.set_text(str(i + 1) + '/' + str(size))
 
             self.sort_slides()
-            self.debug_text.state_recall()
 
             LOGGER.info("total slides in memory: %i" % len(self.slides.values()))
 
