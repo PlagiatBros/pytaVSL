@@ -127,9 +127,9 @@ class Text(State, Perspective, SlideBase):
         self.buf[0].textures = [font]
 
         # only used in PostProcess
-        self.buf[0].unib[13] = 0.0
+        self.unif[37] = 0.0
         # only used in Video
-        self.buf[0].unib[12] = 0.0
+        self.unif[38] = 0.0
 
         self.set_v_align(self.v_align)
         self.set_h_align(self.h_align)

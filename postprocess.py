@@ -22,7 +22,7 @@ class PostProcess(State, Perspective, SlideBase):
             super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture)
 
             # force alpha to 1.0
-            self.buf[0].unib[13] = 1.0
+            self.unif[37] = 1.0
 
         def scale(self, x, y, z):
             """

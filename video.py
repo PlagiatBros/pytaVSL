@@ -49,7 +49,7 @@ class Video(object):
 
         if self.video:
             # only used in Video
-            self.buf[0].unib[12] = 1.0
+            self.unif[38] = 1.0
 
     def draw(self, *args, **kwargs):
 

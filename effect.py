@@ -22,7 +22,7 @@ class Effect(object):
         ----- ------------------------------------------ -------
         index                                            from to
         ===== ========================================== ==== ==
-          12  random, unused, unused                      36  38
+          12  random, is_post_process, is_video           36  38
           13  key_color r, g, b                           39  41
           14  key_threshold, unused, unused               42  43
           15  invert, unused, unused                      45  46
@@ -60,9 +60,9 @@ class Effect(object):
         self.set_effect_mask_threshold(self.effect_mask_threshold)
 
         # only used in PostProcess
-        self.buf[0].unib[13] = 0.0
+        self.unif[37] = 0.0
         # only used in Video
-        self.buf[0].unib[12] = 0.0
+        self.unif[38] = 0.0
 
     @osc_property('effect', 'current_effect')
     def set_effect(self, effect='default'):
