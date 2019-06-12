@@ -29,7 +29,7 @@ class PytaVSL(OscServer):
     It's also an OSC server which contains the method to control all of its children.
     """
 
-    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title=''):
+    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='', show_fps=False):
 
         super(PytaVSL, self).__init__(name, port)
 
@@ -52,9 +52,11 @@ class PytaVSL(OscServer):
 
         # Texts
         self.texts = {}
+
         self.debug_text = Text(self, 'debug', font=FONTS["mono"], init_z=-100)
         self.debug_text.set_size(0.025)
         self.debug_text.set_align('top', 'right')
+        self.show_fps = show_fps
 
         # Z-sorted slides
         self.sorted_slides = []
@@ -88,11 +90,11 @@ class PytaVSL(OscServer):
         self.post_process.set_visible(0)
         #######
 
-        # fps counter
-        # nframes = 0
-        # elapsed = 0
-        # start = time()
-        # elapsed = 0
+        if self.show_fps:
+            nframes = 0
+            elapsed = 0
+            start = time()
+            elapsed = 0
 
         while self.DISPLAY.loop_running():
 
@@ -118,13 +120,13 @@ class PytaVSL(OscServer):
                 self.post_process.capture_end()
                 self.post_process.draw()
 
-            # fps counter
-            # if time() - start > 1.0:
-            #     self.debug_text.set_visible(1)
-            #     self.debug_text.set_text('fps: %i' % nframes)
-            #     start = time()
-            #     nframes = 0
-            # nframes += 1
+            if self.show_fps:
+                if time() - start > 1.0:
+                    self.debug_text.set_visible(1)
+                    self.debug_text.set_text('fps: %i' % nframes)
+                    start = time()
+                    nframes = 0
+                nframes += 1
 
             self.debug_text.draw()
 
