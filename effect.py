@@ -105,6 +105,7 @@ class Effect(object):
         rgbwave strength
         """
         self.effect_rgbwave = float(value)
+        self.unif[48] = self.effect_rgbwave
         self.toggle_effect('RGBWAVE', self.effect_rgbwave != 0)
 
     @osc_property('charcoal', 'effect_charcoal')

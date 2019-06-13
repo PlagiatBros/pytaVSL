@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from pi3d.Display import Display
 import pi3d
 
+from itertools import combinations
 
 baseFs = open('shaders/base.fs', 'r').read()
 baseVs = open('shaders/base.vs', 'r').read()
@@ -42,3 +43,21 @@ def get_shader(effects):
         SHADER_CACHE[name] = pi3d.Shader(None, vs, fs)
 
     return SHADER_CACHE[name]
+
+
+def init_shader_cache():
+
+    EFFECTS = ['KEY', 'CHARCOAL', 'RGBWAVE', 'INVERT', 'MASK', 'NOISE']
+
+    for prefix in [None, 'VIDEO', 'POST_PROCESS']:
+        
+        effects = EFFECTS[:]
+        if prefix:
+            effects.append(prefix)
+
+        for i in range(len(effects)):
+            combos = list(combinations(effects, i))
+            for combo in combos:
+                get_shader(list(combo))
+
+    print('%i shaders combinations in cache' % len(SHADER_CACHE))

@@ -10,6 +10,7 @@ from threading import Thread
 from signal import signal, SIGINT, SIGTERM
 import traceback
 from time import time
+from shaders import init_shader_cache
 
 from text import Text
 from postprocess import PostProcess
@@ -41,6 +42,8 @@ class PytaVSL(OscServer):
         self.CAMERA3D.was_moved = False
 
         self.time = time()
+
+        init_shader_cache()
 
         self.post_process = PostProcess(self)
 
