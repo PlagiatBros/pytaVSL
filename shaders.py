@@ -50,6 +50,7 @@ def get_shader(effects):
 
 
 def init_shader_cache():
+    LOGGER.debug('compiling shaders...')
 
     EFFECTS = ['KEY', 'CHARCOAL', 'RGBWAVE', 'INVERT', 'MASK', 'NOISE']
 
