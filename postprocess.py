@@ -21,8 +21,11 @@ class PostProcess(State, Perspective, SlideBase):
 
             super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture)
 
-            # force alpha to 1.0
-            self.unif[37] = 1.0
+        def set_effect_shader(self, name):
+            """
+            use special post_process shaders
+            """
+            super(PostProcess, self).set_effect_shader('POST_PROCESS_' + name)
 
         def scale(self, x, y, z):
             """

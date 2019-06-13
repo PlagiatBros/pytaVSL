@@ -126,11 +126,6 @@ class Text(State, Perspective, SlideBase):
         self.buf = [pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms)]
         self.buf[0].textures = [font]
 
-        # only used in PostProcess
-        self.unif[37] = 0.0
-        # only used in Video
-        self.unif[38] = 0.0
-
         self.set_v_align(self.v_align)
         self.set_h_align(self.h_align)
         self.set_shader(self.shader)

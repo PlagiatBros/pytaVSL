@@ -22,7 +22,7 @@ class Effect(object):
         ----- ------------------------------------------ -------
         index                                            from to
         ===== ========================================== ==== ==
-          12  random, is_post_process, is_video           36  38
+          12  random, unused, unused                      36  38
           13  key_color r, g, b                           39  41
           14  key_threshold, unused, unused               42  43
           15  invert, unused, unused                      45  46
@@ -59,10 +59,11 @@ class Effect(object):
         self.set_effect_mask_hardness(self.effect_mask_hardness)
         self.set_effect_mask_threshold(self.effect_mask_threshold)
 
-        # only used in PostProcess
-        self.unif[37] = 0.0
-        # only used in Video
-        self.unif[38] = 0.0
+    def set_effect_shader(self, name):
+        """
+        override Shape.set_shader to retreive shader by name
+        """
+        self.set_shader(SHADERS[name])
 
     @osc_property('effect', 'current_effect')
     def set_effect(self, effect='default'):
@@ -70,7 +71,7 @@ class Effect(object):
         special effect (default|rgbwave|charcoal|noise)
         """
         try:
-            self.set_shader(SHADERS[effect])
+            self.set_effect_shader(effect)
             self.current_effect = effect
             self.effect_active = True
         except:

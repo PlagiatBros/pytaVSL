@@ -32,9 +32,14 @@ def _load_shader(text):
 
 def init_shaders():
 
-    for name in EFFECTS:
+    for prefix in ['POST_PROCESS', 'VIDEO', '']:
 
-        fs = _load_shader(baseFs.replace('{EFFECT}', name))
-        vs = _load_shader(baseVs)
+        for name in EFFECTS:
 
-        SHADERS[name] = pi3d.Shader(None, vs, fs)
+            define = ('#define %s\n' % prefix) if prefix else ''
+            sname = ('%s_%s' % (prefix, name)) if prefix else name
+
+            fs = _load_shader(define + baseFs.replace('{EFFECT}', name))
+            vs = _load_shader(baseVs)
+
+            SHADERS[sname] = pi3d.Shader(None, vs, fs)

@@ -47,10 +47,6 @@ class Video(object):
 
         super(Video, self).__init__(texture=texture, *args, **kwargs)
 
-        if self.video:
-            # only used in Video
-            self.unif[38] = 1.0
-
     def draw(self, *args, **kwargs):
 
         if self.video and self.visible:
@@ -58,6 +54,15 @@ class Video(object):
 
         super(Video, self).draw(*args, **kwargs)
 
+
+    def set_effect_shader(self, name):
+        """
+        use special video shaders
+        """
+        if self.video:
+            super(Video, self).set_effect_shader('VIDEO_' + name)
+        else:
+            super(Video, self).set_effect_shader(name)
 
     @osc_property('video_time', 'video_time')
     def set_video_time(self, time):
