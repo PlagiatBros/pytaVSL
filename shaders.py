@@ -7,6 +7,9 @@ import pi3d
 
 from itertools import combinations
 
+import logging
+LOGGER = logging.getLogger(__name__)
+
 def _load_shader(text):
     new_text = ''
     if '#include' in text:
@@ -50,15 +53,13 @@ def init_shader_cache():
 
     EFFECTS = ['KEY', 'CHARCOAL', 'RGBWAVE', 'INVERT', 'MASK', 'NOISE']
 
-    for prefix in [None, 'VIDEO', 'POST_PROCESS']:
+    for i in range(len(EFFECTS)):
+        combos = list(combinations(EFFECTS, i))
+        for combo in combos:
+            for prefix in [None, 'VIDEO', 'POST_PROCESS']:
+                c = list(combo)
+                if prefix:
+                    c.append(prefix)
+                get_shader(c)
 
-        effects = EFFECTS[:]
-        if prefix:
-            effects.append(prefix)
-
-        for i in range(len(effects)):
-            combos = list(combinations(effects, i))
-            for combo in combos:
-                get_shader(list(combo))
-
-    print('%i shaders combinations in cache' % len(SHADER_CACHE))
+    LOGGER.debug('%i shaders combinations in cache' % len(SHADER_CACHE))
