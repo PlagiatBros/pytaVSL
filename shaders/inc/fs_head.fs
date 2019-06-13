@@ -12,5 +12,5 @@ varying vec2 maskCoords;
 
 const vec2 resolution = vec2({WIDTH}, {HEIGHT});
 
-#include shaders/inc/random.inc
-#include shaders/inc/colors.inc
+#include shaders/inc/random.fs
+#include shaders/inc/colors.fs

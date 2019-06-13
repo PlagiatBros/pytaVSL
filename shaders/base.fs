@@ -1,8 +1,8 @@
-#include shaders/inc/fs_head.inc
+#include shaders/inc/fs_head.fs
 
 void main(void) {
 
-    #include shaders/inc/fs_main.inc
+    #include shaders/inc/fs_main.fs
 
     #ifdef POST_PROCESS
     gl_FragColor.a = 1.0;

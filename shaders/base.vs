@@ -1,7 +1,7 @@
-#include shaders/inc/vs_head.inc
+#include shaders/inc/vs_head.vs
 
 void main(void) {
 
-    #include shaders/inc/vs_main.inc
+    #include shaders/inc/vs_main.vs
 
 }
