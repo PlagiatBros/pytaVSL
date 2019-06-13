@@ -5,14 +5,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from pi3d.Display import Display
 import pi3d
 
-EFFECTS = [
-    'default',
-    'noise',
-    'rgbwave',
-    'charcoal'
-]
-
-SHADERS = {}
 
 baseFs = open('shaders/base.fs', 'r').read()
 baseVs = open('shaders/base.vs', 'r').read()
@@ -30,16 +22,23 @@ def _load_shader(text):
         new_text = text
     return new_text
 
-def init_shaders():
+SHADER_CACHE = {}
 
-    for prefix in ['POST_PROCESS', 'VIDEO', '']:
+def get_shader(effects):
 
-        for name in EFFECTS:
+    effects.sort()
+    name = '_'.join(effects)
 
-            define = ('#define %s\n' % prefix) if prefix else ''
-            sname = ('%s_%s' % (prefix, name)) if prefix else name
+    if not name in SHADER_CACHE:
 
-            fs = _load_shader(define + baseFs.replace('{EFFECT}', name))
-            vs = _load_shader(baseVs)
+        fsdata = ''
+        for fx in effects:
+            fsdata += '#define %s\n' % fx
+        fsdata += baseFs
 
-            SHADERS[sname] = pi3d.Shader(None, vs, fs)
+        fs = _load_shader(fsdata)
+        vs = _load_shader(baseVs)
+
+        SHADER_CACHE[name] = pi3d.Shader(None, vs, fs)
+
+    return SHADER_CACHE[name]

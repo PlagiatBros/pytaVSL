@@ -21,11 +21,7 @@ class PostProcess(State, Perspective, SlideBase):
 
             super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture)
 
-        def set_effect_shader(self, name):
-            """
-            use special post_process shaders
-            """
-            super(PostProcess, self).set_effect_shader('POST_PROCESS_' + name)
+            self.active_effects.append('POST_PROCESS')
 
         def scale(self, x, y, z):
             """

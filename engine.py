@@ -18,7 +18,6 @@ from utils import unicode, empty_texture
 from memory import MemoryMonitor
 from osc import OscServer, osc_method
 from config import *
-from shaders import init_shaders
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -42,8 +41,6 @@ class PytaVSL(OscServer):
         self.CAMERA3D.was_moved = False
 
         self.time = time()
-
-        init_shaders()
 
         self.post_process = PostProcess(self)
 
@@ -181,6 +178,7 @@ class PytaVSL(OscServer):
                     print(traceback.format_exc())
                 self.debug_text.set_text(str(i + 1) + '/' + str(size))
 
+            self.debug_text.set_visible(0)
             self.sort_slides()
 
             LOGGER.info("total slides in memory: %i" % len(self.slides.values()))

@@ -6,7 +6,7 @@ import pi3d
 from pi3d.constants import (opengles, GL_TEXTURE_2D)
 import random
 
-from shaders import SHADERS
+from shaders import get_shader
 from osc import osc_property
 
 import logging
@@ -35,49 +35,41 @@ class Effect(object):
 
         super(Effect, self).__init__(*args, **kwargs)
 
-        self.effect_active = False
-        self.current_effect = 'default'
-        self.set_effect()
+        self.active_effects = []
+        self.active_effects_changed = True
 
         self.effect_key_color = [0.0, 0.0, 0.0]
         self.effect_key_threshold = 0
+        self.set_effect_key_color(*self.effect_key_color)
+        self.set_effect_key_threshold(self.effect_key_threshold)
+
         self.effect_invert = 0.0
+        self.set_effect_invert(self.effect_invert)
+
         self.effect_rgbwave = 0.0
-        self.effect_charcoal = [2.0, 0.0, 2.0]
-        self.effect_noise = [0.5, 0.0, 0.0]
+        self.set_effect_rgbwave(self.effect_rgbwave)
+
+        self.effect_charcoal = 0.0
+        self.effect_charcoal_settings = [2.0, 0.0, 2.0]
+        self.set_effect_charcoal_settings(*self.effect_charcoal_settings)
+
+        self.effect_noise = [0.0, 0.0, 0.0]
+        self.set_effect_noise(*self.effect_noise)
+
         self.effect_mask = None
         self.effect_mask_hardness = 0.0
         self.effect_mask_threshold = 1.0
-
-        self.set_effect_key_color(*self.effect_key_color)
-        self.set_effect_key_threshold(self.effect_key_threshold)
-        self.set_effect_invert(self.effect_invert)
-        self.set_effect_rgbwave(self.effect_rgbwave)
-        self.set_effect_charcoal(*self.effect_charcoal)
-        self.set_effect_noise(*self.effect_noise)
         self.set_effect_mask(self.effect_mask)
         self.set_effect_mask_hardness(self.effect_mask_hardness)
         self.set_effect_mask_threshold(self.effect_mask_threshold)
 
-    def set_effect_shader(self, name):
-        """
-        override Shape.set_shader to retreive shader by name
-        """
-        self.set_shader(SHADERS[name])
-
-    @osc_property('effect', 'current_effect')
-    def set_effect(self, effect='default'):
-        """
-        special effect (default|rgbwave|charcoal|noise)
-        """
-        try:
-            self.set_effect_shader(effect)
-            self.current_effect = effect
-            self.effect_active = True
-        except:
-            self.set_effect()
-            self.effect_active = False
-            LOGGER.error('could not load shader %s' % effect)
+    def toggle_effect(self, name, state):
+        if state and name not in self.active_effects:
+            self.active_effects.append(name)
+            self.active_effects_changed = True
+        elif not state and name in self.active_effects:
+            self.active_effects.remove(name)
+            self.active_effects_changed = True
 
     @osc_property('key_color', 'effect_key_color')
     def set_effect_key_color(self, r, g, b):
@@ -97,13 +89,15 @@ class Effect(object):
         self.effect_key_threshold = float(value)
         self.unif[42] = self.effect_key_threshold
 
+        self.toggle_effect('KEY', self.effect_key_threshold != 0)
+
     @osc_property('invert', 'effect_invert')
     def set_effect_invert(self, value):
         """
         invert colors (0|1)
         """
-        self.effect_invert = float(bool(value))
-        self.unif[45] = self.effect_invert
+        self.effect_invert = int(bool(value))
+        self.toggle_effect('INVERT', self.effect_invert != 0)
 
     @osc_property('rgbwave', 'effect_rgbwave')
     def set_effect_rgbwave(self, value):
@@ -111,17 +105,25 @@ class Effect(object):
         rgbwave strength
         """
         self.effect_rgbwave = float(value)
-        self.unif[48] = self.effect_rgbwave
+        self.toggle_effect('RGBWAVE', self.effect_rgbwave != 0)
 
     @osc_property('charcoal', 'effect_charcoal')
-    def set_effect_charcoal(self, size, threshold, strength):
+    def set_effect_charcoal(self, value):
+        """
+        enable charcoal effect (0|1)
+        """
+        self.effect_charcoal = int(bool(value))
+        self.toggle_effect('CHARCOAL', self.effect_charcoal != 0)
+
+    @osc_property('charcoal_settings', 'effect_charcoal_settings')
+    def set_effect_charcoal_settings(self, size, threshold, strength):
         """
         charcoal pen size (px), edge threshold and stroke strength
         """
-        self.effect_charcoal = [float(value) for value in [size, threshold, strength]]
-        self.unif[51] = self.effect_charcoal[0]
-        self.unif[52] = self.effect_charcoal[1]
-        self.unif[53] = self.effect_charcoal[2]
+        self.effect_charcoal_settings = [float(value) for value in [size, threshold, strength]]
+        self.unif[51] = self.effect_charcoal_settings[0]
+        self.unif[52] = self.effect_charcoal_settings[1]
+        self.unif[53] = self.effect_charcoal_settings[2]
 
     @osc_property('noise', 'effect_noise')
     def set_effect_noise(self, density, x, y):
@@ -132,6 +134,7 @@ class Effect(object):
         self.unif[54] = self.effect_noise[0]
         self.unif[55] = self.effect_noise[1]
         self.unif[56] = self.effect_noise[2]
+        self.toggle_effect('NOISE', self.effect_noise[0] != 0)
 
 
     @osc_property('mask', 'effect_mask')
@@ -143,7 +146,7 @@ class Effect(object):
             if len(self.buf[0].textures) == 2:
                 self.effect_mask = None
                 del self.buf[0].textures[1]
-                self.unif[57] = 0.0
+                self.toggle_effect('MASK', False)
             return
 
         target = self.parent.get_children(self.parent.slides, slide)
@@ -156,7 +159,7 @@ class Effect(object):
             else:
                 self.buf[0].textures[1] = tex
 
-            self.unif[57] = 1.0
+            self.toggle_effect('MASK', True)
         else:
             LOGGER.error('mask "%s" not found' % (slide))
 
@@ -178,7 +181,9 @@ class Effect(object):
 
     def draw(self, *args, **kwargs):
 
-        if self.effect_active:
-            self.unif[36] = random.random()
+        self.unif[36] = random.random()
+        if self.active_effects_changed:
+            self.set_shader(get_shader(self.active_effects))
+            self.active_effects_changed = False
 
         super(Effect, self).draw(*args, **kwargs)
