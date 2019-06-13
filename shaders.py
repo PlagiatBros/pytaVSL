@@ -52,10 +52,10 @@ def get_shader(effects):
 def init_shader_cache():
     LOGGER.debug('compiling shaders...')
 
-    EFFECTS = ['KEY', 'CHARCOAL', 'RGBWAVE', 'INVERT', 'MASK', 'NOISE']
+    PRECOMPILED = ['KEY', 'CHARCOAL', 'RGBWAVE', 'INVERT', 'MASK', 'NOISE']
 
-    for i in range(len(EFFECTS)):
-        combos = list(combinations(EFFECTS, i))
+    for i in range(len(PRECOMPILED)):
+        combos = list(combinations(PRECOMPILED, i))
         for combo in combos:
             for prefix in [None, 'VIDEO', 'POST_PROCESS']:
                 c = list(combo)

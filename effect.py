@@ -26,7 +26,7 @@ class Effect(object):
           13  key_color r, g, b                           39  41
           14  key_threshold, unused, unused               42  43
           15  invert, unused, unused                      45  46
-          16  rgbwave, unused, unused                     48  50
+          16  rgbwave, fish, unused                       48  50
           17  charcoal radius, thresh, strength           51  53
           18  noise, seed1, seed2                         54  56
           19  mask, mask_hardness, unused                 57  59
@@ -62,6 +62,9 @@ class Effect(object):
         self.set_effect_mask(self.effect_mask)
         self.set_effect_mask_hardness(self.effect_mask_hardness)
         self.set_effect_mask_threshold(self.effect_mask_threshold)
+
+        self.effect_fish = 0.0
+        self.set_effect_fish(self.effect_fish)
 
     def toggle_effect(self, name, state):
         if state and name not in self.active_effects:
@@ -179,6 +182,15 @@ class Effect(object):
         """
         self.effect_mask_threshold = float(thresh)
         self.unif[59] = self.effect_mask_threshold
+
+    @osc_property('fish', 'effect_fish')
+    def set_effect_fish(self, value):
+        """
+        fish (-1-1)
+        """
+        self.effect_fish = float(value)
+        self.unif[49] = self.effect_fish
+        self.toggle_effect('FISH', self.effect_fish != 0)
 
     def draw(self, *args, **kwargs):
 

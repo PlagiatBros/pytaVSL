@@ -2,6 +2,10 @@
 
 void main(void) {
 
+    #ifdef FISH
+    #include shaders/effects/fish.fs
+    #endif
+
     #include shaders/inc/fs_main.fs
 
     #ifdef POST_PROCESS
