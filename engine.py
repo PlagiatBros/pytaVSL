@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import pi3d
 from pi3d.constants import opengles, DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT, GL_CULL_FACE
+import ctypes
 
 import glob
 from threading import Thread
@@ -43,6 +44,9 @@ class PytaVSL(OscServer):
 
         # enable texture backside
         opengles.glDisable(GL_CULL_FACE)
+
+        # wireframe size
+        opengles.glLineWidth(ctypes.c_float(1.0))
 
         self.time = time()
 

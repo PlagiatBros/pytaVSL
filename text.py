@@ -53,7 +53,12 @@ class Text(State, Perspective, SlideBase):
 
         self.color = [1.0, 1.0, 1.0]
 
-        self.new_string() # remove ?
+        # disable mesh feature
+        del self.osc_attributes['mesh_size']
+        del self.osc_attributes['mesh_debug']
+
+        # init empty string
+        self.new_string()
 
 
     def new_string(self):

@@ -4,7 +4,7 @@ void main(void) {
 
     #include shaders/inc/vs_main.vs
 
-    #ifdef POST_PROCESS
+    #ifdef WARP
     #include shaders/effects/warp.vs
     #endif
 

@@ -17,19 +17,20 @@ from video import Video
 from osc import OscNode, osc_property
 from config import *
 from mesh import Mesh
+from warp import Warp
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
 class SlideBase(OscNode, Effect, Animable, Mesh):
 
-    def __init__(self, parent, name, texture, width=None, height=None, init_z=0.0, tiles=[1,1]):
+    def __init__(self, parent, name, texture, width=None, height=None, init_z=0.0, mesh_size=[1,1]):
 
         if type(texture) is str:
 
             texture = pi3d.Texture(texture)
 
-        super(SlideBase, self).__init__(w=width if width is not None else texture.ix, h=height if height is not None else texture.iy, tiles=tiles)
+        super(SlideBase, self).__init__(w=width if width is not None else texture.ix, h=height if height is not None else texture.iy, mesh_size=mesh_size)
 
         self.name = name
         self.parent = parent
@@ -118,6 +119,24 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
                 for t in b.textures:
                     t.unload_opengl()
             self.parent.monitor.free(self)
+
+    @osc_property('mesh_size', 'mesh_size')
+    def set_mesh_size(self, x, y):
+        """
+        mesh definition (normalized)
+        """
+        new_size = [abs(int(x)), abs(int(y))]
+        if new_size != self.mesh_size:
+            self.mesh_size = new_size
+            self.create_mesh_buffer()
+
+    @osc_property('mesh_debug', 'mesh_debug')
+    def set_mesh_wireframe(self, debug):
+        """
+        wireframe mode (0|1)
+        """
+        self.mesh_debug = int(bool(debug))
+        self.set_mesh_debug(self.mesh_debug)
 
     @osc_property('tiles', 'tiles')
     def set_tiles(self, x, y):
@@ -270,7 +289,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         """
         self.set_rotate(None, None, rz)
 
-class Slide(State, Perspective, Video, Gif, SlideBase):
+class Slide(State, Perspective, Video, Gif, Warp, SlideBase):
 
     def __init__(self, *args, **kwargs):
 
