@@ -6,8 +6,6 @@ import pi3d
 from utils import unicode
 from osc import osc_method, osc_property
 
-from pi3d.constants import (opengles, GL_TEXTURE0)
-
 import logging
 LOGGER = logging.getLogger(__name__)
 
@@ -113,5 +111,4 @@ class Video(object):
     def video_load_current_frame(self):
         ok, frame = self.video_reader.retrieve()
         if ok:
-            opengles.glActiveTexture(GL_TEXTURE0)
-            self.video_texture.update_ndarray(frame)
+            self.video_texture.update_ndarray(frame, 0)

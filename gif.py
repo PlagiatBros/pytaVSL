@@ -5,7 +5,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pi3d
 from pi3d.Display import Display
 from PIL.GifImagePlugin import GifImageFile
-from pi3d.constants import (opengles, GL_TEXTURE0)
 
 from utils import unicode
 from osc import osc_property
@@ -88,8 +87,7 @@ class Gif(object):
 
         if current_frame is not initial_frame:
 
-            opengles.glActiveTexture(GL_TEXTURE0)
-            self.buf[0].textures[0].update_ndarray(current_frame.ndarray)
+            self.buf[0].textures[0].update_ndarray(current_frame.ndarray, 0)
 
             self.gif_changed_time = now + elapsed
 
@@ -114,8 +112,7 @@ class Gif(object):
             frame -= 1
         self.gif_index = frame
         if self.gif:
-            opengles.glActiveTexture(GL_TEXTURE0)
-            self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray)
+            self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray, 0)
 
     @osc_property('gif_speed', 'gif_speed')
     def set_speed(self, speed):
