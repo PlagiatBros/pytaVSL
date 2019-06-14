@@ -23,13 +23,13 @@ LOGGER = logging.getLogger(__name__)
 
 class SlideBase(OscNode, Effect, Animable, Mesh):
 
-    def __init__(self, parent, name, texture, width=None, height=None, init_z=0.0):
+    def __init__(self, parent, name, texture, width=None, height=None, init_z=0.0, tiles=[1,1]):
 
         if type(texture) is str:
 
             texture = pi3d.Texture(texture)
 
-        super(SlideBase, self).__init__(w=width if width is not None else texture.ix, h=height if height is not None else texture.iy)
+        super(SlideBase, self).__init__(w=width if width is not None else texture.ix, h=height if height is not None else texture.iy, tiles=tiles)
 
         self.name = name
         self.parent = parent

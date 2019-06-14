@@ -36,13 +36,12 @@ def get_shader(effects):
 
     if not name in SHADER_CACHE:
 
-        fsdata = ''
+        defines = ''
         for fx in effects:
-            fsdata += '#define %s\n' % fx
-        fsdata += baseFs
+            defines += '#define %s\n' % fx
 
-        fs = fsdata.replace('{WIDTH}', str(float(Display.INSTANCE.width))).replace('{HEIGHT}', str(float(Display.INSTANCE.height)))
-        vs = baseVs
+        fs = defines + baseFs.replace('{WIDTH}', str(float(Display.INSTANCE.width))).replace('{HEIGHT}', str(float(Display.INSTANCE.height)))
+        vs = defines + baseVs
 
         SHADER_CACHE[name] = pi3d.Shader(None, vs, fs)
 
