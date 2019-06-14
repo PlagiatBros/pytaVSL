@@ -19,6 +19,8 @@ class Warp(object):
         self.warp_2 = [0.0, 0.0]
         self.warp_3 = [0.0, 0.0]
         self.warp_4 = [0.0, 0.0]
+
+        self.warp = False
         self.unif_warp_loc = 0;
         self.unif_warp = (ctypes.c_float * 8) (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
@@ -69,13 +71,14 @@ class Warp(object):
         self.toggle_warp_effect()
 
     def toggle_warp_effect(self):
-        self.toggle_effect('WARP', self.warp_1 or self.warp_2 or self.warp_3 or self.warp_4)
+        self.warp = self.warp_1 or self.warp_2 or self.warp_3 or self.warp_4
+        self.toggle_effect('WARP', self.warp)
 
     def draw(self, *args, **kwargs):
 
         if self.visible:
 
-            if self.shader:
+            if self.shader and self.warp:
                 self.shader.use()
                 opengles.glUniform2fv(self.unif_warp_loc, 4, self.unif_warp)
 
