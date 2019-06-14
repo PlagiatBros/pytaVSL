@@ -16,11 +16,12 @@ from gif import Gif
 from video import Video
 from osc import OscNode, osc_property
 from config import *
+from mesh import Mesh
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
-class SlideBase(OscNode, Effect, Animable, pi3d.Plane):
+class SlideBase(OscNode, Effect, Animable, Mesh):
 
     def __init__(self, parent, name, texture, width=None, height=None, init_z=0.0):
 

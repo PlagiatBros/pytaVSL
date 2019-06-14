@@ -3,7 +3,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pi3d
-from pi3d.constants import DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT
+from pi3d.constants import opengles, DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT, GL_CULL_FACE
 
 import glob
 from threading import Thread
@@ -40,6 +40,9 @@ class PytaVSL(OscServer):
         self.CAMERA3D = pi3d.Camera(is_3d=True, eye=(0, 0, -height), scale=0.8465)
         self.CAMERA.was_moved = False
         self.CAMERA3D.was_moved = False
+
+        # enable texture backside
+        opengles.glDisable(GL_CULL_FACE)
 
         self.time = time()
 
