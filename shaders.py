@@ -29,12 +29,15 @@ baseVs = _load_shader(open('shaders/base.vs', 'r').read())
 
 SHADER_CACHE = {}
 
-def get_shader(effects):
+def get_shader(effects, log=True):
 
     effects.sort()
     name = '_'.join(effects)
 
     if not name in SHADER_CACHE:
+
+        if log:
+            LOGGER.debug('compiling shader "%s"' % name)
 
         defines = ''
         for fx in effects:
@@ -49,7 +52,7 @@ def get_shader(effects):
 
 
 def init_shader_cache():
-    LOGGER.debug('compiling shaders...')
+    print('precompiling shaders...')
 
     PRECOMPILED = ['KEY', 'CHARCOAL', 'RGBWAVE', 'INVERT', 'MASK', 'NOISE']
 
@@ -60,6 +63,6 @@ def init_shader_cache():
                 c = list(combo)
                 if prefix:
                     c.append(prefix)
-                get_shader(c)
+                get_shader(c, False)
 
-    LOGGER.debug('%i shaders combinations in cache' % len(SHADER_CACHE))
+    print('%i shaders combinations in cache' % len(SHADER_CACHE))
