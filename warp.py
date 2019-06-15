@@ -11,6 +11,8 @@ from osc import osc_property
 import logging
 LOGGER = logging.getLogger(__name__)
 
+WARP_ZERO = [0, 0]
+
 class Warp(object):
 
     def __init__(self, *args, **kwargs):
@@ -71,7 +73,7 @@ class Warp(object):
         self.toggle_warp_effect()
 
     def toggle_warp_effect(self):
-        self.warp = self.warp_1 or self.warp_2 or self.warp_3 or self.warp_4
+        self.warp = self.warp_1 != WARP_ZERO or self.warp_2 != WARP_ZERO or self.warp_3 != WARP_ZERO or self.warp_4 != WARP_ZERO
         self.toggle_effect('WARP', self.warp)
 
     def draw(self, *args, **kwargs):
