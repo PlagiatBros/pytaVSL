@@ -440,13 +440,16 @@ class PytaVSL(OscServer):
 
         if 'slides' in scene:
             for name in scene['slides']:
+                self.slides[name].reset()
                 self.slides[name].state_set(scene['slides'][name])
 
         if 'texts' in scene:
             for name in scene['texts']:
+                self.texts[name].reset()
                 self.texts[name].state_set(scene['texts'][name])
 
         if 'post_process' in scene:
+            self.post_process.reset()
             self.post_process.state_set(scene['post_process'])
         else:
             self.post_process.set_visible(0)
