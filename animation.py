@@ -24,14 +24,14 @@ class Animation():
         self.loop = loop
         self.backward = False
         self.current = None
-        self.reset()
+        self.reset(True)
 
-    def reset(self):
+    def reset(self, init=False):
         self.done = False
         self.current = None
         self.start_date = self.parent.time
         self.end_date = self.duration + self.start_date
-        if self.loop == -1:
+        if self.loop == -1 and not init:
             self.backward = not self.backward
 
     def play(self):
