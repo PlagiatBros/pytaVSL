@@ -22,8 +22,17 @@ from warp import Warp
 import logging
 LOGGER = logging.getLogger(__name__)
 
-V_ALIGN = ['C', 'B', 'T']
-H_ALIGN = ['C', 'L', 'R']
+V_ALIGN = {
+    'C': 'center',
+    'B': 'bottom',
+    'T': 'top'
+}
+
+H_ALIGN ={
+    'C': 'center',
+    'L': 'left',
+    'R': 'right'
+}
 
 class SlideBase(OscNode, Effect, Animable, Mesh):
 
@@ -59,8 +68,8 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         self.init_z = init_z
 
         # Alignment
-        self.h_align = 'C'
-        self.v_align = 'C'
+        self.h_align = 'center'
+        self.v_align = 'center'
 
         # Scale
         self.init_scale = min(Display.INSTANCE.width / self.width, Display.INSTANCE.height / self.height)
@@ -132,15 +141,15 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         Override Shape.position to take text alignment into account
         """
         offx = 0
-        if self.h_align != 'C':
+        if self.h_align != 'center':
             offx = (Display.INSTANCE.width - self.width * self.sx) / 2.0
-        if self.h_align == 'L':
+        if self.h_align == 'left':
             offx *= -1
 
         offy = 0
-        if self.v_align != 'C':
+        if self.v_align != 'center':
             offy = (Display.INSTANCE.height - self.height * self.sy) / 2.0
-        if self.v_align == 'B':
+        if self.v_align == 'bottom':
             offy *= -1
 
         super(SlideBase, self).position(x * Display.INSTANCE.width  + offx, y * Display.INSTANCE.height + offy, z)
@@ -233,8 +242,8 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         reverse = False
 
         if h == v and h == 'C':
-            self.set_h_align(h)
-            self.set_v_align(v)
+            self.set_h_align('center')
+            self.set_v_align('center')
             return
 
         if (v != 'C' and v in H_ALIGN) or (h != 'C' and h in V_ALIGN):
@@ -243,9 +252,9 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
             v = h
             h = a
 
-        if h in H_ALIGN and h != self.h_align:
+        if h in H_ALIGN and H_ALIGN[h] != self.h_align:
             self.set_h_align(h)
-        if v in V_ALIGN and v != self.v_align:
+        if v in V_ALIGN and V_ALIGN[v] != self.v_align:
             self.set_v_align(v)
 
     @osc_property('align_h', 'h_align', shorthand=True)
@@ -253,7 +262,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         """
         horizontal alignment (center|left|right)
         """
-        align = str(align)[0].upper()
+        align = H_ALIGN[str(align)[0].upper()]
 
         if align != self.h_align:
             self.h_align = align
@@ -264,7 +273,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         """
         vertical alignment (center|top|bottom)
         """
-        align = str(align)[0].upper()
+        align = V_ALIGN[str(align)[0].upper()]
 
         if align != self.v_align:
             self.v_align = align

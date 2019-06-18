@@ -34,7 +34,7 @@ class Text(State, Perspective, SlideBase):
         self.size = 'auto'
 
         self.need_regen = False
-        self.last_draw_align_h = 'C'
+        self.last_draw_align_h = 'center'
 
         # cool
         self.glitch = False
@@ -66,7 +66,6 @@ class Text(State, Perspective, SlideBase):
         size /= TEXT_RESOLUTION
         size /= 600. / Display.INSTANCE.height # size was calibrated on 800x600
 
-        justify = self.h_align
         string = self.string
         font = self.font
 
@@ -87,9 +86,9 @@ class Text(State, Perspective, SlideBase):
         nlines = string.count("\n") + 1
 
         def make_verts(): #local function to justify each line
-            if justify.upper() == "C":
+            if self.h_align == 'center':
                 cx = xoff / 2.0
-            elif justify.upper() == "L":
+            elif self.h_align == 'left':
                 cx = 0.0
             else:
                 cx = xoff
@@ -161,7 +160,7 @@ class Text(State, Perspective, SlideBase):
         Override Slide.scale to trigger string regeneration when needed
         """
         super(Text, self).scale(sx, sy, sz)
-        if self.v_align != 'C':
+        if self.v_align != 'center':
             self.need_regen = True
 
     def position(self, x, y, z):
