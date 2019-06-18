@@ -12,16 +12,19 @@ LOGGER = logging.getLogger(__name__)
 class Animation():
 
     def __init__(self, parent, name, start, end, duration, loop, setter):
+
         self.parent = parent
         self.name = name
+
         self.start = start
         self.end = end
         self.duration = duration
+        self.loop = loop
+
         self.nargs = len(start)
         self.forward_a = [1.0 * (end[i] - start[i]) / duration for i in range(self.nargs)]
         self.backward_a = [1.0 * (start[i] - end[i]) / duration for i in range(self.nargs)]
         self.setter = setter
-        self.loop = loop
         self.backward = False
         self.current = None
         self.reset(True)
@@ -49,17 +52,28 @@ class Animation():
             self.setter(*value)
             self.current = value
 
+    def get_state(self):
+        return {
+            'start': self.start,
+            'end': self.end,
+            'duration': self.duration,
+            'loop': self.loop,
+        }
+
 class Strobe():
 
-    def __init__(self, parent, name, start, end, duration, ratio, setter):
+    def __init__(self, parent, start, end, duration, ratio, setter):
 
         self.parent = parent
-        self.duration = max(int(duration), 0.001) * 0.04
-        self.date = self.parent.time
-        self.breakpoint = max(float(ratio), 0.0) * self.duration
+
+        self.duration = max(float(duration), 0.001)
+        self.ratio = ratio
         self.start = start
         self.end = end
         self.setter = setter
+
+        self.date = self.parent.time
+        self.breakpoint = max(float(self.ratio), 0.0) * self.duration
         self.current = None
 
     def play(self):
@@ -72,6 +86,13 @@ class Strobe():
             self.setter(*value)
             self.current = state
 
+    def get_state(self):
+        return {
+            'start': self.start,
+            'end': self.end,
+            'duration': self.duration,
+            'ratio': self.ratio,
+        }
 
 class Animable(object):
 
@@ -145,7 +166,7 @@ class Animable(object):
             args: [from ...] [to ...] period ratio
                 from: initial value(s) (items with default values must be omitted)
                 to: destination value(s) (items with default values must be omitted)
-                period: strobe period in frames
+                duration: strobe period in seconds
                 ratio: time proportion spent on "from" (between 0.0 and 1.0)
         """
         attribute = property.lower()
@@ -172,7 +193,7 @@ class Animable(object):
                 start = [args[i] for i in range(argcount)]
                 end = [args[i + argcount] for i in range(argcount)]
 
-                self.strobes[attribute] = Strobe(self.parent, attribute, start, end, duration, ratio, method)
+                self.strobes[attribute] = Strobe(self.parent, start, end, duration, ratio, method)
 
         else:
             LOGGER.error('invalid property argument "%s" for /%s/strobe' % (attribute, self.name))
