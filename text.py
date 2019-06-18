@@ -57,6 +57,8 @@ class Text(State, Perspective, SlideBase):
         # init empty string
         self.new_string()
 
+    def get_osc_path(self):
+        return '/%s/text/%s' % (self.parent.name, self.name)
 
     def new_string(self):
         """

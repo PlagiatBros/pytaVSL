@@ -377,3 +377,6 @@ class Slide(State, Perspective, Video, Gif, Warp, SlideBase):
     def __init__(self, *args, **kwargs):
 
         super(Slide, self).__init__(*args, **kwargs)
+
+    def get_osc_path(self):
+        return '/%s/slide/%s' % (self.parent.name, self.name)

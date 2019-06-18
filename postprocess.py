@@ -36,3 +36,6 @@ class PostProcess(State, Perspective, Warp, SlideBase):
 
     def capture_end(self):
         self.buf[0].textures[0]._end()
+
+    def get_osc_path(self):
+        return '/%s/post_process' % self.parent.name

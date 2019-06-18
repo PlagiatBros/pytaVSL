@@ -116,7 +116,7 @@ class Animable(object):
         attribute = property.lower()
 
         if attribute == 'visible':
-            LOGGER.error('invalid property argument "%s" for /%s/animate' % (attribute, self.name))
+            LOGGER.error('invalid property argument "%s" for %s/animate' % (attribute, self.get_osc_path()))
             return
 
         if attribute in self.osc_attributes:
@@ -124,7 +124,7 @@ class Animable(object):
             argcount = method.osc_argcount_min
 
             if len(args) < argcount * 2 + 1 or len(args) > argcount * 2 + 2:
-                LOGGER.error('bad number of argument for /%s/animate %s (%i or %i expected, %i provided)' % (self.name, attribute, argcount * 2 + 1, argcount * 2 + 2, len(args)))
+                LOGGER.error('bad number of argument for %s/animate %s (%i or %i expected, %i provided)' % (self.get_osc_path(), attribute, argcount * 2 + 1, argcount * 2 + 2, len(args)))
                 return
 
             loop = 0
@@ -143,7 +143,7 @@ class Animable(object):
             self.animations[attribute] = Animation(self.parent, attribute, start, end, duration, loop, method)
 
         else:
-            LOGGER.error('invalid property argument "%s" for /%s/animate' % (attribute, self.name))
+            LOGGER.error('invalid property argument "%s" for %s/animate' % (attribute, self.get_osc_path()))
 
     @osc_method('animate_stop')
     def stop_animate(self, *properties):
@@ -172,7 +172,7 @@ class Animable(object):
         attribute = property.lower()
 
         if attribute == 'visible':
-            LOGGER.error('invalid property argument "%s" for /%s/strobe' % (attribute, self.name))
+            LOGGER.error('invalid property argument "%s" for %s/strobe' % (attribute, self.get_osc_path()))
             return
 
         if attribute in self.osc_attributes:
@@ -180,7 +180,7 @@ class Animable(object):
             argcount = method.osc_argcount_min
 
             if len(args) != argcount * 2 + 2:
-                LOGGER.error('bad number of argument for /%s/strobe %s (%i expected, %i provided)' % (self.name, attribute, argcount * 2 + 2, len(args)))
+                LOGGER.error('bad number of argument for %s/strobe %s (%i expected, %i provided)' % (self.get_osc_path(), attribute, argcount * 2 + 2, len(args)))
                 return
 
             duration = args[-2]
@@ -196,7 +196,7 @@ class Animable(object):
                 self.strobes[attribute] = Strobe(self.parent, start, end, duration, ratio, method)
 
         else:
-            LOGGER.error('invalid property argument "%s" for /%s/strobe' % (attribute, self.name))
+            LOGGER.error('invalid property argument "%s" for %s/strobe' % (attribute, self.get_osc_path()))
 
     @osc_method('strobe_stop')
     def stop_strobe(self, *properties):

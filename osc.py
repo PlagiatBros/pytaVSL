@@ -80,6 +80,9 @@ class OscNode(object):
                 if method.shorthand:
                     self.osc_attributes_horthands.append(method.osc_setter_alias)
 
+    def get_osc_path(self):
+        return ''
+
     def osc_get_value(self, attribute):
         if attribute in self.osc_attributes:
             method = self.osc_attributes[attribute]
@@ -125,9 +128,9 @@ class OscNode(object):
 
             if len(value) > argcount or len(value) < argcount_min:
                 if method.osc_argcount_min == argcount:
-                    LOGGER.error('bad number of argument for /%s/set %s (%i expected, %i provided)' % (self.name, attribute, argcount, len(value)))
+                    LOGGER.error('bad number of argument for %s/set %s (%i expected, %i provided)' % (self.get_osc_path(), attribute, argcount, len(value)))
                 else:
-                    LOGGER.error('bad number of argument for /%s/set %s (%i to %i, expected, %i provided)' % (self.name, attribute, argcount_min, argcount, len(value)))
+                    LOGGER.error('bad number of argument for %s/set %s (%i to %i, expected, %i provided)' % (self.get_osc_path(), attribute, argcount_min, argcount, len(value)))
                 return
 
             current = self.osc_get_value(attribute)
@@ -138,7 +141,7 @@ class OscNode(object):
             method(*value)
 
         else:
-            LOGGER.error('invalid property argument "%s" for /%s/set' % (attribute, self.name))
+            LOGGER.error('invalid property argument "%s" for %s/set' % (attribute, self.get_osc_path()))
 
     @osc_method('log')
     def osc_log(self, property):
@@ -150,7 +153,7 @@ class OscNode(object):
             value = self.osc_get_value(property)
             print('%s.%s: %s' % (self.name, property, value))
         else:
-            LOGGER.error('invalid property argument "%s" for /%s/log' % (property, self.name))
+            LOGGER.error('invalid property argument "%s" for %s/log' % (property, self.get_osc_path()))
 
 
 def osc_to_regexp_transliteration(match):
@@ -206,6 +209,9 @@ class OscServer(OscNode):
     def stop(self):
 
         self.server.free()
+
+    def get_osc_path(self):
+        return '/%s' % self.name
 
     def get_children(self, store, name):
 
