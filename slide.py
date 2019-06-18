@@ -22,6 +22,9 @@ from warp import Warp
 import logging
 LOGGER = logging.getLogger(__name__)
 
+V_ALIGN = ['C', 'B', 'T']
+H_ALIGN = ['C', 'L', 'R']
+
 class SlideBase(OscNode, Effect, Animable, Mesh):
 
     def __init__(self, parent, name, texture, width=None, height=None, init_z=0.0, mesh_size=[1,1]):
@@ -54,6 +57,10 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         self.pos_y = 0.0
         self.pos_z = init_z
         self.init_z = init_z
+
+        # Alignment
+        self.h_align = 'C'
+        self.v_align = 'C'
 
         # Scale
         self.init_scale = min(Display.INSTANCE.width / self.width, Display.INSTANCE.height / self.height)
@@ -119,6 +126,24 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
                 for t in b.textures:
                     t.unload_opengl()
             self.parent.monitor.free(self)
+
+    def position(self, x, y, z):
+        """
+        Override Shape.position to take text alignment into account
+        """
+        offx = 0
+        if self.h_align != 'C':
+            offx = (Display.INSTANCE.width - self.width * self.sx) / 2.0
+        if self.h_align == 'L':
+            offx *= -1
+
+        offy = 0
+        if self.v_align != 'C':
+            offy = (Display.INSTANCE.height - self.height * self.sy) / 2.0
+        if self.v_align == 'B':
+            offy *= -1
+
+        super(SlideBase, self).position(x * Display.INSTANCE.width  + offx, y * Display.INSTANCE.height + offy, z)
 
     @osc_property('mesh_size', 'mesh_size')
     def set_mesh_size(self, x, y):
@@ -198,10 +223,57 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         if strobe <= 0:
             self.set_color(*self.color)
 
+    @osc_property('align', 'h_align', 'v_align')
+    def set_align(self, h, v):
+        """
+        horizontal and vertical alignment (center|left|right, center|top|bottom)
+        """
+        h = h[0].upper()
+        v = v[0].upper()
+        reverse = False
+
+        if h == v and h == 'C':
+            self.set_h_align(h)
+            self.set_v_align(v)
+            return
+
+        if (v != 'C' and v in H_ALIGN) or (h != 'C' and h in V_ALIGN):
+            # invert args
+            a = v
+            v = h
+            h = a
+
+        if h in H_ALIGN and h != self.h_align:
+            self.set_h_align(h)
+        if v in V_ALIGN and v != self.v_align:
+            self.set_v_align(v)
+
+    @osc_property('align_h', 'h_align')
+    def set_h_align(self, align):
+        """
+        horizontal alignment (center|left|right)
+        """
+        align = str(align)[0].upper()
+
+        if align != self.h_align:
+            self.h_align = align
+            self.set_position(self.pos_x, self.pos_y, None)
+
+    @osc_property('align_v', 'v_align')
+    def set_v_align(self, align):
+        """
+        vertical alignment (center|top|bottom)
+        """
+        align = str(align)[0].upper()
+
+        if align != self.v_align:
+            self.v_align = align
+            self.set_position(self.pos_x, self.pos_y, None)
+
     @osc_property('position', 'pos_x', 'pos_y', 'pos_z')
     def set_position(self, x, y, z):
         """
-        object xyz offset to center (px)
+        object xyz offset to alignment (0-1)
         """
         sort_parent = False
         if x is not None:
@@ -219,21 +291,21 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
     @osc_property('position_x', 'pos_x')
     def set_position_x(self, x):
         """
-        object x-offset (px, bottom to top)
+        object x-offset (0-1, bottom to top)
         """
         self.set_position(x, None, None)
 
     @osc_property('position_y', 'pos_y')
     def set_position_y(self, y):
         """
-        object y-offset (px, left to right)
+        object y-offset (0-1, left to right)
         """
         self.set_position(None, y, None)
 
     @osc_property('position_z', 'pos_z')
     def set_position_z(self, z):
         """
-        object z-axis offset (px, near to far)
+        object z-axis offset (near to far)
         """
         self.set_position(None, None, z)
 
@@ -245,6 +317,8 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         self.sx = float(sx)
         self.sy = float(sy)
         self.scale(sx * self.init_scale, sy * self.init_scale, 1.0)
+        if self.h_align != 'C' or self.v_align != 'C':
+            self.position(self.pos_x, self.pos_y, self.pos_z)
 
     @osc_property('zoom', 'sx')
     def set_zoom(self, zoom):

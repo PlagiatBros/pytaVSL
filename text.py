@@ -17,8 +17,6 @@ from config import *
 import logging
 LOGGER = logging.getLogger(__name__)
 
-V_ALIGN = ['C', 'B', 'T']
-H_ALIGN = ['C', 'L', 'R']
 _NORMALS = [[0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0]]
 GAP = 1
 
@@ -35,12 +33,8 @@ class Text(State, Perspective, SlideBase):
 
         self.size = 'auto'
 
-        self.h_align = 'C'
-        self.v_align = 'C'
-
-        self.align_offset = [0, 0]
-
         self.need_regen = False
+        self.last_draw_align_h = 'C'
 
         # cool
         self.glitch = False
@@ -52,6 +46,9 @@ class Text(State, Perspective, SlideBase):
         super(Text, self).__init__(parent, name, texture=self.font, width=Display.INSTANCE.width, height=Display.INSTANCE.height, init_z=init_z)
 
         self.color = [1.0, 1.0, 1.0]
+
+        # fix alignment (handled in new_string())
+        self.width = 0
 
         # disable mesh feature
         del self.osc_attributes['mesh_size']
@@ -96,6 +93,7 @@ class Text(State, Perspective, SlideBase):
                 cx = 0.0
             else:
                 cx = xoff
+
             for j in temp_verts:
                 self.verts.append([(j[0] - cx) * sx,
                                  (j[1] + nlines * font.height * GAP / 2.0 - yoff) * sy,
@@ -131,6 +129,10 @@ class Text(State, Perspective, SlideBase):
         self.buf = [pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms)]
         self.buf[0].textures = [font]
 
+        self.height = self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
+        self.last_draw_align_h = self.h_align
+
+
         self.set_v_align(self.v_align)
         self.set_h_align(self.h_align)
         self.set_shader(self.shader)
@@ -164,10 +166,11 @@ class Text(State, Perspective, SlideBase):
 
     def position(self, x, y, z):
         """
-        Override Shape.position to take text alignment into account
+        Override Slide.position to trigger string regeneration if h_align has changed
         """
-        super(Text, self).position(x + self.align_offset[0], y + self.align_offset[1], z)
-
+        super(Text, self).position(x, y, z)
+        if self.h_align != self.last_draw_align_h:
+            self.need_regen = True
 
     def set_text(self, string, duration=0, stop_glitch=True):
         """
@@ -240,79 +243,6 @@ class Text(State, Perspective, SlideBase):
         text string with optional glitch duration
         """
         self.set_text(text, glitch_duration)
-
-    @osc_property('align', 'h_align', 'v_align')
-    def set_align(self, h, v):
-        """
-        horizontal and vertical alignment (center|left|right, center|top|bottom)
-        """
-        h = h[0].upper()
-        v = v[0].upper()
-        reverse = False
-
-        if h == v and h == 'C':
-            self.set_h_align(h)
-            self.set_v_align(v)
-            return
-
-        if (v != 'C' and v in H_ALIGN) or (h != 'C' and h in V_ALIGN):
-            # invert args
-            a = v
-            v = h
-            h = a
-
-        if h in H_ALIGN and h != self.h_align:
-            self.set_h_align(h)
-        if v in V_ALIGN and v != self.v_align:
-            self.set_v_align(v)
-
-    @osc_property('align_h', 'h_align')
-    def set_h_align(self, align):
-        """
-        horizontal alignment (center|left|right)
-        """
-        align = str(align)[0].upper()
-
-        if align == self.h_align:
-            return
-
-        self.h_align = align
-
-        x = 0
-
-        if self.h_align == 'L':
-            x = - Display.INSTANCE.width / 2.
-        elif self.h_align == 'R':
-            x = Display.INSTANCE.width / 2.
-
-        self.align_offset[0] = x
-        self.set_position(self.pos_x, self.pos_y, None)
-        self.need_regen = True
-
-    @osc_property('align_v', 'v_align')
-    def set_v_align(self, align):
-        """
-        vertical alignment (center|top|bottom)
-        """
-        align = str(align)[0].upper()
-
-        if align == self.v_align:
-            return
-
-        self.v_align = align
-
-        size = min(1, self.font.ratio / self.length) if self.size == 'auto' else self.size
-
-        y = 0
-
-        if self.v_align == 'T':
-            y = Display.INSTANCE.height / 2. - self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
-        elif self.v_align == 'B':
-            y = - Display.INSTANCE.height / 2. + self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
-
-        self.align_offset[1] = y
-        self.set_position(self.pos_x, self.pos_y, None)
-
 
     @osc_property('size', 'size')
     def set_size(self, size):
