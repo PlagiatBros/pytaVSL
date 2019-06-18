@@ -2,7 +2,6 @@
 
 from pi3d_font import Font
 
-TEXTS_FONTS = ["sans", "sans", "mono", "mono"]
 TEXT_RESOLUTION = 0.5
 CODEPOINTS = list(range(32, 126)) + list(range(160,255)) + ['ʒ', '~', 'ä']
 FONTS = {
