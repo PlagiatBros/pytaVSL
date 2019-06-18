@@ -4,7 +4,6 @@ import ctypes
 import numpy as np
 import itertools
 import os.path
-import sys
 
 # NB PIL must be available to use Font. Otherwise use Pngfont
 from PIL import Image, ImageDraw, ImageFont

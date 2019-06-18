@@ -1,5 +1,8 @@
 # encoding: utf-8
 
+import liblo
+import re
+
 from osc import *
 
 def osc_to_regexp_transliteration(match):

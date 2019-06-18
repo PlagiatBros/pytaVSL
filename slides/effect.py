@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-import pi3d
-from pi3d.constants import (opengles, GL_TEXTURE_2D)
 import random
 
 from shaders import get_shader

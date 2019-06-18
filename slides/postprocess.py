@@ -1,13 +1,10 @@
 # encoding: utf-8
 
-import pi3d
 from pi3d.util.OffScreenTexture import OffScreenTexture
-from pi3d.Display import Display
 
 from perspective import Perspective
 from slide import SlideBase
 from state import State
-from osc import osc_property
 from warp import Warp
 
 import logging

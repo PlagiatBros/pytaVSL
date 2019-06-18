@@ -1,8 +1,6 @@
 # encoding: utf-8
 
-import liblo
 import logging
-import re
 from inspect import getmembers, getargspec
 
 from config import *

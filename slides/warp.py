@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-import pi3d
 from pi3d.constants import opengles
 import ctypes
 

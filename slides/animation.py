@@ -1,8 +1,5 @@
 # encoding: utf-8
 
-import pi3d
-from pi3d.Display import Display
-
 from osc import osc_method
 
 import logging

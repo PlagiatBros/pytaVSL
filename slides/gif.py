@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 import pi3d
-from pi3d.Display import Display
 from PIL.GifImagePlugin import GifImageFile
 
 from osc import osc_property

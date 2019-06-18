@@ -8,7 +8,6 @@ from state import State
 from slide import SlideBase
 from perspective import Perspective
 from osc import osc_property
-from pi3d_font import Font
 from config import *
 
 import logging

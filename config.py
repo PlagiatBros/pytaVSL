@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-import pi3d
 from pi3d_font import Font
 
 TEXTS_FONTS = ["sans", "sans", "mono", "mono"]

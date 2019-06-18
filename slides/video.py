@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 import pi3d
-from osc import osc_method, osc_property
+from osc import osc_property
 
 import logging
 LOGGER = logging.getLogger(__name__)
