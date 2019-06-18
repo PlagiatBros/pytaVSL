@@ -11,7 +11,12 @@ from threading import Thread
 from signal import signal, SIGINT, SIGTERM
 import traceback
 from time import time, sleep
+
 import toml
+tomlencoder = toml.TomlEncoder()
+def dump_float(f):
+    return "%g" % f
+tomlencoder.dump_funcs[float] = dump_float
 
 from shaders import init_shader_cache
 from text import Text
@@ -442,8 +447,8 @@ class PytaVSL(OscServer):
         def threaded():
 
             try:
+                content = toml.dumps(scene, tomlencoder).replace(',]', ' ]')
                 writer = open(file, 'w')
-                content = toml.dumps(scene).replace(',]', ' ]')
                 writer.write(content)
                 writer.close()
             except Exception as e:
