@@ -295,7 +295,7 @@ class PytaVSL(OscServer):
                 return
 
         group = Slide(parent=self, name=name, texture=empty_texture(), width=self.DISPLAY.width, height=self.DISPLAY.height)
-        group.is_group = True
+        group.is_group = slides
 
         for child in self.get_children(self.slides, slides):
 
@@ -323,11 +323,30 @@ class PytaVSL(OscServer):
     def create_clone(self, slide, clone_name):
         """
         Create a clone slide
-            slide: target slide name
+            slide: target slide name (can't be a clone nor a group)
             clone_name: new clone name (replaces any previously created clone with the same name)
         """
         clone_name = clone_name.lower()
         target_name = slide.lower()
+
+        target = self.get_children(self.slides, target_name)
+        if len(target) > 1:
+            LOGGER.error('could not create clone "%s" (target "%s" matches %i slides)' % (clone_name, target_name, len(target)))
+            return
+
+        target = target[0]
+
+        if target.is_group:
+            LOGGER.error('could not create clone "%s" (target "%s" is a group' % (clone_name, target.name))
+            return
+
+        if target.is_clone:
+            LOGGER.error('could not create clone "%s" (target "%s" is a clone' % (clone_name, target.name))
+            return
+
+        if not target:
+            LOGGER.error('no slide to clone (%s)' % (target_name))
+            return
 
         if clone_name in self.slides:
             if self.slides[clone_name].is_clone:
@@ -336,24 +355,13 @@ class PytaVSL(OscServer):
                 LOGGER.error("could not create clone \"%s\" (name taken by a non-clone slide)" % clone_name)
                 return
 
-        target = self.get_children(self.slides, target_name)
-        if len(target) > 1:
-            LOGGER.error('cannot clone more than 1 slide at a time (%s matches %i slides)' % (target_name, len(target)))
-            return
-
-        if not target:
-            LOGGER.error('no slide to clone (%s)' % (target_name))
-            return
-
-        target = target[0]
-
         clone_z = target.pos_z - 0.001
         clone = Slide(parent=self, name=clone_name, texture=pi3d.Texture(target.buf[0].textures[0].image), width=target.width, height=target.height, init_z=clone_z)
         clone.state_set(target.state_get())
         clone.set_position_z(clone_z)
 
         clone.gif = target.gif
-        clone.is_clone = True
+        clone.is_clone = target.name
 
         self.add_slide(clone)
 
@@ -378,6 +386,14 @@ class PytaVSL(OscServer):
                 if not 'slides' in scene:
                     scene['slides'] = {}
                 scene['slides'][slide.name] = slide.state_get()
+                if slide.is_clone:
+                    if not 'clones' in scene:
+                        scene['clones'] = {}
+                    scene['clones'][slide.name] = {'target': slide.is_clone}
+                if slide.is_group:
+                    if not 'groups' in scene:
+                        scene['groups'] = {}
+                    scene['groups'][slide.name] = {'children': slide.is_group}
 
         for n in self.texts:
             slide = self.texts[n]
@@ -413,6 +429,14 @@ class PytaVSL(OscServer):
             slide.set_visible(0)
 
         scene = self.scenes[name]
+
+        if 'clones' in scene:
+            for name in scene['clones']:
+                self.create_clone(*scene['clones'][name]['target'], name)
+
+        if 'groups' in scene:
+            for name in scene['groups']:
+                self.create_group(*scene['groups'][name]['children'], name)
 
         if 'slides' in scene:
             for name in scene['slides']:
