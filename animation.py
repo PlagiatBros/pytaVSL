@@ -54,8 +54,8 @@ class Animation():
 
     def get_state(self):
         return {
-            'start': self.start,
-            'end': self.end,
+            'from': self.start,
+            'to': self.end,
             'duration': self.duration,
             'loop': self.loop,
         }
@@ -88,8 +88,8 @@ class Strobe():
 
     def get_state(self):
         return {
-            'start': self.start,
-            'end': self.end,
+            'from': self.start,
+            'to': self.end,
             'duration': self.duration,
             'ratio': self.ratio,
         }

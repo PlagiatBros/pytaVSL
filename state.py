@@ -46,11 +46,11 @@ class State(object):
             if name == 'animations':
                 for n in state[name]:
                     args = state[name][n]
-                    self.animate(n, *args['start'], *args['end'], args['duration'], args['loop'])
+                    self.animate(n, *args['from'], *args['to'], args['duration'], args['loop'])
             elif name == 'strobes':
                 for n in state[name]:
                     args = state[name][n]
-                    self.strobe(n, *args['start'], *args['end'], args['duration'], args['ratio'])
+                    self.strobe(n, *args['from'], *args['to'], args['duration'], args['ratio'])
             else:
                 self.osc_set(name, *state[name])
 
