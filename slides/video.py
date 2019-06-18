@@ -1,9 +1,6 @@
 # encoding: utf-8
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import pi3d
-from utils import unicode
 from osc import osc_method, osc_property
 
 import logging
@@ -22,7 +19,7 @@ class Video(object):
         self.video_speed = 1.0
         self.video_time = 0
 
-        if isinstance(texture, (str, unicode)):
+        if isinstance(texture, str):
             match = videos_formats.match(texture)
             if match and match.string:
                 LOGGER.warning('video support is experimental !')

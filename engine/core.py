@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import pi3d
 from pi3d.constants import opengles, DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT, GL_CULL_FACE
 import ctypes
@@ -11,26 +9,24 @@ from threading import Thread
 from signal import signal, SIGINT, SIGTERM
 import traceback
 from time import time, sleep
-
-import toml
-tomlencoder = toml.TomlEncoder()
-def dump_float(f):
-    return "%g" % f
-tomlencoder.dump_funcs[float] = dump_float
+import numpy
 
 from shaders import init_shader_cache
 from text import Text
 from postprocess import PostProcess
 from slide import Slide
-from utils import unicode, empty_texture
 from memory import MemoryMonitor
-from osc import OscServer, osc_method
+from osc import osc_method
+from server import OscServer
+from scenes import Scenes
 from config import *
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
-class PytaVSL(OscServer):
+EMPTY_TEXTURE = None
+
+class PytaVSL(Scenes, OscServer):
     """
     Main object, contains the screen and the slides.
     It's also an OSC server which contains the method to control all of its children.
@@ -58,6 +54,9 @@ class PytaVSL(OscServer):
 
         init_shader_cache()
 
+        global EMPTY_TEXTURE
+        EMPTY_TEXTURE = pi3d.Texture(numpy.zeros((1,1,4), dtype='uint8'))
+
         self.post_process = PostProcess(self)
 
         # Slides
@@ -81,9 +80,6 @@ class PytaVSL(OscServer):
 
         # Memory
         self.monitor = MemoryMonitor(max_gpu_memory, self.flush)
-
-        # Scenes
-        self.scenes = {}
 
         # Signal
         signal(SIGINT, self.stop)
@@ -294,7 +290,7 @@ class PytaVSL(OscServer):
                 LOGGER.error("could not create group \"%s\" (name taken by a non-group slide)" % name)
                 return
 
-        group = Slide(parent=self, name=name, texture=empty_texture(), width=self.DISPLAY.width, height=self.DISPLAY.height)
+        group = Slide(parent=self, name=name, texture=EMPTY_TEXTURE, width=self.DISPLAY.width, height=self.DISPLAY.height)
         group.is_group = slides
 
         for child in self.get_children(self.slides, slides):
@@ -375,153 +371,3 @@ class PytaVSL(OscServer):
         for clone in self.get_children(self.slides, clone_name):
             if clone.is_clone:
                 self.remove_slide(clone)
-
-
-    def scene_get(self):
-        scene = {}
-
-        for n in self.slides:
-            slide = self.slides[n]
-            if slide.visible:
-                if not 'slides' in scene:
-                    scene['slides'] = {}
-                scene['slides'][slide.name] = slide.state_get()
-                if slide.is_clone:
-                    if not 'clones' in scene:
-                        scene['clones'] = {}
-                    scene['clones'][slide.name] = {'target': slide.is_clone}
-                if slide.is_group:
-                    if not 'groups' in scene:
-                        scene['groups'] = {}
-                    scene['groups'][slide.name] = {'children': slide.is_group}
-
-        for n in self.texts:
-            slide = self.texts[n]
-            if slide.visible:
-                if not 'texts' in scene:
-                    scene['texts'] = {}
-                scene['texts'][slide.name] = slide.state_get()
-
-        if self.post_process.visible:
-            scene['post_process'] = self.post_process.state_get()
-
-        return scene
-
-    @osc_method('scene_save')
-    def scene_save(self, name):
-        """
-        Save current scene (visible slides/texts/clones/groups' state)
-            name: slot name
-        """
-        self.scenes[name] = self.scene_get()
-
-    @osc_method('scene_recall')
-    def scene_recall(self, name):
-        """
-        Recall scene (visible slides/texts/clones/groups' state)
-            name: slot name
-        """
-        if name not in self.scenes:
-            LOGGER.error('scene "%s" not found' % name)
-            return
-
-        for slide in self.sorted_slides:
-            slide.set_visible(0)
-
-        scene = self.scenes[name]
-
-        if 'clones' in scene:
-            for name in scene['clones']:
-                self.create_clone(*scene['clones'][name]['target'], name)
-
-        if 'groups' in scene:
-            for name in scene['groups']:
-                self.create_group(*scene['groups'][name]['children'], name)
-
-        if 'slides' in scene:
-            for name in scene['slides']:
-                self.slides[name].reset()
-                self.slides[name].state_set(scene['slides'][name])
-
-        if 'texts' in scene:
-            for name in scene['texts']:
-                self.texts[name].reset()
-                self.texts[name].state_set(scene['texts'][name])
-
-        if 'post_process' in scene:
-            self.post_process.reset()
-            self.post_process.state_set(scene['post_process'])
-        else:
-            self.post_process.set_visible(0)
-
-    @osc_method('scene_export')
-    def scenes_export(self, file_or_name, file=None):
-        """
-        Save scene to file (visible slides/texts/clones/groups' state)
-            file_or_name: scene slot name or file path to save current scene
-            file: file path (if file_or_name is a slot name)
-        """
-
-        if file:
-            if name not in self.scenes:
-                LOGGER.error('scene "%s" not found' % name)
-                return
-            scene = self.scenes[file_or_name]
-        else:
-            scene = self.scene_get()
-            file = file_or_name
-
-        def threaded():
-
-            try:
-                content  = '# pytaVSL scene file\n\n'
-                content += toml.dumps(scene, tomlencoder)
-                content = content.replace(',]', '')
-                content = content.replace('= [ ', '= ')
-                writer = open(file, 'w')
-                writer.write(content)
-                writer.close()
-            except Exception as e:
-                LOGGER.error('could not export scene to file %s' % file)
-                print(traceback.format_exc())
-
-        t = Thread(target=threaded)
-        t.daemon = True
-        t.start()
-
-    @osc_method('scene_import')
-    def scenes_import(self, *files):
-        """
-        Load scene files
-            files: file path or glob patterns
-        """
-        paths = []
-        for f in files:
-            paths += glob.glob(f)
-
-        if len(files) == 0:
-            LOGGER.error("file \"%s\" not found" % path)
-
-        def threaded():
-
-            size = len(paths)
-
-            for i in range(size):
-                try:
-                    path = paths[i]
-                    name = path.split('/')[-1].split('.')[0].lower()
-                    _content = open(path, 'r').read()
-                    content = ''
-                    for line in _content.split('\n'):
-                        if '=' in line:
-                            line += ']'
-                        content += line + '\n'
-                    content = content.replace('=', '= [')
-                    self.scenes[name] = toml.loads(content)
-                except Exception as e:
-                    LOGGER.error('could not load scene file %s' % path)
-                    print(traceback.format_exc())
-
-        t = Thread(target=threaded)
-        t.daemon = True
-        t.start()

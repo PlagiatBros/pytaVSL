@@ -1,11 +1,21 @@
 #!/usr/bin/python
+# encoding: utf-8
+
 
 VERSION="pytaVSL v0.0.0"
 
-import argparse
-from sys import argv
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from sys import argv, path, version_info, exit
 
-parser = argparse.ArgumentParser(prog="python %s" % argv[0], formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+if version_info[0] != 3:
+    print('Error: Python 3 is required to run pytaVSL')
+    exit(0)
+
+path.append('engine')
+path.append('slides')
+path.append('shaders')
+
+parser = ArgumentParser(prog="python3m %s" % argv[0], formatter_class=ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('--namespace', help='osc namespace', default='pyta')
 parser.add_argument('--port', help='udp port or unix socket path', default=5555)

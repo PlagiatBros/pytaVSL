@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from pi3d.Shape import Shape
 from pi3d.Buffer import Buffer
 from pi3d.constants import opengles, GL_LINE_STRIP, GL_TRIANGLES, GL_LINE_LOOP

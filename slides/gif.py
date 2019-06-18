@@ -1,12 +1,9 @@
 # encoding: utf-8
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import pi3d
 from pi3d.Display import Display
 from PIL.GifImagePlugin import GifImageFile
 
-from utils import unicode
 from osc import osc_property
 
 import logging
@@ -32,7 +29,7 @@ class Gif(object):
         self.gif_speed = 1.0
         self.gif_length = 0
 
-        if isinstance(texture, (str, unicode)) and '.gif' in texture:
+        if isinstance(texture, str) and '.gif' in texture:
             gif = GifImageFile(texture)
             if gif.is_animated:
                 self.set_frames(gif)

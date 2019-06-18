@@ -1,12 +1,10 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+# encoding: utf-8
 
 import ctypes
 import numpy as np
 import itertools
 import os.path
 import sys
-if sys.version_info[0] == 3:
-  unichr = chr
 
 # NB PIL must be available to use Font. Otherwise use Pngfont
 from PIL import Image, ImageDraw, ImageFont
@@ -162,7 +160,7 @@ class Font(pi3d.Texture):
 
     for i in itertools.chain([0], codepoints):
       try:
-        ch = unichr(i)
+        ch = chr(i)
       except TypeError:
         ch = i
 

@@ -3,7 +3,6 @@
 import pi3d
 from pi3d.Display import Display
 
-from utils import unicode
 from osc import osc_method
 
 import logging

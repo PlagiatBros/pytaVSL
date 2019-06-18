@@ -4,9 +4,9 @@
 
 ### Requirements
 
-- python
-- python-liblo
-- python-toml
+- python3
+- python3-liblo
+- python3-toml
 - [pi3d](http://pi3d.github.io)
 
 

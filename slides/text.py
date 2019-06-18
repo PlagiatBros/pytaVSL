@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import pi3d
 from pi3d.Display import Display
 import random
@@ -9,7 +7,6 @@ import random
 from state import State
 from slide import SlideBase
 from perspective import Perspective
-from utils import unicode, unichr
 from osc import osc_property
 from pi3d_font import Font
 from config import *
@@ -100,7 +97,7 @@ class Text(State, Perspective, SlideBase):
                                  (j[1] + nlines * font.height * GAP / 2.0 - yoff) * sy,
                                  j[2]])
 
-        default = font.glyph_table.get(unichr(0), None)
+        default = font.glyph_table.get(chr(0), None)
         for i, c in enumerate(string):
             if c == '\n':
                 make_verts()
@@ -183,10 +180,7 @@ class Text(State, Perspective, SlideBase):
         if stop_glitch:
             self.glitch = False
 
-        if unicode is str:
-            self.string = str(string)
-        else:
-            self.string = str(string).decode('utf8')
+        self.string = str(string)
 
         if '\n' in self.string:
             self.length = max(max(map(lambda line: len(line), self.string.split('\n'))), 1)
