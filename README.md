@@ -6,6 +6,7 @@
 
 - python
 - python-liblo
+- python-toml
 - [pi3d](http://pi3d.github.io)
 
 

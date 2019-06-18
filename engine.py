@@ -11,8 +11,9 @@ from threading import Thread
 from signal import signal, SIGINT, SIGTERM
 import traceback
 from time import time, sleep
-from shaders import init_shader_cache
+import toml
 
+from shaders import init_shader_cache
 from text import Text
 from postprocess import PostProcess
 from slide import Slide
@@ -363,12 +364,7 @@ class PytaVSL(OscServer):
                 self.remove_slide(clone)
 
 
-    @osc_method('scene_save')
-    def scene_save(self, name):
-        """
-        Save current scene (visible slides and texts' state)
-            name: slot name
-        """
+    def scene_get(self):
         scene = {
             'slides': {},
             'texts': {},
@@ -387,7 +383,15 @@ class PytaVSL(OscServer):
         if self.post_process.visible:
             scene['post_process'] = self.post_process.state_get()
 
-        self.scenes[name] = scene
+        return scene
+
+    @osc_method('scene_save')
+    def scene_save(self, name):
+        """
+        Save current scene (visible slides and texts' state)
+            name: slot name
+        """
+        self.scenes[name] = self.scene_get()
 
     @osc_method('scene_recall')
     def scene_recall(self, name):
@@ -412,3 +416,62 @@ class PytaVSL(OscServer):
             self.post_process.state_set(scene['post_process'])
         else:
             self.post_process.set_visible(0)
+
+    @osc_method('scene_export')
+    def scenes_export(self, file_or_name, file=None):
+        """
+        Save scene to file
+            file_or_name: scene slot name or file path to save current scene
+            file: file path (if file_or_name is a slot name)
+        """
+
+        if file:
+            if name not in self.scenes:
+                LOGGER.error('scene "%s" not found' % name)
+                return
+            scene = self.scenes[file_or_name]
+        else:
+            scene = self.scene_get()
+            file = file_or_name
+
+        def threaded():
+
+            try:
+                toml.dump(scene, open(file, 'w'))
+            except Exception as e:
+                LOGGER.error('could not export scene to file %s' % file)
+                print(traceback.format_exc())
+
+        t = Thread(target=threaded)
+        t.daemon = True
+        t.start()
+
+    @osc_method('scene_import')
+    def scenes_import(self, *files):
+        """
+        Load scene files
+            files: file path or glob patterns
+        """
+        paths = []
+        for f in files:
+            paths += glob.glob(f)
+
+        if len(files) == 0:
+            LOGGER.error("file \"%s\" not found" % path)
+
+        def threaded():
+
+            size = len(paths)
+
+            for i in range(size):
+                try:
+                    path = paths[i]
+                    name = path.split('/')[-1].split('.')[0].lower()
+                    self.scenes[name] = toml.load(path)
+                except Exception as e:
+                    LOGGER.error('could not load scene file %s' % path)
+                    print(traceback.format_exc())
+
+        t = Thread(target=threaded)
+        t.daemon = True
+        t.start()
