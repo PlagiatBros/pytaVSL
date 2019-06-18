@@ -32,7 +32,6 @@ optional arguments:
                         '2:mono', '3:mono'])
   --fps FPS             maximum framerate, 0 for free wheeling (default: 25)
   --max-gpu MAX_GPU     maximum gpu memory (in MB) (default: 64)
-  --fullscreen          launch in fullscreen (default: False)
   --api                 print osc api and exit (default: False)
   --debug               print debug logs (default: False)
   --show-fps            show fps (default: False)
