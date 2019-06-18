@@ -76,6 +76,9 @@ class PytaVSL(OscServer):
         # Memory
         self.monitor = MemoryMonitor(max_gpu_memory, self.flush)
 
+        # Scenes
+        self.scenes = {}
+
         # Signal
         signal(SIGINT, self.stop)
         signal(SIGTERM, self.stop)
@@ -358,3 +361,54 @@ class PytaVSL(OscServer):
         for clone in self.get_children(self.slides, clone_name):
             if clone.is_clone:
                 self.remove_slide(clone)
+
+
+    @osc_method('scene_save')
+    def scene_save(self, name):
+        """
+        Save current scene (visible slides and texts' state)
+            name: slot name
+        """
+        scene = {
+            'slides': {},
+            'texts': {},
+            'post_process': {}
+        }
+        for n in self.slides:
+            slide = self.slides[n]
+            if slide.visible:
+                scene['slides'][slide.name] = slide.state_get()
+
+        for n in self.texts:
+            slide = self.texts[n]
+            if slide.visible:
+                scene['texts'][slide.name] = slide.state_get()
+
+        if self.post_process.visible:
+            scene['post_process'] = self.post_process.state_get()
+
+        self.scenes[name] = scene
+
+    @osc_method('scene_recall')
+    def scene_recall(self, name):
+        """
+        Recall scene (visible slides and texts' state)
+            name: slot name
+        """
+        if name not in self.scenes:
+            LOGGER.error('scene "%s" not found' % name)
+            return
+
+        for slide in self.sorted_slides:
+            slide.set_visible(0)
+
+        scene = self.scenes[name]
+        for name in scene['slides']:
+            self.slides[name].state_set(scene['slides'][name])
+        for name in scene['texts']:
+            self.texts[name].state_set(scene['texts'][name])
+
+        if scene['post_process']:
+            self.post_process.state_set(scene['post_process'])
+        else:
+            self.post_process.set_visible(0)
