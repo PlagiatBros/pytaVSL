@@ -447,7 +447,9 @@ class PytaVSL(OscServer):
         def threaded():
 
             try:
-                content = toml.dumps(scene, tomlencoder).replace(',]', ' ]')
+                content = toml.dumps(scene, tomlencoder)
+                content = content.replace(',]', '')
+                content = content.replace('= [ ', '= ')
                 writer = open(file, 'w')
                 writer.write(content)
                 writer.close()
@@ -480,7 +482,14 @@ class PytaVSL(OscServer):
                 try:
                     path = paths[i]
                     name = path.split('/')[-1].split('.')[0].lower()
-                    self.scenes[name] = toml.load(path)
+                    _content = open(path, 'r').read()
+                    content = ''
+                    for line in _content.split('\n'):
+                        if '=' in line:
+                            line += ']'
+                        content += line + '\n'
+                    content = content.replace('=', '= [')
+                    self.scenes[name] = toml.loads(content)
                 except Exception as e:
                     LOGGER.error('could not load scene file %s' % path)
                     print(traceback.format_exc())
