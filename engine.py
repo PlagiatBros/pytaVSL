@@ -205,7 +205,6 @@ class PytaVSL(OscServer):
                 self.debug_text.set_text(str(i + 1) + '/' + str(size))
 
             self.debug_text.set_visible(0)
-            self.sort_slides()
 
             LOGGER.info("total slides in memory: %i" % len(self.slides.values()))
 
@@ -248,6 +247,7 @@ class PytaVSL(OscServer):
             LOGGER.error('could not add slide "%s" (name taken)' % slide.name)
             return
         self.slides[slide.name] = slide
+        self.sort_slides()
 
     def remove_slide(self, slide):
         if slide.children:
