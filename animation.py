@@ -56,8 +56,8 @@ class Animation():
         return {
             'from': self.start,
             'to': self.end,
-            'duration': self.duration,
-            'loop': self.loop,
+            'duration': [self.duration],
+            'loop': [self.loop],
         }
 
 class Strobe():
@@ -90,8 +90,8 @@ class Strobe():
         return {
             'from': self.start,
             'to': self.end,
-            'duration': self.duration,
-            'ratio': self.ratio,
+            'duration': [self.duration],
+            'ratio': [self.ratio],
         }
 
 class Animable(object):
