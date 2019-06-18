@@ -11,7 +11,7 @@ class Perspective(object):
         super(Perspective, self).__init__(*args, **kwargs)
 
         # perspective
-        self.perspective = 0.0
+        self.perspective = 0
 
     @osc_property('perspective', 'perspective')
     def set_perspective(self, perspective):
