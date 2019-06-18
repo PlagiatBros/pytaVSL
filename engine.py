@@ -447,7 +447,8 @@ class PytaVSL(OscServer):
         def threaded():
 
             try:
-                content = toml.dumps(scene, tomlencoder)
+                content  = '# pytaVSL scene file\n\n'
+                content += toml.dumps(scene, tomlencoder)
                 content = content.replace(',]', '')
                 content = content.replace('= [ ', '= ')
                 writer = open(file, 'w')
