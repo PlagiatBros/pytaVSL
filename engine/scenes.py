@@ -3,12 +3,16 @@
 from osc import osc_method
 
 from threading import Thread
+import traceback
 
 import toml
 tomlencoder = toml.TomlEncoder()
 def dump_float(f):
     return "%g" % f
 tomlencoder.dump_funcs[float] = dump_float
+
+import logging
+LOGGER = logging.getLogger(__name__)
 
 class Scenes(object):
 

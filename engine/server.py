@@ -1,9 +1,11 @@
 # encoding: utf-8
 
+from osc import *
+
 import liblo
 import re
-
-from osc import *
+import logging
+LOGGER = logging.getLogger(__name__)
 
 def osc_to_regexp_transliteration(match):
     s = match.group(0)
