@@ -29,7 +29,7 @@ class State(object):
         for name in self.animations:
             if self.animations[name].loop != 0:
                 if not 'animations' in state:
-                    state['animœtions'] = {}
+                    state['animations'] = {}
                 state['animations'][name] = self.animations[name].get_state()
 
         for name in self.strobes:
