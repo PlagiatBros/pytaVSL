@@ -56,7 +56,7 @@ class Effect(object):
         self.effect_noise = [0.0, 0.0, 0.0]
         self.set_effect_noise(*self.effect_noise)
 
-        self.effect_mask = None
+        self.effect_mask = 0
         self.effect_mask_hardness = 0.0
         self.effect_mask_threshold = 1.0
         self.set_effect_mask(self.effect_mask)
@@ -142,13 +142,13 @@ class Effect(object):
 
 
     @osc_property('mask', 'effect_mask')
-    def set_effect_mask(self, slide=None):
+    def set_effect_mask(self, slide=0):
         """
-        slide name to use as a mask
+        slide name to use as a mask (0 to reset)
         """
-        if slide is None:
+        if slide == 0:
             if len(self.buf[0].textures) == 2:
-                self.effect_mask = None
+                self.effect_mask = 0
                 del self.buf[0].textures[1]
                 self.toggle_effect('MASK', False)
             return
