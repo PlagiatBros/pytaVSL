@@ -417,7 +417,7 @@ class PytaVSL(OscServer):
             for name in scene['texts']:
                 self.texts[name].state_set(scene['texts'][name])
 
-        if scene['post_process']:
+        if 'post_process' in scene:
             self.post_process.state_set(scene['post_process'])
         else:
             self.post_process.set_visible(0)
@@ -442,7 +442,10 @@ class PytaVSL(OscServer):
         def threaded():
 
             try:
-                toml.dump(scene, open(file, 'w'))
+                writer = open(file, 'w')
+                content = toml.dumps(scene).replace(',]', ' ]')
+                writer.write(content)
+                writer.close()
             except Exception as e:
                 LOGGER.error('could not export scene to file %s' % file)
                 print(traceback.format_exc())
