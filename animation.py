@@ -111,6 +111,7 @@ class Animable(object):
             args: [from ...] [to ...] duration loop=0
                 from: initial value(s) (items with default values must be omitted)
                 to: destination value(s) (items with default values must be omitted)
+                duration: animation duration in seconds
                 loop: omitted / 0 (no loop), 1 (infinte loop) or -1 (infinite back-and-forth)
         """
         attribute = property.lower()
