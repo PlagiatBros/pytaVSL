@@ -365,19 +365,20 @@ class PytaVSL(OscServer):
 
 
     def scene_get(self):
-        scene = {
-            'slides': {},
-            'texts': {},
-            'post_process': {}
-        }
+        scene = {}
+        
         for n in self.slides:
             slide = self.slides[n]
             if slide.visible:
+                if not 'slides' in scene:
+                    scene['slides'] = {}
                 scene['slides'][slide.name] = slide.state_get()
 
         for n in self.texts:
             slide = self.texts[n]
             if slide.visible:
+                if not 'texts' in scene:
+                    scene['texts'] = {}
                 scene['texts'][slide.name] = slide.state_get()
 
         if self.post_process.visible:
@@ -407,10 +408,14 @@ class PytaVSL(OscServer):
             slide.set_visible(0)
 
         scene = self.scenes[name]
-        for name in scene['slides']:
-            self.slides[name].state_set(scene['slides'][name])
-        for name in scene['texts']:
-            self.texts[name].state_set(scene['texts'][name])
+
+        if 'slides' in scene:
+            for name in scene['slides']:
+                self.slides[name].state_set(scene['slides'][name])
+
+        if 'texts' in scene:
+            for name in scene['texts']:
+                self.texts[name].state_set(scene['texts'][name])
 
         if scene['post_process']:
             self.post_process.state_set(scene['post_process'])

@@ -26,13 +26,15 @@ class State(object):
             if not name in self.osc_attributes_horthands:
                 state[name] = self.osc_get_value(name)
 
-        state['animations'] = {}
         for name in self.animations:
             if self.animations[name].loop != 0:
+                if not 'animations' in state:
+                    state['animœtions'] = {}
                 state['animations'][name] = self.animations[name].get_state()
 
-        state['strobes'] = {}
         for name in self.strobes:
+            if not 'strobes' in state:
+                state['strobes'] = {}
             state['strobes'][name] = self.strobes[name].get_state()
 
         return state
