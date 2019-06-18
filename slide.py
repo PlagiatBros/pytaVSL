@@ -248,7 +248,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         if v in V_ALIGN and v != self.v_align:
             self.set_v_align(v)
 
-    @osc_property('align_h', 'h_align')
+    @osc_property('align_h', 'h_align', shorthand=True)
     def set_h_align(self, align):
         """
         horizontal alignment (center|left|right)
@@ -259,7 +259,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
             self.h_align = align
             self.set_position(self.pos_x, self.pos_y, None)
 
-    @osc_property('align_v', 'v_align')
+    @osc_property('align_v', 'v_align', shorthand=True)
     def set_v_align(self, align):
         """
         vertical alignment (center|top|bottom)
@@ -288,21 +288,21 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
             parent = self.parent_slide if self.parent_slide is not None else self.parent
             parent.sort_slides()
 
-    @osc_property('position_x', 'pos_x')
+    @osc_property('position_x', 'pos_x', shorthand=True)
     def set_position_x(self, x):
         """
         object x-offset (0-1, bottom to top)
         """
         self.set_position(x, None, None)
 
-    @osc_property('position_y', 'pos_y')
+    @osc_property('position_y', 'pos_y', shorthand=True)
     def set_position_y(self, y):
         """
         object y-offset (0-1, left to right)
         """
         self.set_position(None, y, None)
 
-    @osc_property('position_z', 'pos_z')
+    @osc_property('position_z', 'pos_z', shorthand=True)
     def set_position_z(self, z):
         """
         object z-axis offset (near to far)
@@ -320,7 +320,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         if self.h_align != 'C' or self.v_align != 'C':
             self.position(self.pos_x, self.pos_y, self.pos_z)
 
-    @osc_property('zoom', 'sx')
+    @osc_property('zoom', 'sx', shorthand=True)
     def set_zoom(self, zoom):
         """
         object scaling (scale shorthand)
@@ -342,21 +342,21 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
             self.rz = float(rz)
             self.rotateToZ(self.rz)
 
-    @osc_property('rotate_x', 'rx')
+    @osc_property('rotate_x', 'rx', shorthand=True)
     def set_rotate_x(self, rx):
         """
         object rotation around x axis (deg)
         """
         self.set_rotate(rx, None, None)
 
-    @osc_property('rotate_y', 'ry')
+    @osc_property('rotate_y', 'ry', shorthand=True)
     def set_rotate_y(self, ry):
         """
         object rotation around y axis (deg)
         """
         self.set_rotate(None, ry, None)
 
-    @osc_property('rotate_z', 'rz')
+    @osc_property('rotate_z', 'rz', shorthand=True)
     def set_rotate_z(self, rz):
         """
         object rotation around z axis (deg)

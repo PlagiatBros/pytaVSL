@@ -41,10 +41,11 @@ class osc_property():
     """
     Decorator for exposing class attributes to osc set
     """
-    def __init__(self, alias, *attributes):
+    def __init__(self, alias, *attributes, shorthand=False):
 
         self.osc_setter_alias = alias
         self.osc_getter_attributes = attributes
+        self.shorthand = shorthand
 
     def __call__(self, method):
 
@@ -53,6 +54,7 @@ class osc_property():
         method.osc_getter_attributes = self.osc_getter_attributes
         method.osc_argcount = method.__code__.co_argcount - 1
         method.osc_argcount_min = method.osc_argcount if not method.__defaults__ else method.osc_argcount - len(method.__defaults__)
+        method.shorthand = self.shorthand
 
         return method
 
@@ -65,6 +67,7 @@ class OscNode(object):
         self.osc_methods = {}
         self.osc_attributes = {}
         self.osc_state = {}
+        self.osc_attributes_horthands = []
 
         for name, method in getmembers(self):
 
@@ -74,6 +77,8 @@ class OscNode(object):
 
             if hasattr(method, 'osc_attribute'):
                 self.osc_attributes[method.osc_setter_alias] = method
+                if method.shorthand:
+                    self.osc_attributes_horthands.append(method.osc_setter_alias)
 
     def osc_get_value(self, attribute):
         if attribute in self.osc_attributes:

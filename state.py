@@ -23,7 +23,8 @@ class State(object):
     def state_get(self):
         state = {}
         for name in self.osc_attributes:
-            state[name] = self.osc_get_value(name)
+            if not name in self.osc_attributes_horthands:
+                state[name] = self.osc_get_value(name)
 
         state['animations'] = {}
         for name in self.animations:
