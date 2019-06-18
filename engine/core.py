@@ -52,8 +52,6 @@ class PytaVSL(Scenes, OscServer):
 
         self.time = time()
 
-        init_shader_cache()
-
         global EMPTY_TEXTURE
         EMPTY_TEXTURE = pi3d.Texture(numpy.zeros((1,1,4), dtype='uint8'))
 
@@ -92,6 +90,8 @@ class PytaVSL(Scenes, OscServer):
              - receive osc messages
              - draw slides, skip grouped slides (drawn by their parents)
         """
+
+        init_shader_cache()
 
         ####### upload fonts and post_process to gpu
         for n in self.texts:
