@@ -410,7 +410,7 @@ class PytaVSL(OscServer):
     @osc_method('scene_save')
     def scene_save(self, name):
         """
-        Save current scene (visible slides and texts' state)
+        Save current scene (visible slides/texts/clones/groups' state)
             name: slot name
         """
         self.scenes[name] = self.scene_get()
@@ -418,7 +418,7 @@ class PytaVSL(OscServer):
     @osc_method('scene_recall')
     def scene_recall(self, name):
         """
-        Recall scene (visible slides and texts' state)
+        Recall scene (visible slides/texts/clones/groups' state)
             name: slot name
         """
         if name not in self.scenes:
@@ -457,7 +457,7 @@ class PytaVSL(OscServer):
     @osc_method('scene_export')
     def scenes_export(self, file_or_name, file=None):
         """
-        Save scene to file
+        Save scene to file (visible slides/texts/clones/groups' state)
             file_or_name: scene slot name or file path to save current scene
             file: file path (if file_or_name is a slot name)
         """
