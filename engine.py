@@ -269,7 +269,7 @@ class PytaVSL(OscServer):
         if not font in FONTS:
             LOGGER.error('could not add text "%s" (font "%s" not found)' % (name, font))
             return
-        self.texts[name] = Text(self, 'text/' + name, font=FONTS[font], init_z=-100 + len(self.texts))
+        self.texts[name] = Text(self, name, font=FONTS[font], init_z=-100 + len(self.texts))
         self.sort_slides()
 
     @osc_method('group')
@@ -366,7 +366,7 @@ class PytaVSL(OscServer):
 
     def scene_get(self):
         scene = {}
-        
+
         for n in self.slides:
             slide = self.slides[n]
             if slide.visible:
