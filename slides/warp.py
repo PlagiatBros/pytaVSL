@@ -63,9 +63,8 @@ class Warp(object):
 
     def toggle_warp_effect(self):
         self.warp = self.warp_1 != WARP_ZERO or self.warp_2 != WARP_ZERO or self.warp_3 != WARP_ZERO or self.warp_4 != WARP_ZERO
-        if self.warp:
-            self.warp_texture()
-            self.warp_vertices()
+        self.warp_texture()
+        self.warp_vertices()
         self.toggle_effect('WARP', self.warp)
 
     def warp_texture(self):
@@ -171,6 +170,8 @@ class Warp(object):
         if self.visible:
 
             if self.shader and self.warp:
+                if self.active_effects_changed:
+                    self.apply_effect_changes()
                 self.shader.use()
                 opengles.glUniform4fv(self.unif_warp_loc, 1, self.unif_warp)
 

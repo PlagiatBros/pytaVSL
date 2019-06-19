@@ -75,6 +75,10 @@ class Effect(object):
             self.active_effects.remove(name)
             self.active_effects_changed = True
 
+    def apply_effect_changes(self):
+        self.set_shader(get_shader(self.active_effects))
+        self.active_effects_changed = False
+
     @osc_property('key_color', 'effect_key_color')
     def set_effect_key_color(self, r, g, b):
         """
@@ -196,7 +200,6 @@ class Effect(object):
         self.unif[36] = random.random()
         self.unif[37] = self.parent.time - origin
         if self.active_effects_changed:
-            self.set_shader(get_shader(self.active_effects))
-            self.active_effects_changed = False
+            self.apply_effect_changes()
 
         super(Effect, self).draw(*args, **kwargs)
