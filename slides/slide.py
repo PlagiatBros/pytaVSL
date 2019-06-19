@@ -208,7 +208,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
     @osc_property('color', 'color')
     def set_color(self, r, g, b):
         """
-        rgb balance
+        rgb balance (0<>1)
         """
         self.color = [float(r), float(g), float(b)]
         self.set_material(self.color)
@@ -216,7 +216,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
     @osc_property('alpha', 'color_alpha')
     def set_color_alpha(self, alpha):
         """
-        object opacity (0-1)
+        object opacity (0<>1)
         """
         self.color_alpha = float(alpha)
         self.set_alpha(self.color_alpha)
@@ -281,7 +281,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
     @osc_property('position', 'pos_x', 'pos_y', 'pos_z')
     def set_position(self, x, y, z):
         """
-        object xyz offset to alignment (0-1)
+        object xyz offset to alignment (0<>1)
         """
         sort_parent = False
         if x is not None:
@@ -299,14 +299,14 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
     @osc_property('position_x', 'pos_x', shorthand=True)
     def set_position_x(self, x):
         """
-        object x-offset (0-1, bottom to top)
+        object x-offset (0<>1, bottom to top)
         """
         self.set_position(x, None, None)
 
     @osc_property('position_y', 'pos_y', shorthand=True)
     def set_position_y(self, y):
         """
-        object y-offset (0-1, left to right)
+        object y-offset (0<>1, left to right)
         """
         self.set_position(None, y, None)
 

@@ -164,7 +164,7 @@ class Animable(object):
                 from: initial value(s) (items with default values must be omitted)
                 to: destination value(s) (items with default values must be omitted)
                 duration: strobe period in seconds
-                ratio: time proportion spent on "from" (between 0.0 and 1.0)
+                ratio: time proportion spent on "from" (0<>1)
         """
         attribute = property.lower()
 

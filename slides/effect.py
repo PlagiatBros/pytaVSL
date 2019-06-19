@@ -78,7 +78,7 @@ class Effect(object):
     @osc_property('key_color', 'effect_key_color')
     def set_effect_key_color(self, r, g, b):
         """
-        key rgb color (0-1)
+        key rgb color (0<>1)
         """
         self.effect_key_color = [r, g, b]
         self.unif[39] = self.effect_key_color[0]
@@ -160,7 +160,7 @@ class Effect(object):
     @osc_property('mask_hardness', 'effect_mask_hardness')
     def set_effect_mask_hardness(self, strength):
         """
-        mask hardness (0-1)
+        mask hardness (0<>1)
         """
         self.effect_mask_hardness = float(strength)
         self.unif[58] = self.effect_mask_hardness
@@ -168,7 +168,7 @@ class Effect(object):
     @osc_property('mask_threshold', 'effect_mask_threshold')
     def set_effect_mask_threshold(self, thresh):
         """
-        mask threshold (0-1)
+        mask threshold (0<>1)
         """
         self.effect_mask_threshold = float(thresh)
         self.unif[59] = self.effect_mask_threshold
@@ -176,7 +176,7 @@ class Effect(object):
     @osc_property('fish', 'effect_fish')
     def set_effect_fish(self, value):
         """
-        fish effect(-1-1)
+        fish effect(-1<>1)
         """
         self.effect_fish = float(value)
         self.unif[49] = self.effect_fish
