@@ -63,11 +63,17 @@ class Warp(object):
 
     def toggle_warp_effect(self):
         self.warp = self.warp_1 != WARP_ZERO or self.warp_2 != WARP_ZERO or self.warp_3 != WARP_ZERO or self.warp_4 != WARP_ZERO
-        self.warp_texture()
-        self.warp_shape()
+        if self.warp:
+            self.warp_texture()
+            self.warp_vertices()
         self.toggle_effect('WARP', self.warp)
 
     def warp_texture(self):
+        """
+        Compute homogeneous coordinates factor at each angle and pass it to the shader
+            https://bitlush.com/blog/arbitrary-quadrilaterals-in-opengl-es-2-0
+            http://www.reedbeta.com/blog/quadrilateral-interpolation-part-1/
+        """
 
         p0x = self.warp_1[0]
         p0y = self.warp_1[1] + 1
@@ -113,22 +119,52 @@ class Warp(object):
         # error
         LOGGER.error('%s: impossible texture warping' % self.name)
 
-    def warp_shape(self):
+    def warp_vertices(self):
+        """
+        Move vertices to warped quadrilateral
+            Positions are interpolated linearly -> no projective warping if mesh_size > [1, 1]
+        """
 
-        self.buf[0].array_buffer[0][0] = -self.width/2. + self.width  * self.warp_1[0]
-        self.buf[0].array_buffer[0][1] = self.height/2. + self.height * self.warp_1[1]
+        p0x = (self.warp_1[0] - 0.5) * self.width
+        p0y = (self.warp_1[1] + 1 - 0.5) * self.height
 
-        self.buf[0].array_buffer[1][0] = -self.width/2. + self.width  * self.warp_4[0]
-        self.buf[0].array_buffer[1][1] = -self.height/2. + self.height * self.warp_4[1]
+        p1x = (self.warp_2[0] + 1 - 0.5) * self.width
+        p1y = (self.warp_2[1] + 1 - 0.5) * self.height
 
-        self.buf[0].array_buffer[2][0] = self.width/2. + self.width  * self.warp_2[0]
-        self.buf[0].array_buffer[2][1] = self.height/2. + self.height * self.warp_2[1]
+        p2x = (self.warp_3[0] + 1 - 0.5) * self.width
+        p2y = (self.warp_3[1] - 0.5) * self.height
 
-        self.buf[0].array_buffer[3][0] = self.width/2. + self.width  * self.warp_3[0]
-        self.buf[0].array_buffer[3][1] = -self.height/2. + self.height * self.warp_3[1]
+        p3x = (self.warp_4[0] - 0.5) * self.width
+        p3y = (self.warp_4[1] - 0.5) * self.height
+
+        def interpolate(v1, v2, x):
+            r1 = v1[0] + (v2[0] - v1[0]) * x
+            r2 = v1[1] + (v2[1] - v1[1]) * x
+            return [r1, r2]
+
+        ww = self.width / 2.0
+        hh = self.height / 2.0
+        nx, ny = self.mesh_size
+        i = 0
+        for x in range(nx + 1):
+            for y in range(ny + 1):
+                p = [-ww + self.width * x / nx, hh - self.height * y / ny ]
+                x1 = interpolate([p0x, p0y], [p1x, p1y], 1.*x/nx)
+                x2 = interpolate([p3x, p3y], [p2x, p2y], 1.*x/nx)
+                p = interpolate(x1, x2, 1.*y/ny);
+                self.buf[0].array_buffer[i][0] = p[0]
+                self.buf[0].array_buffer[i][1] = p[1]
+                i += 1
 
         self.buf[0].re_init()
 
+    def create_mesh_buffer(self):
+        """
+        Override Mesh.create_mesh_buffer to re-warp vertices after changing mesh_size
+        """
+        super(Warp, self).create_mesh_buffer()
+        if self.warp:
+            self.warp_vertices()
 
     def draw(self, *args, **kwargs):
 
