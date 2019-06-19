@@ -6,6 +6,7 @@ uniform sampler2D tex2;
 
 uniform vec3 unib[5]; // Buffer
 uniform vec3 unif[20]; // Shape
+uniform vec2 warp[4]; // Warp
 
 varying vec2 coords;
 varying vec2 maskCoords;

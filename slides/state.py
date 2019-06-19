@@ -18,10 +18,10 @@ class State(object):
         if type(self).__name__ not in RESET_STATES:
             RESET_STATES[type(self).__name__] = self.state_get()
 
-            # Text exception
-            if type(self).__name__ == 'Text':
-                 del RESET_STATES[type(self).__name__]['mesh_size']
-                 del RESET_STATES[type(self).__name__]['mesh_debug']
+            # Text exception (disabled)
+            # if type(self).__name__ == 'Text':
+            #      del RESET_STATES[type(self).__name__]['mesh_size']
+            #      del RESET_STATES[type(self).__name__]['mesh_debug']
 
     def state_get(self):
         state = {}

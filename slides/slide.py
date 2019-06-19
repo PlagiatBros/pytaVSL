@@ -152,23 +152,24 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
 
         super(SlideBase, self).position(x * Display.INSTANCE.width  + offx, y * Display.INSTANCE.height + offy, z)
 
-    @osc_property('mesh_size', 'mesh_size')
-    def set_mesh_size(self, x, y):
-        """
-        mesh definition (normalized)
-        """
-        new_size = [abs(int(x)), abs(int(y))]
-        if new_size != self.mesh_size:
-            self.mesh_size = new_size
-            self.create_mesh_buffer()
-
-    @osc_property('mesh_debug', 'mesh_debug')
-    def set_mesh_wireframe(self, debug):
-        """
-        wireframe mode (0|1)
-        """
-        self.mesh_debug = int(bool(debug))
-        self.set_mesh_debug(self.mesh_debug)
+    # disabled until its useful
+    # @osc_property('mesh_size', 'mesh_size')
+    # def set_mesh_size(self, x, y):
+    #     """
+    #     mesh definition (normalized)
+    #     """
+    #     new_size = [abs(int(x)), abs(int(y))]
+    #     if new_size != self.mesh_size:
+    #         self.mesh_size = new_size
+    #         self.create_mesh_buffer()
+    #
+    # @osc_property('mesh_debug', 'mesh_debug')
+    # def set_mesh_wireframe(self, debug):
+    #     """
+    #     wireframe mode (0|1)
+    #     """
+    #     self.mesh_debug = int(bool(debug))
+    #     self.set_mesh_debug(self.mesh_debug)
 
     @osc_property('tiles', 'tiles')
     def set_tiles(self, x, y):

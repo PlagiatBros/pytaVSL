@@ -46,9 +46,9 @@ class Text(State, Perspective, SlideBase):
         # fix alignment (handled in new_string())
         self.width = 0
 
-        # disable mesh feature
-        del self.osc_attributes['mesh_size']
-        del self.osc_attributes['mesh_debug']
+        # disable mesh feature (disabled)
+        # del self.osc_attributes['mesh_size']
+        # del self.osc_attributes['mesh_debug']
 
         # init empty string
         self.new_string()
