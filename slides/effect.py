@@ -8,6 +8,9 @@ from osc import osc_property
 import logging
 LOGGER = logging.getLogger(__name__)
 
+import time
+origin = time.time()
+
 class Effect(object):
 
     def __init__(self, *args, **kwargs):
@@ -18,13 +21,13 @@ class Effect(object):
         ----- ------------------------------------------ -------
         index                                            from to
         ===== ========================================== ==== ==
-          12  random, unused, unused                      36  38
+          12  random, time, unused                        36  38
           13  key_color r, g, b                           39  41
           14  key_threshold, unused, unused               42  43
           15  invert, unused, unused                      45  46
-          16  rgbwave, fish, unused                       48  50
+          16  rgbwave, fish, tunnel                       48  50
           17  charcoal radius, thresh, strength           51  53
-          18  noise, seed1, seed2                         54  56
+          18  noise                                       54  56
           19  mask, mask_hardness, unused                 57  59
         ===== ========================================== ==== ==
         """
@@ -46,11 +49,10 @@ class Effect(object):
         self.set_effect_rgbwave(self.effect_rgbwave)
 
         self.effect_charcoal = 0.0
-        self.effect_charcoal_settings = [2.0, 0.0, 2.0]
-        self.set_effect_charcoal_settings(*self.effect_charcoal_settings)
+        self.set_effect_charcoal(self.effect_charcoal)
 
-        self.effect_noise = [0.0, 0.0, 0.0]
-        self.set_effect_noise(*self.effect_noise)
+        self.effect_noise = 0.0
+        self.set_effect_noise(self.effect_noise)
 
         self.effect_mask = ''
         self.effect_mask_hardness = 0.0
@@ -61,6 +63,9 @@ class Effect(object):
 
         self.effect_fish = 0.0
         self.set_effect_fish(self.effect_fish)
+
+        self.effect_tunnel = 0.0
+        self.set_effect_tunnel(self.effect_tunnel)
 
     def toggle_effect(self, name, state):
         if state and name not in self.active_effects:
@@ -101,7 +106,7 @@ class Effect(object):
     @osc_property('rgbwave', 'effect_rgbwave')
     def set_effect_rgbwave(self, value):
         """
-        rgbwave strength
+        rgbwave effect (strength)
         """
         self.effect_rgbwave = float(value)
         self.unif[48] = self.effect_rgbwave
@@ -110,31 +115,20 @@ class Effect(object):
     @osc_property('charcoal', 'effect_charcoal')
     def set_effect_charcoal(self, value):
         """
-        enable charcoal effect (0|1)
+        charcoal effect (size)
         """
-        self.effect_charcoal = int(bool(value))
+        self.effect_charcoal = float(value)
+        self.unif[51] = self.effect_charcoal
         self.toggle_effect('CHARCOAL', self.effect_charcoal != 0)
 
-    @osc_property('charcoal_settings', 'effect_charcoal_settings')
-    def set_effect_charcoal_settings(self, size, threshold, strength):
-        """
-        charcoal pen size (px), edge threshold and stroke strength
-        """
-        self.effect_charcoal_settings = [float(value) for value in [size, threshold, strength]]
-        self.unif[51] = self.effect_charcoal_settings[0]
-        self.unif[52] = self.effect_charcoal_settings[1]
-        self.unif[53] = self.effect_charcoal_settings[2]
-
     @osc_property('noise', 'effect_noise')
-    def set_effect_noise(self, density, x, y):
+    def set_effect_noise(self, density):
         """
-        noise density (0-1) and xy chaos stretching
+        noise (density)
         """
-        self.effect_noise = [float(value) for value in [density, x, y]]
-        self.unif[54] = self.effect_noise[0]
-        self.unif[55] = self.effect_noise[1]
-        self.unif[56] = self.effect_noise[2]
-        self.toggle_effect('NOISE', self.effect_noise[0] != 0)
+        self.effect_noise = float(density)
+        self.unif[54] = self.effect_noise
+        self.toggle_effect('NOISE', self.effect_noise != 0)
 
 
     @osc_property('mask', 'effect_mask')
@@ -182,15 +176,25 @@ class Effect(object):
     @osc_property('fish', 'effect_fish')
     def set_effect_fish(self, value):
         """
-        fish (-1-1)
+        fish effect(-1-1)
         """
         self.effect_fish = float(value)
         self.unif[49] = self.effect_fish
         self.toggle_effect('FISH', self.effect_fish != 0)
 
+    @osc_property('tunnel', 'effect_tunnel')
+    def set_effect_tunnel(self, value):
+        """
+        tunnel effect (speed)
+        """
+        self.effect_tunnel = float(value)
+        self.unif[50] = self.effect_tunnel
+        self.toggle_effect('TUNNEL', self.effect_tunnel != 0)
+
     def draw(self, *args, **kwargs):
 
         self.unif[36] = random.random()
+        self.unif[37] = self.parent.time - origin
         if self.active_effects_changed:
             self.set_shader(get_shader(self.active_effects))
             self.active_effects_changed = False
