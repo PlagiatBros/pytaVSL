@@ -11,6 +11,10 @@
 
 void main(void) {
 
+    #ifdef WARP
+    #include shaders/effects/warp.fs
+    #endif
+
     #ifdef FISH
     #include shaders/effects/fish.fs
     #endif
