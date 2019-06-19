@@ -121,8 +121,9 @@ class Scenes(object):
             try:
                 content  = '# pytaVSL scene file\n\n'
                 content += toml.dumps(scene, tomlencoder)
-                content = content.replace(',]', '')
-                content = content.replace('= [ ', '= ')
+                content = content.replace(',]', ' ]')
+                # content = content.replace(',]', '')
+                # content = content.replace('= [ ', '= ')
                 writer = open(file, 'w')
                 writer.write(content)
                 writer.close()
@@ -156,13 +157,13 @@ class Scenes(object):
                     path = paths[i]
                     name = path.split('/')[-1].split('.')[0].lower()
                     _content = open(path, 'r').read()
-                    content = ''
-                    for line in _content.split('\n'):
-                        if '=' in line:
-                            line += ']'
-                        content += line + '\n'
-                    content = content.replace('=', '= [')
-                    self.scenes[name] = toml.loads(content)
+                    # content = ''
+                    # for line in _content.split('\n'):
+                    #     if '=' in line:
+                    #         line += ']'
+                    #     content += line + '\n'
+                    # content = content.replace('=', '= [')
+                    self.scenes[name] = toml.loads(_content)
                 except Exception as e:
                     LOGGER.error('could not load scene file %s' % path)
                     print(traceback.format_exc())
