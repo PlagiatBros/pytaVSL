@@ -8,10 +8,6 @@
 #include shaders/effects/noise.fs
 #endif
 
-#ifdef WARP
-#include shaders/effects/warp.fs
-#endif
-
 
 void main(void) {
 
@@ -21,11 +17,6 @@ void main(void) {
 
 
     #include shaders/inc/fs_main.fs
-
-
-    #ifdef WARP
-    gl_FragColor = apply_warp(gl_FragColor, coords);
-    #endif
 
     #ifdef TUNNEL
     gl_FragColor.rgb = tunnel(coords, unif[16][2]).rgb;

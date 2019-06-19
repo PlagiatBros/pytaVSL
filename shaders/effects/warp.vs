@@ -1,5 +1,5 @@
 // bilinear interpolation
-// disable: projective interpolation (warp.fs) is used instead 
+// TODO: projective interpolation
 
 vec2 BL, BR, TL, TR;
 

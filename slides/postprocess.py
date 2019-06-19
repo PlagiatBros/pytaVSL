@@ -16,7 +16,7 @@ class PostProcess(State, Perspective, Warp, SlideBase):
 
         texture = OffScreenTexture("post_process")
 
-        super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture, mesh_size=[1, 1])
+        super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture, mesh_size=[64, 64])
 
         self.active_effects.append('POST_PROCESS')
 
