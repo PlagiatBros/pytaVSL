@@ -60,6 +60,7 @@ class OscServer(OscNode):
     def stop(self):
 
         self.server.free()
+        self.server = None
 
     def get_osc_path(self):
         return '/%s' % self.name

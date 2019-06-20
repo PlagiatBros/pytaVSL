@@ -123,7 +123,7 @@ class PytaVSL(Scenes, OscServer):
             self.time = time()
 
             # process osc messages
-            while self.server.recv(0):
+            while self.server and self.server.recv(0):
                 pass
 
             post_processing = self.post_process.visible
