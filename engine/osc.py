@@ -137,15 +137,3 @@ class OscNode(object):
 
         else:
             LOGGER.error('invalid property argument "%s" for %s/set' % (attribute, self.get_osc_path()))
-
-    @osc_method('log')
-    def osc_log(self, property):
-        """
-        Print property's value in the console
-            property: exposed osc property
-        """
-        if property in self.osc_attributes:
-            value = self.osc_get_value(property)
-            print('%s.%s: %s' % (self.name, property, value))
-        else:
-            LOGGER.error('invalid property argument "%s" for %s/log' % (property, self.get_osc_path()))

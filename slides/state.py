@@ -1,7 +1,9 @@
 # encoding: utf-8
 
 from osc import osc_method
+from scenes import tomlencoder
 
+import toml
 import logging
 LOGGER = logging.getLogger(__name__)
 
@@ -89,3 +91,21 @@ class State(object):
             self.state_set(state)
         else:
             LOGGER.error('no state "%s" in %s' % (name, self.name))
+
+    @osc_method('log')
+    def state_log(self, property=None):
+        """
+        Print object's state in the console
+            property: name of the property to display (all when omitted)
+        """
+        if property is None:
+            state = self.state_get()
+        elif property in self.osc_attributes:
+            state = {}
+            state[property] = self.osc_get_value(property)
+        else:
+            LOGGER.error('invalid property argument "%s" for %s/log' % (property, self.get_osc_path()))
+            return
+
+        print(self.get_osc_path() + '/log')
+        print('  ' + toml.dumps(state, tomlencoder).replace(',]', ' ]').replace('\n', '\n  '))
