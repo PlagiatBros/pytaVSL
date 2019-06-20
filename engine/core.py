@@ -98,7 +98,8 @@ class PytaVSL(Scenes, OscServer):
                 slide = Slide(parent=self, name='memtest_' + str(i), texture=pi3d.Texture(numpy.zeros((1920,1080,4), dtype='uint8')), width=800, height=600)
                 self.add_slide(slide)
                 slide.set_visible(1)
-                sleep(1./self.fps * 2)
+                print('Testing video memory size...%iMB' % int(self.monitor.allocated / 1000000.))
+                sleep(1./self.fps)
 
             self.stop()
             print('OpenGL crashed with %iMB in memory' % int(self.monitor.allocated / 1000000.))
