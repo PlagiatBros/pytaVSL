@@ -90,23 +90,23 @@ class PytaVSL(Scenes, OscServer):
         self.show_fps = False
         self.debug_text.set_text('MEMTEST...')
         self.debug_text.set_visible(1)
+        print('Testing video memory size...')
         def threaded():
             i=0
-            print('Testing video memory size...')
-            while True:
+            while self.measured_fps > 10:
                 i +=1
                 slide = Slide(parent=self, name='memtest_' + str(i), texture=pi3d.Texture(numpy.zeros((1920,1080,4), dtype='uint8')), width=800, height=600)
                 self.add_slide(slide)
                 slide.set_visible(1)
                 sleep(1./self.fps * 2)
-                if self.measured_fps < 10:
-                    self.stop()
-                    print('OpenGL crashed with %iMB in memory' % int(self.monitor.allocated / 1000000.))
-                    break
 
-        t = Thread(target=threaded)
-        t.daemon = True
-        t.start()
+            self.stop()
+            print('OpenGL crashed with %iMB in memory' % int(self.monitor.allocated / 1000000.))
+
+        t1 = Thread(target=threaded)
+        t1.daemon = True
+        t1.start()
+
 
     def start(self):
         """
