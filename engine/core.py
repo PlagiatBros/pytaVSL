@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 import pi3d
-from pi3d.constants import opengles, DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT, GL_CULL_FACE
+from pi3d.constants import opengles, DISPLAY_CONFIG_FULLSCREEN, DISPLAY_CONFIG_DEFAULT, GL_CULL_FACE, GL_NO_ERROR
 import ctypes
 
 import glob
@@ -93,7 +93,7 @@ class PytaVSL(Scenes, OscServer):
         print('Testing video memory size...')
         def threaded():
             i=0
-            while self.measured_fps > 10:
+            while opengles.glGetError() == GL_NO_ERROR and self.measured_fps > 10:
                 i +=1
                 slide = Slide(parent=self, name='memtest_' + str(i), texture=pi3d.Texture(numpy.zeros((1920,1080,4), dtype='uint8')), width=800, height=600)
                 self.add_slide(slide)
