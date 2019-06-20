@@ -32,7 +32,7 @@ class PytaVSL(Scenes, OscServer):
     It's also an OSC server which contains the method to control all of its children.
     """
 
-    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='', show_fps=False):
+    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='', show_fps=False, memtest=False):
 
         super(PytaVSL, self).__init__(name, port)
 
@@ -70,6 +70,7 @@ class PytaVSL(Scenes, OscServer):
         # fps
         self.show_fps = show_fps
         self.fps = fps or 60
+        self.measured_fps = self.fps
 
         # Z-sorted slides
         self.sorted_slides = []
@@ -77,11 +78,35 @@ class PytaVSL(Scenes, OscServer):
         self._sort_slides()
 
         # Memory
-        self.monitor = MemoryMonitor(max_gpu_memory, self.flush)
+        self.do_memtest = memtest
+        self.monitor = MemoryMonitor(max_gpu_memory if not memtest else 10000, self.flush)
 
         # Signal
         signal(SIGINT, self.stop)
         signal(SIGTERM, self.stop)
+
+    def memtest(self):
+        self.fps = 25
+        self.show_fps = False
+        self.debug_text.set_text('MEMTEST...')
+        self.debug_text.set_visible(1)
+        def threaded():
+            i=0
+            print('Testing video memory size...')
+            while True:
+                i +=1
+                slide = Slide(parent=self, name='memtest_' + str(i), texture=pi3d.Texture(numpy.zeros((1920,1080,4), dtype='uint8')), width=800, height=600)
+                self.add_slide(slide)
+                slide.set_visible(1)
+                sleep(1./self.fps * 2)
+                if self.measured_fps < 10:
+                    self.stop()
+                    print('OpenGL crashed with %iMB in memory' % int(self.monitor.allocated / 1000000.))
+                    break
+
+        t = Thread(target=threaded)
+        t.daemon = True
+        t.start()
 
     def start(self):
         """
@@ -105,26 +130,32 @@ class PytaVSL(Scenes, OscServer):
         self.post_process.set_visible(0)
         #######
 
-        if self.show_fps:
-            nframes = 0
-            elapsed = 0
-            start = time()
-            elapsed = 0
+        # Init framerate measurement
+        nframes = 0
+        elapsed = 0
+        start = time()
+        elapsed = 0
+
+        if self.do_memtest:
+            self.memtest()
 
         while self.DISPLAY.loop_running():
 
-            # wait last frame end
+            # >ait last frame end
             now = time()
             delta = 1. / self.fps - (now - self.time)
             if delta > 0:
                 sleep(delta)
 
-            # update clock
+            # Update clock
             self.time = time()
 
-            # process osc messages
+            # Process osc messages
             while self.server and self.server.recv(0):
                 pass
+
+
+            # Draw slides
 
             post_processing = self.post_process.visible
 
@@ -142,14 +173,21 @@ class PytaVSL(Scenes, OscServer):
                 self.post_process.capture_end()
                 self.post_process.draw()
 
-            if self.show_fps:
-                if time() - start > 1.0:
-                    self.debug_text.set_visible(1)
-                    self.debug_text.set_text('fps: %i' % nframes)
-                    start = time()
-                    nframes = 0
-                nframes += 1
 
+            # Measure framerate
+            if time() - start > 1.0:
+                self.measured_fps = nframes
+                start = time()
+                nframes = 0
+
+            nframes += 1
+
+            if self.show_fps:
+                self.debug_text.set_visible(1)
+                self.debug_text.set_text('fps: %i' % self.measured_fps)
+
+
+            # Debug text always on top
             self.debug_text.draw()
 
 
