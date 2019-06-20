@@ -240,7 +240,7 @@ class OscServer(OscNode):
                     args = ", ".join(args)
                     print('    %s [%s]' % (name, args))
                     printc(3, '\n' + method.__doc__.replace('    ', '  ').strip(), 'blue')
-                    printc(3, 'init: %s\n' % str(obj.osc_get_value(name)).replace("'", '"'), 'teal')
+                    printc(3, 'initial: %s\n' % str(obj.osc_get_value(name)).replace("'", '"'), 'blue')
 
         printc(0, '\nPytaVSL: OSC API', 'teal', 'bold')
         printc(0, '\nMethod paths, property names and slide/text names are always case insensitive.', 'italic')
