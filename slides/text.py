@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 import pi3d
-from pi3d.Display import Display
 import random
 
 from state import State
@@ -39,7 +38,7 @@ class Text(State, Perspective, SlideBase):
         self.glitch_duration = 1
         self.glitch_start = 0
 
-        super(Text, self).__init__(parent, name, texture=self.font, width=Display.INSTANCE.width, height=Display.INSTANCE.height, init_z=init_z)
+        super(Text, self).__init__(parent, name, texture=self.font, width=parent.width, height=parent.height, init_z=init_z)
 
         self.color = [1.0, 1.0, 1.0]
 
@@ -62,7 +61,7 @@ class Text(State, Perspective, SlideBase):
         """
         size = min(1, self.font.ratio / self.length) if self.size == 'auto' else self.size
         size /= TEXT_RESOLUTION
-        size /= 600. / Display.INSTANCE.height # size was calibrated on 800x600
+        size /= 600. / self.parent.height # size was calibrated on 800x600
 
         string = self.string
         font = self.font

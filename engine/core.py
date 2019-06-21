@@ -37,7 +37,9 @@ class PytaVSL(Scenes, OscServer):
         super(PytaVSL, self).__init__(name, port)
 
         # setup OpenGL
+        self.width = width
         self.height = height
+
         self.DISPLAY = pi3d.Display.create(window_title=window_title, w=width, h=height, background=(0.0, 0.0, 0.0, 1.0), frames_per_second=0, depth=24, display_config=DISPLAY_CONFIG_FULLSCREEN if fullscreen else DISPLAY_CONFIG_DEFAULT, far=100000)
         self.CAMERA = pi3d.Camera(is_3d=False, eye=(0, 0, -height))
         self.CAMERA3D = pi3d.Camera(is_3d=True, eye=(0, 0, -height), scale=0.8465)
@@ -330,7 +332,7 @@ class PytaVSL(Scenes, OscServer):
                 LOGGER.error("could not create group \"%s\" (name taken by a non-group slide)" % name)
                 return
 
-        group = Slide(parent=self, name=name, texture=EMPTY_TEXTURE, width=self.DISPLAY.width, height=self.DISPLAY.height)
+        group = Slide(parent=self, name=name, texture=EMPTY_TEXTURE, width=self.width, height=self.height)
         group.is_group = slides
 
         for child in self.get_children(self.slides, slides):

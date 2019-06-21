@@ -28,7 +28,7 @@ parser.add_argument('--memtest',  help='test video memory size', default=False, 
 parser.add_argument('--api',  help='print osc api and exit', default=False, action='store_true')
 parser.add_argument('--debug',  help='print debug logs', default=False, action='store_true')
 parser.add_argument('--show-fps',  help='show fps', default=False, action='store_true')
-parser.add_argument('--geometry',  help='output resolution', type=str, default='800x600', metavar='WIDTHxHEIGHT')
+parser.add_argument('--resolution',  help='output resolution', type=str, default='800x600', metavar='WIDTHxHEIGHT')
 parser.add_argument('--title',  help='window title', type=str, default='pytaVSL', metavar='TITLE')
 parser.add_argument('--version', action='version', version=VERSION)
 
@@ -38,7 +38,7 @@ from pi3d import Log
 Log(name=None, level='DEBUG' if args.debug else 'WARNING')
 
 from engine import PytaVSL
-geometry = [int(x) for x in args.geometry.split('x')]
+geometry = [int(x) for x in args.resolution.split('x')]
 pyta = PytaVSL(
     name=args.namespace,
     port=args.port,

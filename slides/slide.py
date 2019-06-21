@@ -4,8 +4,6 @@ import pi3d
 import colorsys
 import random
 
-from pi3d.Display import Display
-
 from state import State
 from effect import Effect
 from animation import Animable
@@ -70,7 +68,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         self.v_align = 'center'
 
         # Scale
-        self.init_scale = min(Display.INSTANCE.width / self.width, Display.INSTANCE.height / self.height)
+        self.init_scale = min(self.parent.width / self.width, self.parent.height / self.height)
         self.sx = 1.0
         self.sy = 1.0
 
@@ -140,17 +138,17 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         """
         offx = 0
         if self.h_align != 'center':
-            offx = (Display.INSTANCE.width - self.width * self.sx) / 2.0
+            offx = (self.parent.width - self.width * self.sx) / 2.0
         if self.h_align == 'left':
             offx *= -1
 
         offy = 0
         if self.v_align != 'center':
-            offy = (Display.INSTANCE.height - self.height * self.sy) / 2.0
+            offy = (self.parent.height - self.height * self.sy) / 2.0
         if self.v_align == 'bottom':
             offy *= -1
 
-        super(SlideBase, self).position(x * Display.INSTANCE.width  + offx, y * Display.INSTANCE.height + offy, z)
+        super(SlideBase, self).position(x * self.parent.width  + offx, y * self.parent.height + offy, z)
 
     @osc_property('mesh_size', 'mesh_size')
     def set_mesh_size(self, x, y):
