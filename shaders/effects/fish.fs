@@ -5,10 +5,15 @@ float power = unif[16][1] * 2.2;
 float bind;
 vec2 uv = coords;
 if (power > 0.0) {
+    power = power / 1.5;
     bind = sqrt(dot(m, m));
     uv = m +  normalize(d) * tan(r * power) * bind / tan(bind * power) ;
 } else {
     bind = 0.5;
     uv = m +  normalize(d) * atan(r * power) * bind / atan(bind * power) ;
 }
+#ifdef WARP
+coords = uv;
+#else
 vec2 coords = uv;
+#endif
