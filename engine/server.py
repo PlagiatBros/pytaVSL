@@ -110,6 +110,9 @@ class OscServer(OscNode):
         elif path[0] == 'text':
             target = self.get_children(self.texts, path[1])
             cmd = path[2]
+        elif path[0] == 'selected':
+            target = self.get_children(self.slides, self.selected)
+            cmd = path[1]
         else:
             target = [self]
             cmd = path[0]

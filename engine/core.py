@@ -16,7 +16,7 @@ from text import Text
 from postprocess import PostProcess
 from slide import Slide
 from memory import MemoryMonitor
-from osc import osc_method
+from osc import osc_method, osc_property
 from server import OscServer
 from scenes import Scenes
 from config import *
@@ -50,7 +50,7 @@ class PytaVSL(Scenes, OscServer):
         opengles.glDisable(GL_CULL_FACE)
 
         # wireframe size
-        opengles.glLineWidth(ctypes.c_float(1.0))
+        opengles.glLineWidth(ctypes.c_float(2.0))
 
         self.time = time()
 
@@ -68,6 +68,12 @@ class PytaVSL(Scenes, OscServer):
         self.debug_text = Text(self, 'debug', font=FONTS["mono"], init_z=-100)
         self.debug_text.set_size(0.025)
         self.debug_text.set_align('top', 'right')
+
+
+        # Select
+        self.select_slide = Slide(parent=self, name='SELECTION', texture=pi3d.Texture(numpy.ones((1,1,3), dtype='uint8')), width=self.width, height=self.height, init_z=-100)
+        self.selected = None
+        self.stroke_selected = 0
 
         # fps
         self.show_fps = show_fps
@@ -177,6 +183,9 @@ class PytaVSL(Scenes, OscServer):
                 self.post_process.capture_end()
                 self.post_process.draw()
 
+
+            if self.selected and self.stroke_selected:
+                self.draw_select_slide()
 
             # Measure framerate
             if time() - start > 1.0:
@@ -413,3 +422,39 @@ class PytaVSL(Scenes, OscServer):
         for clone in self.get_children(self.slides, clone_name):
             if clone.is_clone:
                 self.remove_slide(clone)
+
+    @osc_property('select', 'selected')
+    def set_selected_slide(self, slide=None):
+        """
+        selected slide's name (exposes selected slide's methods on osc address /pyta/selected/<method>)
+        """
+        self.selected = slide
+
+    @osc_property('select_stroke', 'stroke_selected')
+    def set_selected_stroke(self, stroke):
+        """
+        draw a green stroke on selected slide (0|1)
+        """
+        self.stroke_selected = int(bool(stroke))
+
+
+    def draw_select_slide(self):
+        slide = self.get_children(self.slides, self.selected)
+        if len(slide) > 0:
+            slide = slide[0]
+            state = slide.state_get()
+            if 'animations' in state:
+                del state['animations']
+            if 'strobes' in state:
+                del state['strobes']
+            self.select_slide.width = slide.width
+            self.select_slide.height = slide.height
+            self.select_slide.state_set(state)
+            self.select_slide.set_alpha(1)
+            self.select_slide.set_color(-1, 2, -1)
+            self.select_slide.set_position_z(-self.select_slide.pos_z - 1)
+            self.select_slide.set_mesh_wireframe(1)
+            self.select_slide.draw()
+        else:
+            LOGGER.error('selected slide "%s" does not exist anymore' % self.selected)
+            self.selected = None
