@@ -51,7 +51,7 @@ class State(object):
             if name == 'animations':
                 for n in state[name]:
                     args = state[name][n]
-                    self.animate(n, *args['from'], *args['to'], *args['duration'], *args['loop'])
+                    self.animate(n, *args['from'], *args['to'], *args['duration'], *args['loop'], *args['easing'])
             elif name == 'strobes':
                 for n in state[name]:
                     args = state[name][n]

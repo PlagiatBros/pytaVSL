@@ -5,21 +5,52 @@ from osc import osc_method
 import logging
 LOGGER = logging.getLogger(__name__)
 
+
+from inspect import getmembers
+import easing_functions
+
+EASING_NAMES = [
+    "linear",
+    "back",
+    "bounce",
+    "circular",
+    "cubic",
+    "elastic",
+    "exponential",
+    "quad",
+    "quartic",
+    "quintic",
+    "sine"
+]
+EASING_FUNCTIONS = {}
+for name, easing in getmembers(easing_functions):
+    name = name.replace('Ease', '').replace('InOut', '').lower()
+    if name in EASING_NAMES:
+        EASING_FUNCTIONS[name] = easing
+
+
+
 class Animation():
 
-    def __init__(self, parent, name, start, end, duration, loop, setter):
+    def __init__(self, parent, name, start, end, duration, loop, easing, setter):
 
         self.parent = parent
         self.name = name
 
         self.start = start
         self.end = end
-        self.duration = duration
+        self.duration = max(0.01, duration)
         self.loop = loop
 
         self.nargs = len(start)
-        self.forward_a = [1.0 * (end[i] - start[i]) / duration for i in range(self.nargs)]
-        self.backward_a = [1.0 * (start[i] - end[i]) / duration for i in range(self.nargs)]
+
+        if not easing in EASING_FUNCTIONS:
+            LOGGER.error('unknown easing "%s", falling back to "linear"' % easing)
+            easing = "linear"
+
+        self.easing = easing
+        self.easing_func = [EASING_FUNCTIONS[easing](start=start[i], end=end[i], duration=self.duration) for i in range(self.nargs)]
+
         self.setter = setter
         self.backward = False
         self.current = None
@@ -39,10 +70,11 @@ class Animation():
         if t >= self.duration:
             t = self.duration
             self.done = True
+
         if self.backward:
-            value = [self.backward_a[i] * t + self.end[i] for i in range(self.nargs)]
-        else:
-            value = [self.forward_a[i] * t + self.start[i] for i in range(self.nargs)]
+            t = self.duration - t
+
+        value = [self.easing_func[i].ease(t) for i in range(self.nargs)]
 
         if value != self.current:
             self.setter(*value)
@@ -54,6 +86,7 @@ class Animation():
             'to': self.end,
             'duration': [self.duration],
             'loop': [self.loop],
+            'easing': [self.easing],
         }
 
 class Strobe():
@@ -104,12 +137,18 @@ class Animable(object):
         """
         Animate a property
             property: exposed osc property
-            args: [from ...] [to ...] duration loop=0
+            args: [from ...] [to ...] duration loop=0 easing="linear"
                 from: initial value(s) (items with default values must be omitted)
                 to: destination value(s) (items with default values must be omitted)
                 duration: animation duration in seconds
                 loop: omitted / 0 (no loop), 1 (infinte loop) or -1 (infinite back-and-forth)
+                easing: easing function (case-insentive), optionally suffixed with "in" or "out"
+
+            note: loop and easing can be interchanged
+            available easing functions: linear, back, bounce, circular, cubic, elastic, exponential, quad, quartic, quintic, sine
+
         """
+
         attribute = property.lower()
 
         if attribute == 'visible':
@@ -120,15 +159,27 @@ class Animable(object):
             method = self.osc_attributes[attribute]
             argcount = method.osc_argcount_min
 
-            if len(args) < argcount * 2 + 1 or len(args) > argcount * 2 + 2:
-                LOGGER.error('bad number of argument for %s/animate %s (%i or %i expected, %i provided)' % (self.get_osc_path(), attribute, argcount * 2 + 1, argcount * 2 + 2, len(args)))
+            if len(args) < argcount * 2 + 1 or len(args) > argcount * 2 + 3:
+                LOGGER.error('bad number of argument for %s/animate %s (%i to %i expected, %i provided)' % (self.get_osc_path(), attribute, argcount * 2 + 1, argcount * 2 + 3, len(args)))
                 return
 
-            loop = 0
             duration = args[-1]
+            loop = 0
+            easing = "linear"
             if len(args) == (argcount * 2 + 2):
-                loop = args[-1]
+                if type(args[-1]) is str:
+                    easing = args[-1].lower()
+                else:
+                    loop = args[-1]
                 duration = args[-2]
+            if len(args) == (argcount * 2 + 3):
+                if type(args[-1]) is str:
+                    easing = args[-1].lower()
+                    loop = args[-2]
+                else:
+                    loop = args[-1]
+                    easing = args[-2].lower()
+                duration = args[-3]
 
             current = self.osc_get_value(attribute)
             if current is not None:
@@ -137,7 +188,7 @@ class Animable(object):
             start = [args[i] for i in range(argcount)]
             end = [args[i + argcount] for i in range(argcount)]
 
-            self.animations[attribute] = Animation(self.parent, attribute, start, end, duration, loop, method)
+            self.animations[attribute] = Animation(self.parent, attribute, start, end, duration, loop, easing, method)
 
         else:
             LOGGER.error('invalid property argument "%s" for %s/animate' % (attribute, self.get_osc_path()))
