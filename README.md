@@ -13,12 +13,12 @@
 ### Usage
 
 ```
-usage: python ./pytaVSL.py [-h] [--namespace NAMESPACE] [--port PORT]
-                           [--load FILES [FILES ...]]
-                           [--text NAME:FONT [NAME:FONT ...]] [--fps FPS]
-                           [--max-gpu MAX_GPU] [--fullscreen] [--api]
-                           [--debug] [--show-fps] [--geometry WIDTHxHEIGHT]
-                           [--title TITLE] [--version]
+usage: python3 ./pytaVSL.py [-h] [--namespace NAMESPACE] [--port PORT]
+                            [--load FILES [FILES ...]]
+                            [--text NAME:FONT [NAME:FONT ...]] [--fps FPS]
+                            [--max-vram MAX_VRAM] [--memtest] [--api]
+                            [--debug] [--show-fps] [--resolution WIDTHxHEIGHT]
+                            [--title TITLE] [--version]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -31,11 +31,12 @@ optional arguments:
                         text objects to create (default: ['0:sans', '1:sans',
                         '2:mono', '3:mono'])
   --fps FPS             maximum framerate, 0 for free wheeling (default: 25)
-  --max-gpu MAX_GPU     maximum gpu memory (in MB) (default: 64)
+  --max-vram MAX_VRAM   maximum video memory allocation (in MB) (default: 64)
+  --memtest             test video memory size (default: False)
   --api                 print osc api and exit (default: False)
   --debug               print debug logs (default: False)
   --show-fps            show fps (default: False)
-  --geometry WIDTHxHEIGHT
+  --resolution WIDTHxHEIGHT
                         output resolution (default: 800x600)
   --title TITLE         window title (default: pytaVSL)
   --version             show program's version number and exit
