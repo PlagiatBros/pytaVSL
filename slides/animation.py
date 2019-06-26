@@ -25,7 +25,7 @@ EASING_NAMES = [
 EASING_FUNCTIONS = {}
 for name, easing in getmembers(easing_functions):
     name = name.replace('Ease', '').replace('InOut', '').lower()
-    if name in EASING_NAMES:
+    if name in EASING_NAMES or name[0:-2] in EASING_NAMES or name[0:-3] in EASING_NAMES:
         EASING_FUNCTIONS[name] = easing
 
 
