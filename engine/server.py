@@ -246,7 +246,7 @@ class OscServer(OscNode):
                     printc(3, 'initial: %s\n' % str(obj.osc_get_value(name)).replace("'", '"'), 'blue')
 
         printc(0, '\nPytaVSL: OSC API', 'teal', 'bold')
-        printc(0, '\nMethod paths, property names and slide/text names are always case insensitive.', 'italic')
+        printc(0, '\nMethod paths, property names and slide/text/scene/state names are always case insensitive.', 'italic')
 
         print('\nEngine')
         print_methods('  /%s/' % self.name, self)

@@ -75,6 +75,7 @@ class State(object):
         Save all properties, looped animations and strobes in a save slot
             name: slot name
         """
+        name = str(name).lower()
         if not name:
             self.osc_quickstate = self.state_get()
         else:
@@ -86,6 +87,7 @@ class State(object):
         Restore all properties, looped animations and strobes from a save slot
             name: slot name
         """
+        name = str(name).lower()
         if name in self.osc_states:
             state = self.osc_states[name]
             self.state_set(state)
@@ -108,4 +110,4 @@ class State(object):
             return
 
         print(self.get_osc_path() + '/log')
-        print('  ' + toml.dumps(state, tomlencoder).replace(',]', ' ]').replace('\n', '\n  '))
+        print('  ' + toml.dumps(state, tomlencoder).replace(',]', ' ]').replace('\n', '\n  ').strip())

@@ -149,7 +149,7 @@ class Animable(object):
 
         """
 
-        attribute = property.lower()
+        attribute = str(property).lower()
 
         if attribute == 'visible':
             LOGGER.error('invalid property argument "%s" for %s/animate' % (attribute, self.get_osc_path()))
@@ -217,7 +217,7 @@ class Animable(object):
                 duration: strobe period in seconds
                 ratio: time proportion spent on "from" (0<>1)
         """
-        attribute = property.lower()
+        attribute = str(property).lower()
 
         if attribute == 'visible':
             LOGGER.error('invalid property argument "%s" for %s/strobe' % (attribute, self.get_osc_path()))

@@ -115,7 +115,7 @@ class OscNode(object):
             property: exposed osc property
             value: new value (items with default values can be omitted)
         """
-        attribute = property.lower()
+        attribute = str(property).lower()
         if attribute in self.osc_attributes:
             method = self.osc_attributes[attribute]
             argcount = method.osc_argcount

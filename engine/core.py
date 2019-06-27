@@ -224,7 +224,7 @@ class PytaVSL(Scenes, OscServer):
     def load_textures(self, *files):
         """
         Load files to slides
-            files: file path or glob patterns
+            files: file path or glob patterns. Each slide is named after the file (whitout the extension)
         """
         paths = []
         for f in files:
@@ -331,8 +331,8 @@ class PytaVSL(Scenes, OscServer):
             slides: slide name pattern
             group_name: new group's name (replaces any previously created group with the same name)
         """
-        name = group_name.lower()
-        slides = slides.lower()
+        name = str(group_name).lower()
+        slides = str(slides).lower()
 
         if name in self.slides:
             if self.slides[name].is_group:
@@ -361,7 +361,7 @@ class PytaVSL(Scenes, OscServer):
         Remove slide group
             group_name: group's name
         """
-        name = group_name.lower()
+        name = str(group_name).lower()
         for group in self.get_children(self.slides, name):
             if group.is_group:
                 self.remove_slide(group)
@@ -373,8 +373,8 @@ class PytaVSL(Scenes, OscServer):
             slide: target slide name (can't be a clone nor a group)
             clone_name: new clone name (replaces any previously created clone with the same name)
         """
-        clone_name = clone_name.lower()
-        target_name = slide.lower()
+        clone_name = str(clone_name).lower()
+        target_name = str(slide).lower()
 
         target = self.get_children(self.slides, target_name)
         if len(target) > 1:
@@ -418,7 +418,7 @@ class PytaVSL(Scenes, OscServer):
         Remove clone slide
             clone_name: clone's name
         """
-        clone_name = clone_name.lower()
+        clone_name = str(clone_name).lower()
         for clone in self.get_children(self.slides, clone_name):
             if clone.is_clone:
                 self.remove_slide(clone)

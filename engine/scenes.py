@@ -58,6 +58,8 @@ class Scenes(object):
         Save current scene (visible slides/texts/clones/groups' state)
             name: slot name
         """
+        name = str(name).lower()
+
         self.scenes[name] = self.scene_get()
 
     @osc_method('scene_recall')
@@ -66,6 +68,8 @@ class Scenes(object):
         Recall scene (visible slides/texts/clones/groups' state)
             name: slot name
         """
+        name = str(name).lower()
+
         if name not in self.scenes:
             LOGGER.error('scene "%s" not found' % name)
             return
@@ -108,10 +112,11 @@ class Scenes(object):
         """
 
         if file:
+            name = str(file_or_name).lower()
             if name not in self.scenes:
                 LOGGER.error('scene "%s" not found' % name)
                 return
-            scene = self.scenes[file_or_name]
+            scene = self.scenes[name]
         else:
             scene = self.scene_get()
             file = file_or_name
@@ -139,7 +144,7 @@ class Scenes(object):
     def scenes_import(self, *files):
         """
         Load scene files
-            files: file path or glob patterns
+            files: file path or glob patterns. Each scene is named after the file (whitout the extension)
         """
         paths = []
         for f in files:
