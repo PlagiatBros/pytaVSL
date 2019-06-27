@@ -153,7 +153,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
     @osc_property('mesh_size', 'mesh_size')
     def set_mesh_size(self, x, y):
         """
-        mesh definition (normalized)
+        mesh definition (number of tiles on the x and y-axis)
         """
         new_size = [abs(int(x)), abs(int(y))]
         if new_size != self.mesh_size:
