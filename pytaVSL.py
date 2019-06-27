@@ -52,6 +52,9 @@ pyta = PytaVSL(
     memtest=args.memtest
 )
 
+if args.memtest and 'y' not in input('Warning: the memory test may freeze/crash your system, continue ? (y/N)').lower():
+    exit(0)
+
 if args.api:
     pyta.print_api()
 else:
