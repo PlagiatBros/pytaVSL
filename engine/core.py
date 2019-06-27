@@ -73,7 +73,7 @@ class PytaVSL(Scenes, OscServer):
         # Select
         self.select_slide = Slide(parent=self, name='SELECTION', texture=pi3d.Texture(numpy.ones((1,1,3), dtype='uint8')), width=self.width, height=self.height, init_z=-100)
         self.selected = None
-        self.stroke_selected = 0
+        self.stroke_selected = 1
 
         # fps
         self.show_fps = show_fps
