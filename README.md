@@ -50,7 +50,7 @@ optional arguments:
 
 ### Documentation
 
-The osc api can be read by running the following command:
+The osc api can be read [here](https://github.com/PlagiatBros/pytaVSL/blob/master/API) or by running the following command:
 ```
 python3 pytaVSL.py --api | less -cr
 ```
