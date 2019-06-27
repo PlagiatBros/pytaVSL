@@ -734,17 +734,17 @@ Texts
     align [h, v]
 
       horizontal and vertical alignment (center|left|right, center|top|bottom)
-      initial: ["right", "top"]
+      initial: ["center", "center"]
 
     align_h [align]
 
       horizontal alignment (center|left|right)
-      initial: ["right"]
+      initial: ["center"]
 
     align_v [align]
 
       vertical alignment (center|top|bottom)
-      initial: ["top"]
+      initial: ["center"]
 
     alpha [alpha]
 
@@ -754,12 +754,12 @@ Texts
     color [r, g, b]
 
       rgb balance (0<>1)
-      initial: [1.0, 1.0, 1.0]
+      initial: [0.5, 0.5, 0.5]
 
     color_strobe [strobe]
 
       random color strobing (0|1)
-      initial: [0]
+      initial: [0.0]
 
     offset [x, y]
 
@@ -895,7 +895,7 @@ Texts
     size [size]
 
       text size (1=full height, "auto"=fit, "current"=fix current size if "auto")
-      initial: [0.025]
+      initial: ["auto"]
 
     text [text, glitch_duration=0]
 
