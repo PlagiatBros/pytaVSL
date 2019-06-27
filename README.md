@@ -1,13 +1,19 @@
 ## pytaVSL
 *python tiny approximative Virtual Stage Light*
 
+pytaVSL is a video-projection and compositing software built on top of [pi3d](https://github.com/tipam/pi3d/). It's designed for the live and has many cool features:
+- fully osc-controllable
+- slides (from image, gif and video files) and texts
+- per slide settings, effects, mapping, animations and states
+- global scenes management
 
 ### Requirements
 
 - python3
 - python3-liblo
 - python3-toml
-- [pi3d](http://pi3d.github.io)
+- python3-opencv (if video playback is needed)
+- [pi3d](https://github.com/tipam/pi3d/)
 
 
 ### Usage
