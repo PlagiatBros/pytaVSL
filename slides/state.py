@@ -44,7 +44,17 @@ class State(object):
 
         return state
 
-    def state_set(self, state):
+    def state_set(self, new_state=None, reset=False):
+        if new_state is None:
+            new_state = {}
+        if reset:
+            state = {}
+            state.update(RESET_STATES[type(self).__name__])
+            state['position'][2] = self.init_z
+            state.update(new_state)
+        else:
+            state = new_state
+
         self.stop_strobe()
         self.stop_animate()
         for name in state:
@@ -66,8 +76,7 @@ class State(object):
         """
         Reset all properties, animations and strobes
         """
-        self.state_set(RESET_STATES[type(self).__name__])
-        self.set_position_z(self.init_z)
+        self.state_set(None, reset=True)
 
     @osc_method('save')
     def state_save(self, name="quicksave"):
@@ -76,10 +85,7 @@ class State(object):
             name: slot name
         """
         name = str(name).lower()
-        if not name:
-            self.osc_quickstate = self.state_get()
-        else:
-            self.osc_states[name] = self.state_get()
+        self.osc_states[name] = self.state_get()
 
     @osc_method('recall')
     def state_recall(self, name="quicksave"):

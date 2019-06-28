@@ -89,17 +89,14 @@ class Scenes(object):
 
         if 'slides' in scene:
             for name in scene['slides']:
-                self.slides[name].state_reset()
-                self.slides[name].state_set(scene['slides'][name])
+                self.slides[name].state_set(scene['slides'][name], reset=True)
 
         if 'texts' in scene:
             for name in scene['texts']:
-                self.texts[name].state_reset()
-                self.texts[name].state_set(scene['texts'][name])
+                self.texts[name].state_set(scene['texts'][name], reset=True)
 
         if 'post_process' in scene:
-            self.post_process.state_reset()
-            self.post_process.state_set(scene['post_process'])
+            self.post_process.state_set(scene['post_process'], reset=True)
         else:
             self.post_process.set_visible(0)
 
