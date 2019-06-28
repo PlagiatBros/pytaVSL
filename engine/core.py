@@ -151,7 +151,7 @@ class PytaVSL(Scenes, OscServer):
 
         while self.DISPLAY.loop_running():
 
-            # >ait last frame end
+            # wait last frame end
             now = time()
             delta = 1. / self.fps - (now - self.time)
             if delta > 0:
