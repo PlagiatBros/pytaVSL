@@ -230,12 +230,11 @@ class PytaVSL(Scenes, OscServer):
         for f in files:
             paths += glob.glob(f)
 
-        if len(files) == 0:
-            LOGGER.error("file \"%s\" not found" % path)
+        size = len(paths)
+        if len(paths) == 0:
+            LOGGER.error("file \"%s\" not found" % files)
 
         def threaded():
-
-            size = len(paths)
 
             self.debug_text.set_visible(1)
             self.debug_text.set_text('0/' + str(size))

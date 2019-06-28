@@ -2,8 +2,9 @@
 
 from osc import osc_method
 
-from threading import Thread
+import glob
 import traceback
+from threading import Thread
 
 import toml
 tomlencoder = toml.TomlEncoder()
@@ -147,12 +148,11 @@ class Scenes(object):
         for f in files:
             paths += glob.glob(f)
 
-        if len(files) == 0:
-            LOGGER.error("file \"%s\" not found" % path)
+        size = len(paths)
+        if len(paths) == 0:
+            LOGGER.error("file \"%s\" not found" % files)
 
         def threaded():
-
-            size = len(paths)
 
             for i in range(size):
                 try:
