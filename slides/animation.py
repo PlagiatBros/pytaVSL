@@ -37,9 +37,9 @@ class Animation():
         self.parent = parent
         self.name = name
 
-        self.start = start
-        self.end = end
-        self.duration = max(0.01, duration)
+        self.start = [float(x) for x in start]
+        self.end = [float(x) for x in end]
+        self.duration = max(0.01, float(duration))
         self.loop = loop
 
         self.nargs = len(start)
@@ -96,9 +96,9 @@ class Strobe():
         self.parent = parent
 
         self.duration = max(float(duration), 0.001)
-        self.ratio = ratio
-        self.start = start
-        self.end = end
+        self.ratio = float(ratio)
+        self.start = [float(x) for x in start]
+        self.end = [float(x) for x in end]
         self.setter = setter
 
         self.date = self.parent.time
