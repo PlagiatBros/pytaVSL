@@ -22,6 +22,7 @@ class State(object):
 
             # Text exception
             if type(self).__name__ == 'Text':
+                 RESET_STATES[type(self).__name__]['color'] = [1.0, 1.0, 1.0]
                  del RESET_STATES[type(self).__name__]['mesh_size']
                  del RESET_STATES[type(self).__name__]['mesh_debug']
 
