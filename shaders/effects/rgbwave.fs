@@ -19,7 +19,7 @@ float rgbDiff = waveStrength * 2.0 * (6.0 + sin(waveRand * 500.0 + coords.y * 40
 float rgbUvX = coords.x + rgbWave;
 
 gl_FragColor.rgb = vec3(
-    texture2D(tex0, vec2(rgbUvX + rgbDiff, coords.y) + shake).r,
-    texture2D(tex0, vec2(rgbUvX, coords.y) + shake).g,
-    texture2D(tex0, vec2(rgbUvX - rgbDiff, coords.y) + shake).b
+    tex2D(tex0, vec2(rgbUvX + rgbDiff, coords.y) + shake).r,
+    tex2D(tex0, vec2(rgbUvX, coords.y) + shake).g,
+    tex2D(tex0, vec2(rgbUvX - rgbDiff, coords.y) + shake).b
 );

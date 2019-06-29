@@ -1,5 +1,21 @@
 #include shaders/inc/fs_head.fs
 
+vec4 tex2D(sampler2D tex, vec2 coords) {
+    #ifdef TEXT
+        float alphaTest = texture2D(tex, coords).r;
+        vec4 color = vec4(step(0.5, alphaTest));
+        color.rgb *= 0.5;
+        color.a += smoothstep(.48, 0.5, alphaTest);
+        // if (alphaTest > 0.4 && alphaTest < 0.48) {
+        //      color = vec4(1., -1., -1., .8);
+        // }
+        return color;
+    #else
+        return texture2D(tex, coords);
+    #endif
+}
+
+
 #ifdef TUNNEL
 #include shaders/effects/tunnel.fs
 #endif
@@ -7,7 +23,6 @@
 #ifdef NOISE
 #include shaders/effects/noise.fs
 #endif
-
 
 void main(void) {
 

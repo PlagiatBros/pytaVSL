@@ -41,6 +41,7 @@ class Text(State, Perspective, SlideBase):
         super(Text, self).__init__(parent, name, texture=self.font, width=parent.width, height=parent.height, init_z=init_z)
 
         self.color = [1.0, 1.0, 1.0]
+        self.active_effects.append('TEXT')
 
         # fix alignment (handled in new_string())
         self.width = 0
@@ -60,13 +61,12 @@ class Text(State, Perspective, SlideBase):
         Update string buffer. Mostly copied from pi3d.String
         """
         size = min(1, self.font.ratio / self.length) if self.size == 'auto' else self.size
-        size /= TEXT_RESOLUTION
-        size /= 600. / self.parent.height # size was calibrated on 800x600
+        size /= self.font.line_height / self.parent.height # relative to screend height
 
         string = self.string
         font = self.font
 
-        sy = sx = size * 4.0
+        sy = sx = size
 
         sy *= self.sy
         sx *= self.sx
@@ -92,14 +92,14 @@ class Text(State, Perspective, SlideBase):
 
             for j in temp_verts:
                 self.verts.append([(j[0] - cx) * sx,
-                                 (j[1] + nlines * font.height * GAP / 2.0 - yoff) * sy,
+                                 (j[1] + nlines * font.line_height * GAP / 2.0 - yoff) * sy,
                                  j[2]])
 
         default = font.glyph_table.get(chr(0), None)
         for i, c in enumerate(string):
             if c == '\n':
                 make_verts()
-                yoff += font.height * GAP
+                yoff += font.line_height * GAP
                 xoff = 0.0
                 temp_verts = []
                 lines += 1
@@ -122,10 +122,11 @@ class Text(State, Perspective, SlideBase):
 
         make_verts()
 
+        tex = self.buf[0].textures
         self.buf = [pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms)]
-        self.buf[0].textures = [font]
+        self.buf[0].textures = tex
 
-        self.height = self.font.size * size * self.sy * 2 / TEXT_RESOLUTION * (1+self.string.count('\n'))
+        self.height = self.font.line_height * self.sy * (1+self.string.count('\n')) * size
         self.last_draw_align_h = self.h_align
 
 

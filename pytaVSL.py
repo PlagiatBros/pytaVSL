@@ -11,6 +11,7 @@ if version_info[0] != 3:
     print('Error: Python 3 is required to run pytaVSL')
     exit(0)
 
+path.append('fonts')
 path.append('engine')
 path.append('slides')
 path.append('shaders')
