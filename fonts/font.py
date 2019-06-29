@@ -80,6 +80,7 @@ class Font(pi3d.Texture):
                 ch = i
 
             chwidth, chheight = imgfont.getsize(ch)
+            chwidth += 10
 
             if ch == 'A':
                 self.ratio = 1.0 * chheight / chwidth
@@ -87,7 +88,7 @@ class Font(pi3d.Texture):
             curX = xindex * self.line_height
             curY = yindex * self.line_height
 
-            h_offset = (self.line_height - chwidth) / 2.0 + 1
+            h_offset = (self.line_height - chwidth) / 2.0
             draw.text((curX + h_offset, curY), ch, font=imgfont, fill=(255,255,255,255))
 
             x = float(curX + h_offset) / self.ix
