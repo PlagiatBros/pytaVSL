@@ -135,7 +135,8 @@ class SdfFont(Font):
         try:
             self.load_sdf()
         except:
-            self.create_sdf()
+            if 'y' in input('Warning: no signed distance field found for %s, do you want to create it now ?\nYou need a big computer and a compiled sdfgen binary in the fonts folder. (y/N)' % self.font).lower():
+                self.create_sdf()
 
     def create_sdf(self):
         from subprocess import call
