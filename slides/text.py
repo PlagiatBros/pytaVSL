@@ -61,7 +61,7 @@ class Text(State, Perspective, SlideBase):
         Update string buffer. Mostly copied from pi3d.String
         """
         size = min(1, self.font.ratio / self.length) if self.size == 'auto' else self.size
-        size /= self.font.line_height / self.parent.height # relative to screend height
+        size /= self.font.nominal_height / self.parent.height # relative to screend height
 
         string = self.string
         font = self.font

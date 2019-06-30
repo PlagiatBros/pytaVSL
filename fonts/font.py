@@ -18,7 +18,7 @@ TEXTURE_SIZE = 2048
 
 class Font(pi3d.Texture):
 
-    def __init__(self, font, codepoints=CODEPOINTS, size=TEXTURE_SIZE, sdf_tmp=False):
+    def __init__(self, font, codepoints, size):
         """Arguments:
         *font*:
             File path/name to a TrueType font file.
@@ -56,6 +56,7 @@ class Font(pi3d.Texture):
         ascent, descent = imgfont.getmetrics()
         self.line_height = int(size / ch_per_line)
 
+        y_correction = 0# (self.line_height-ascent-descent) / 2
         glyph_img = Image.new("RGBA", (size, size), (0, 0, 0, 255))
 
 
@@ -71,6 +72,7 @@ class Font(pi3d.Texture):
         xindex = 0
 
         self.ratio = 1.0
+        self.nominal_height = 0
 
         for i in itertools.chain([0], codepoints):
 
@@ -83,6 +85,7 @@ class Font(pi3d.Texture):
             chwidth += 10
 
             if ch == 'A':
+                self.nominal_height = chheight
                 self.ratio = 1.0 * chheight / chwidth
 
             curX = xindex * self.line_height
@@ -92,7 +95,7 @@ class Font(pi3d.Texture):
             draw.text((curX + h_offset, curY), ch, font=imgfont, fill=(255,255,255,255))
 
             x = float(curX + h_offset) / self.ix
-            y = float(curY + self.line_height) / self.iy
+            y = float(curY + self.line_height - y_correction) / self.iy
             tw = float(chwidth) / self.ix
             th = float(self.line_height) / self.iy
 
@@ -114,14 +117,27 @@ class Font(pi3d.Texture):
 
         self._tex = ctypes.c_uint()
 
-        if not sdf_tmp:
-            self.sdf_path = '.'.join(self.font.split('.')[0:-1]) + '-sdf.png'
-            try:
-                self.load_sdf()
-            except:
-                self.create_sdf(glyph_img)
 
-    def create_sdf(self, image):
+    def _load_disk(self):
+        """
+        we need to stop the normal file loading by overriding this method
+        """
+
+
+class SdfFont(Font):
+
+    def __init__(self, font, codepoints=CODEPOINTS, size=TEXTURE_SIZE):
+
+        super(SdfFont, self).__init__(font, codepoints, size)
+
+        self.sdf_path = '.'.join(self.font.split('.')[0:-1]) + '-sdf.png'
+
+        try:
+            self.load_sdf()
+        except:
+            self.create_sdf()
+
+    def create_sdf(self):
         from subprocess import call
         print('Generating hi-res font texture for %s' % self.font)
         tmp = Font(self.font, size=TEXTURE_SIZE*8, sdf_tmp=True)
@@ -135,8 +151,3 @@ class Font(pi3d.Texture):
     def load_sdf(self):
         tex = pi3d.Texture(self.sdf_path, automatic_resize=False)
         self.image =  tex.image
-
-    def _load_disk(self):
-        """
-        we need to stop the normal file loading by overriding this method
-        """
