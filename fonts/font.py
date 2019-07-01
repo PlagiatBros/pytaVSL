@@ -136,16 +136,16 @@ class SdfFont(Font):
             self.load_sdf()
         except:
             if 'y' in input('Warning: no signed distance field found for %s, do you want to create it now ?\nYou need a big computer and a compiled sdfgen binary in the fonts folder. (y/N)' % self.font).lower():
-                self.create_sdf()
+                self.create_sdf(codepoints, size)
 
-    def create_sdf(self):
+    def create_sdf(self, codepoints, size):
         from subprocess import call
         print('Generating hi-res font texture for %s' % self.font)
-        tmp = Font(self.font, size=TEXTURE_SIZE*8, sdf_tmp=True)
+        tmp = Font(self.font, codepoints, size * 8)
         image = Image.fromarray(tmp.image)
         image.save(self.sdf_path)
         print('Generating signed distance field for %s' % self.font)
-        call(['./fonts/sdfgen', self.sdf_path, self.sdf_path, '--maxdst', '200', '--size', str(TEXTURE_SIZE)])
+        call(['./fonts/sdfgen', self.sdf_path, self.sdf_path, '--maxdst', '200', '--size', str(size)])
         self.load_sdf()
 
 
