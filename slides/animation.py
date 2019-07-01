@@ -11,6 +11,7 @@ import easing_functions
 
 EASING_NAMES = [
     "linear",
+    "random",
     "back",
     "bounce",
     "circular",
