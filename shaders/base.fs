@@ -2,14 +2,13 @@
 
 vec4 tex2D(sampler2D tex, vec2 coords) {
     #ifdef TEXT
-        float alphaTest = texture2D(tex, coords).r;
-        vec4 color = vec4(step(0.5, alphaTest));
-        color.rgb *= 0.5;
-        color.a += smoothstep(.48, 0.5, alphaTest);
-        // if (alphaTest > 0.4 && alphaTest < 0.48) {
-        //      color = vec4(1., -1., -1., .8);
-        // }
-        return color;
+        float smoothing = 0.25 / (25. * unib[2][2]); // 0.25 / (spread * scale)
+        float distance = texture2D(tex, coords).r;
+        float outlineFactor = smoothstep(0.5 - smoothing, 0.5 + smoothing, distance);
+        vec3 color = mix(unib[4], vec3(unib[1]), outlineFactor);
+        float outlineWidth = 0.5 + smoothing - unib[3][2] / 4.0;
+        float alpha = smoothstep(outlineWidth - smoothing, outlineWidth + smoothing, distance);
+        return vec4(color, alpha);
     #else
         return texture2D(tex, coords);
     #endif
@@ -67,7 +66,9 @@ void main(void) {
     #include shaders/effects/key.fs
     #endif
 
+    #ifndef TEXT
     #include shaders/effects/colorize.fs
+    #endif
 
     #ifdef INVERT
     #include shaders/effects/invert.fs

@@ -38,6 +38,9 @@ class Text(State, Perspective, SlideBase):
         self.glitch_duration = 1
         self.glitch_start = 0
 
+        self.outline = 0.0
+        self.outline_color = [1.0, 0.0, 0.0]
+
         super(Text, self).__init__(parent, name, texture=self.font, width=parent.width, height=parent.height, init_z=init_z)
 
         self.color = [1.0, 1.0, 1.0]
@@ -126,6 +129,9 @@ class Text(State, Perspective, SlideBase):
         self.buf = [pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms)]
         self.buf[0].textures = tex
 
+        # font smoothing
+        self.buf[0].unib[8] = size
+
         self.height = self.font.line_height * self.sy * (1+self.string.count('\n')) * size
         self.last_draw_align_h = self.h_align
 
@@ -136,6 +142,8 @@ class Text(State, Perspective, SlideBase):
         self.set_scale(self.sx, self.sy)
         self.set_material(self.color)
         self.set_tiles(*self.tiles)
+        self.set_text_outline(self.outline)
+        self.set_text_outline_color(*self.outline_color)
 
     def draw(self, *args, **kwargs):
 
@@ -251,3 +259,19 @@ class Text(State, Perspective, SlideBase):
             self.size = float(size)
 
         self.need_regen = True
+
+    @osc_property('outline', 'outline')
+    def set_text_outline(self, outline):
+        """
+        text outline width (0<>1)
+        """
+        self.outline = min(max(0, outline), 1)
+        self.buf[0].unib[11] = self.outline
+
+    @osc_property('outline_color', 'outline_color')
+    def set_text_outline_color(self, r, g, b):
+        """
+        text outline color (0<>1)
+        """
+        self.outline_color = [float(r), float(g), float(b)]
+        self.buf[0].unib[12:15] = self.outline_color
