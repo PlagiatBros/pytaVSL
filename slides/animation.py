@@ -146,7 +146,7 @@ class Animable(object):
                 easing: easing function (case-insentive), optionally suffixed with "in" or "out"
 
             note: loop and easing can be interchanged
-            available easing functions: linear, back, bounce, circular, cubic, elastic, exponential, quad, quartic, quintic, sine
+            available easing functions: linear, random, back, bounce, circular, cubic, elastic, exponential, quad, quartic, quintic, sine
 
         """
 
