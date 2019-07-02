@@ -2,7 +2,7 @@
 
 vec4 tex2D(sampler2D tex, vec2 coords) {
     #ifdef TEXT
-        float smoothing = 0.25 / (25. * unib[2][2]); // 0.25 / (spread * scale)
+        float smoothing = 0.25 / (25. * sqrt(unib[2][2])); // 0.25 / (spread * scale)
         float distance = texture2D(tex, coords).r;
         float outlineFactor = smoothstep(0.5 - smoothing, 0.5 + smoothing, distance);
         vec3 color = mix(unib[4], vec3(unib[1]), outlineFactor);
