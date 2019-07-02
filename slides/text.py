@@ -244,7 +244,7 @@ class Text(State, Perspective, SlideBase):
         """
         text string with optional glitch duration
         """
-        self.set_text(text, glitch_duration)
+        self.set_text(str(text), float(glitch_duration))
 
     @osc_property('size', 'size')
     def set_size(self, size):
