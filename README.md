@@ -22,9 +22,10 @@ pytaVSL is a video-projection and compositing software built on top of [pi3d](ht
 usage: python3 ./pytaVSL.py [-h] [--namespace NAMESPACE] [--port PORT]
                             [--load FILES [FILES ...]]
                             [--text NAME:FONT [NAME:FONT ...]] [--fps FPS]
-                            [--max-vram MAX_VRAM] [--memtest] [--api]
-                            [--debug] [--show-fps] [--resolution WIDTHxHEIGHT]
-                            [--title TITLE] [--version]
+                            [--max-vram MAX_VRAM] [--memtest] [--fullscreen]
+                            [--api] [--debug] [--show-fps]
+                            [--resolution WIDTHxHEIGHT] [--title TITLE]
+                            [--version]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -39,6 +40,7 @@ optional arguments:
   --fps FPS             maximum framerate, 0 for free wheeling (default: 25)
   --max-vram MAX_VRAM   maximum video memory allocation (in MB) (default: 64)
   --memtest             test video memory size (default: False)
+  --fullscreen          launch in fullscreen (default: False)
   --api                 print osc api and exit (default: False)
   --debug               print debug logs (default: False)
   --show-fps            show fps (default: False)
