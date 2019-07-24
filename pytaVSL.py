@@ -25,7 +25,7 @@ parser.add_argument('--text', help='text objects to create', nargs='+', metavar=
 parser.add_argument('--fps',  help='maximum framerate, 0 for free wheeling', type=int, default=25)
 parser.add_argument('--max-vram',  help='maximum video memory allocation (in MB)', type=int, default=64)
 parser.add_argument('--memtest',  help='test video memory size', default=False, action='store_true')
-# parser.add_argument('--fullscreen',  help='launch in fullscreen', default=False, action='store_true')
+parser.add_argument('--fullscreen',  help='launch in fullscreen', default=False, action='store_true')
 parser.add_argument('--api',  help='print osc api and exit', default=False, action='store_true')
 parser.add_argument('--debug',  help='print debug logs', default=False, action='store_true')
 parser.add_argument('--show-fps',  help='show fps', default=False, action='store_true')
@@ -44,7 +44,7 @@ pyta = PytaVSL(
     name=args.namespace,
     port=args.port,
     fps=args.fps,
-    # fullscreen=args.fullscreen,
+    fullscreen=args.fullscreen,
     width=geometry[0],
     height=geometry[1],
     window_title=args.title,
