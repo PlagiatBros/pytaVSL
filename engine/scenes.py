@@ -8,9 +8,9 @@ from threading import Thread
 
 import toml
 tomlencoder = toml.TomlEncoder()
-def dump_float(f):
-    return "%g" % f
-tomlencoder.dump_funcs[float] = dump_float
+# def dump_float(f):
+#     return "%g" % f
+# tomlencoder.dump_funcs[float] = dump_float
 
 import logging
 LOGGER = logging.getLogger(__name__)
