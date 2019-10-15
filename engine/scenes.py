@@ -124,7 +124,7 @@ class Scenes(object):
             try:
                 content  = '# pytaVSL scene file\n\n'
                 content += toml.dumps(scene, tomlencoder)
-                content = content.replace(',]', ' ]')
+                # content = content.replace(',]', ' ]')
                 # content = content.replace(',]', '')
                 # content = content.replace('= [ ', '= ')
                 writer = open(file, 'w')
