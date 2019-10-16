@@ -8,9 +8,12 @@ from threading import Thread
 
 import toml
 tomlencoder = toml.TomlEncoder()
-# def dump_float(f):
-#     return "%g" % f
-# tomlencoder.dump_funcs[float] = dump_float
+def dump_float(f):
+    s = "%g" % f
+    if '.' not in s:
+        s += '.0'
+    return s
+tomlencoder.dump_funcs[float] = dump_float
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -124,7 +127,7 @@ class Scenes(object):
             try:
                 content  = '# pytaVSL scene file\n\n'
                 content += toml.dumps(scene, tomlencoder)
-                # content = content.replace(',]', ' ]')
+                content = content.replace(',]', ' ]')
                 # content = content.replace(',]', '')
                 # content = content.replace('= [ ', '= ')
                 writer = open(file, 'w')
