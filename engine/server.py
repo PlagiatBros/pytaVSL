@@ -69,7 +69,7 @@ class OscServer(OscNode):
 
         children = []
 
-        if name == '-1':
+        if name == '-1' or name == '*':
             return list(store.values())
         else:
             name = str(name)
