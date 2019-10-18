@@ -38,11 +38,11 @@ class Scenes(object):
                 if slide.is_clone:
                     if not 'clones' in scene:
                         scene['clones'] = {}
-                    scene['clones'][slide.name] = {'target': slide.is_clone}
+                    scene['clones'][slide.name] = {'target': [slide.is_clone]}
                 if slide.is_group:
                     if not 'groups' in scene:
                         scene['groups'] = {}
-                    scene['groups'][slide.name] = {'children': slide.is_group}
+                    scene['groups'][slide.name] = {'children': [slide.is_group]}
 
         for n in self.texts:
             slide = self.texts[n]
@@ -85,7 +85,7 @@ class Scenes(object):
 
         if 'clones' in scene:
             for name in scene['clones']:
-                self.create_clone(slide=scene['clones'][name]['target'][0], clone_name=name)
+                self.create_clone(*scene['clones'][name]['target'], clone_name=name)
 
         if 'groups' in scene:
             for name in scene['groups']:
