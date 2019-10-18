@@ -85,7 +85,7 @@ class Scenes(object):
 
         if 'clones' in scene:
             for name in scene['clones']:
-                self.create_clone(*scene['clones'][name]['target'], clone_name=name)
+                self.create_clone(slide=scene['clones'][name]['target'][0], clone_name=name)
 
         if 'groups' in scene:
             for name in scene['groups']:
