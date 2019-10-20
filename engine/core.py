@@ -341,7 +341,7 @@ class PytaVSL(Scenes, OscServer):
                 return
 
         group = Slide(parent=self, name=name, texture=EMPTY_TEXTURE, width=self.width, height=self.height)
-        group.is_group = slides
+        group.is_group = True
 
         for child in self.get_children(self.slides, slides):
 

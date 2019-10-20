@@ -42,7 +42,8 @@ class Scenes(object):
                 if slide.is_group:
                     if not 'groups' in scene:
                         scene['groups'] = {}
-                    scene['groups'][slide.name] = {'children': [slide.is_group]}
+                    children_pattern = '{' + ','.join([x.name for x in slide.children]) + '}'
+                    scene['groups'][slide.name] = {'children': [children_pattern]}
 
         for n in self.texts:
             slide = self.texts[n]
