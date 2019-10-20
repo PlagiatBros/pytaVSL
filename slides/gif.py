@@ -86,7 +86,7 @@ class Gif(object):
 
             self.buf[0].textures[0].update_ndarray(current_frame.ndarray, 0)
 
-            self.gif_changed_time = now + elapsed
+            self.gif_changed_time = now - elapsed
 
             self.gif_normal_index = self.gif_index / (self.gif_length - 1)
 
