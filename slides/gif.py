@@ -23,6 +23,7 @@ class Gif(object):
 
         self.gif = None
         self.gif_index = 0
+        self.gif_normal_index = 0.0
         self.gif_changed_time = 0
         self.gif_duration = 0
         self.gif_speed = 1.0
