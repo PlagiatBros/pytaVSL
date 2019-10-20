@@ -103,10 +103,10 @@ class Gif(object):
         """
         current gif frame
         """
-        self.gif_changed_time = 0
-        self.gif_index = int(frame) % self.gif_length
-        self.gif_normal_index = self.gif_index / (self.gif_length - 1)
         if self.gif:
+            self.gif_changed_time = 0
+            self.gif_index = int(frame) % self.gif_length
+            self.gif_normal_index = self.gif_index / (self.gif_length - 1)
             self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray, 0)
 
     @osc_property('gif_position', 'gif_normal_index', shorthand=True)
