@@ -403,10 +403,18 @@ class PytaVSL(Scenes, OscServer):
 
         clone_z = target.pos_z - 0.001
         clone = Slide(parent=self, name=clone_name, texture=pi3d.Texture(target.buf[0].textures[0].image), width=target.width, height=target.height, init_z=clone_z)
+
+        if target.gif:
+            clone.gif = target.gif
+            clone.gif_length = target.gif_length
+
         clone.state_set(target.state_get())
         clone.set_position_z(clone_z)
 
-        clone.gif = target.gif
+        if target.gif:
+            # sync gif
+            clone.gif_changed_time = target.gif_changed_time
+
         clone.is_clone = True
         clone.clone_target = target.name
 
