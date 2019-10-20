@@ -101,12 +101,7 @@ class Gif(object):
         current gif frame
         """
         self.gif_changed_time = 0
-        frame = int(frame)
-        if self.gif_speed < 0:
-            frame += 1
-        else:
-            frame -= 1
-        self.gif_index = frame
+        self.gif_index = int(frame) % self.gif_length
         if self.gif:
             self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray, 0)
 
