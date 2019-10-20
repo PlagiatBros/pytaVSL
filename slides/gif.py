@@ -113,7 +113,7 @@ class Gif(object):
         """
         relative gif time position (0<>1)
         """
-        self.gif_normal_index = float(position) % 1
+        self.gif_normal_index = float(position)
         if self.gif_normal_index < 0 or self.gif_normal_index > 1:
             self.gif_normal_index = self.gif_normal_index % 1
         self.set_frame_index(int(self.gif_normal_index * (self.gif_length - 1)))
