@@ -38,7 +38,7 @@ class Scenes(object):
                 if slide.is_clone:
                     if not 'clones' in scene:
                         scene['clones'] = {}
-                    scene['clones'][slide.name] = {'target': [slide.is_clone]}
+                    scene['clones'][slide.name] = {'target': [slide.clone_target]}
                 if slide.is_group:
                     if not 'groups' in scene:
                         scene['groups'] = {}

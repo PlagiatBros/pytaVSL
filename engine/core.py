@@ -407,7 +407,8 @@ class PytaVSL(Scenes, OscServer):
         clone.set_position_z(clone_z)
 
         clone.gif = target.gif
-        clone.is_clone = target.name
+        clone.is_clone = True
+        clone.clone_target = target.name
 
         self.add_slide(clone)
 

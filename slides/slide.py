@@ -43,9 +43,12 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         self.name = name
         self.parent = parent
         self.parent_slide = None
+
         self.is_group = False
         self.children_need_sorting = False
+
         self.is_clone = False
+        self.clone_target = None
 
         if texture:
             self.set_textures([texture])
