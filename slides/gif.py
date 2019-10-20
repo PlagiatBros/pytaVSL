@@ -22,7 +22,7 @@ class Gif(object):
         super(Gif, self).__init__(texture=texture, *args, **kwargs)
 
         self.gif = None
-        self.gif_index = -1
+        self.gif_index = 0
         self.gif_changed_time = 0
         self.gif_duration = 0
         self.gif_speed = 1.0
@@ -87,6 +87,8 @@ class Gif(object):
 
             self.gif_changed_time = now + elapsed
 
+            self.gif_normal_index = self.gif_index / (self.gif_length - 1)
+
 
     def draw(self, *args, **kwargs):
 
@@ -96,14 +98,25 @@ class Gif(object):
         super(Gif, self).draw(*args, **kwargs)
 
     @osc_property('gif_frame', 'gif_index')
-    def set_frame(self, frame):
+    def set_frame_index(self, frame):
         """
         current gif frame
         """
         self.gif_changed_time = 0
         self.gif_index = int(frame) % self.gif_length
+        self.gif_normal_index = self.gif_index / (self.gif_length - 1)
         if self.gif:
             self.buf[0].textures[0].update_ndarray(self.gif[self.gif_index].ndarray, 0)
+
+    @osc_property('gif_position', 'gif_normal_index', shorthand=True)
+    def set_normal_index(self, position):
+        """
+        relative gif time position (0<>1)
+        """
+        self.gif_normal_index = float(position) % 1
+        if self.gif_normal_index < 0 or self.gif_normal_index > 1:
+            self.gif_normal_index = self.gif_normal_index % 1
+        self.set_frame_index(int(self.gif_normal_index * (self.gif_length - 1)))
 
     @osc_property('gif_speed', 'gif_speed')
     def set_speed(self, speed):
