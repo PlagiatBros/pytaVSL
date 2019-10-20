@@ -22,6 +22,7 @@ parser.add_argument('--namespace', help='osc namespace', default='pyta')
 parser.add_argument('--port', help='udp port or unix socket path', default=5555)
 parser.add_argument('--load', help='image files to load', nargs='+', metavar='FILES')
 parser.add_argument('--text', help='text objects to create', nargs='+', metavar='NAME:FONT', default=["0:sans", "1:sans", "2:mono", "3:mono"])
+parser.add_argument('--scenes', help='scene files to load', nargs='+', metavar='FILES')
 parser.add_argument('--fps',  help='maximum framerate, 0 for free wheeling', type=int, default=25)
 parser.add_argument('--max-vram',  help='maximum video memory allocation (in MB)', type=int, default=64)
 parser.add_argument('--memtest',  help='test video memory size', default=False, action='store_true')
@@ -61,6 +62,8 @@ if args.api:
 else:
     if args.load:
         pyta.load_textures(*args.load)
+    if args.scenes:
+        pyta.scenes_import(*args.scenes)
     if args.text:
         for item in args.text:
             pyta.create_text(*item.split(':'))
