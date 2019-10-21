@@ -15,10 +15,6 @@ vec4 tex2D(sampler2D tex, vec2 coords) {
 }
 
 
-#ifdef TUNNEL
-#include shaders/effects/tunnel.fs
-#endif
-
 #ifdef NOISE
 #include shaders/effects/noise.fs
 #endif
@@ -36,14 +32,6 @@ void main(void) {
 
     #include shaders/inc/fs_main.fs
 
-    #ifdef TUNNEL
-    gl_FragColor.rgb = tunnel(coords, unif[16][2]).rgb;
-    #endif
-
-
-    #ifdef POST_PROCESS
-    gl_FragColor.a = unif[5][2];
-    #endif
 
     #ifdef RGBWAVE
     #include shaders/effects/rgbwave.fs

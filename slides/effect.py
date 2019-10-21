@@ -25,7 +25,7 @@ class Effect(object):
           13  key_color r, g, b                           39  41
           14  key_threshold, unused, unused               42  43
           15  invert, unused, unused                      45  46
-          16  rgbwave, fish, tunnel                       48  50
+          16  rgbwave, fish, unused                       48  50
           17  charcoal radius, thresh, strength           51  53
           18  noise                                       54  56
           19  mask, mask_hardness, unused                 57  59
@@ -63,9 +63,6 @@ class Effect(object):
 
         self.effect_fish = 0.0
         self.set_effect_fish(self.effect_fish)
-
-        self.effect_tunnel = 0.0
-        self.set_effect_tunnel(self.effect_tunnel)
 
     def toggle_effect(self, name, state):
         if state and name not in self.active_effects:
@@ -185,15 +182,6 @@ class Effect(object):
         self.effect_fish = float(value)
         self.unif[49] = self.effect_fish
         self.toggle_effect('FISH', self.effect_fish != 0)
-
-    @osc_property('tunnel', 'effect_tunnel')
-    def set_effect_tunnel(self, value):
-        """
-        tunnel effect (speed)
-        """
-        self.effect_tunnel = float(value)
-        self.unif[50] = self.effect_tunnel
-        self.toggle_effect('TUNNEL', self.effect_tunnel != 0)
 
     def draw(self, *args, **kwargs):
 
