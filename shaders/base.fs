@@ -42,7 +42,7 @@ void main(void) {
 
 
     #ifdef POST_PROCESS
-    gl_FragColor.a = 1.0;
+    gl_FragColor.a = unif[5][2];
     #endif
 
     #ifdef RGBWAVE
