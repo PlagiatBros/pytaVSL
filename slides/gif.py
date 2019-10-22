@@ -114,10 +114,11 @@ class Gif(object):
         """
         relative gif time position (0<>1)
         """
-        self.gif_normal_index = float(position)
-        if self.gif_normal_index < 0 or self.gif_normal_index > 1:
-            self.gif_normal_index = self.gif_normal_index % 1
-        self.set_frame_index(int(self.gif_normal_index * (self.gif_length - 1)))
+        self.gif_normal_index = max(0, min(float(position), 1))
+        if self.gif_normal_index == 1:
+            self.set_frame_index(self.gif_length - 1)
+        else:
+            self.set_frame_index(int(self.gif_normal_index * self.gif_length))
 
     @osc_property('gif_speed', 'gif_speed')
     def set_speed(self, speed):

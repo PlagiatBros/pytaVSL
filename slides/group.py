@@ -55,8 +55,8 @@ class Group(object):
         relative sequence position, normalized index (0<>1)
         """
         if self.children:
-            self.sequence_normal_index = float(index)
-            if self.sequence_normal_index < 0 or self.sequence_normal_index > 1:
-                self.sequence_normal_index = self.sequence_normal_index % 1
-
-            self.set_sequence_index(int(self.sequence_normal_index * (len(self.children) - 1)))
+            self.sequence_normal_index = max(0, min(float(index), 1))
+            if self.sequence_normal_index == 1:
+                self.set_sequence_index(len(self.children) - 1)
+            else:
+                self.set_sequence_index(int(self.sequence_normal_index * len(self.children)))
