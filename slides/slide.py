@@ -14,6 +14,7 @@ from osc import OscNode, osc_property
 from config import *
 from mesh import Mesh
 from warp import Warp
+from group import Group
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -43,9 +44,6 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         self.name = name
         self.parent = parent
         self.parent_slide = None
-
-        self.is_group = False
-        self.children_need_sorting = False
 
         self.is_clone = False
         self.clone_target = None
@@ -104,10 +102,6 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
                 self.loaded = True
                 if not self.parent.monitor.alloc(self):
                     return
-
-            if self.children_need_sorting:
-                self.children = sorted(self.children, key=lambda slide: slide.z(), reverse=True)
-                self.children_need_sorting = False
 
             super(SlideBase, self).draw(*args, **kwargs)
 
@@ -371,7 +365,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         """
         self.set_rotate(None, None, rz)
 
-class Slide(State, Perspective, Video, Gif, Warp, SlideBase):
+class Slide(State, Group, Perspective, Video, Gif, Warp, SlideBase):
 
     def __init__(self, *args, **kwargs):
 
