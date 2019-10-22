@@ -30,15 +30,19 @@ class Group(object):
                     self.set_sequence_index(self.sequence_index)
 
             if self.is_group and self.active_effects:
-                self.post_process.unif[:] = self.unif[:]
-                self.post_process.buf[0].unib[:] = self.buf[0].unib[:]
-                self.post_process.set_visible(1)
+                # capture children.draw()
                 self.post_process.capture_start()
 
             super(Group, self).draw(*args, **kwargs)
 
             if self.is_group and self.active_effects:
+                # stop capture
                 self.post_process.capture_end()
+                # copy shader uniforms
+                self.post_process.unif[:] = self.unif[:]
+                self.post_process.buf[0].unib[:] = self.buf[0].unib[:]
+                self.post_process.unif_warp[:] = self.unif_warp[:]
+                # draw
                 self.post_process.draw()
 
     def toggle_effect(self, *args, **kwargs):
@@ -52,6 +56,7 @@ class Group(object):
             if not self.post_process:
                 from postprocess import PostProcess
                 self.post_process = PostProcess(self.parent)
+                self.post_process.set_visible(1)
 
             self.post_process.toggle_effect(*args, **kwargs)
 
