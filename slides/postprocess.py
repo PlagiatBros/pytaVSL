@@ -20,12 +20,6 @@ class PostProcess(State, Perspective, Warp, SlideBase):
 
         self.active_effects.append('POST_PROCESS')
 
-    def scale(self, x, y, z):
-        """
-        Override pi3d.Shape.scale to prevent OffScreenTexture v-flip
-        """
-        super(PostProcess, self).scale(x, -y, z)
-
     def capture_start(self):
         self.buf[0].textures[0]._start()
 
