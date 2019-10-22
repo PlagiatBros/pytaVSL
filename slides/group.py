@@ -10,8 +10,9 @@ class Group(object):
         self.is_group = False
         self.children_need_sorting = False
 
-        self.sequence_index = None
-        self.sequence_normal_index = None
+        self.is_sequence = 0
+        self.sequence_index = 0
+        self.sequence_normal_index = 0
 
         super(Group, self).__init__(*args, **kwargs)
 
@@ -23,14 +24,25 @@ class Group(object):
                 self.children = sorted(self.children, key=lambda slide: slide.z(), reverse=True)
                 self.children_need_sorting = False
 
+                if self.is_sequence:
+                    self.set_sequence_index(self.sequence_index)
+
             super(Group, self).draw(*args, **kwargs)
+
+    @osc_property('sequence_mode', 'is_sequence')
+    def set_sequence_mode(self, mode):
+        """
+        sequence mode (0=disabled, 1=enabled)
+        """
+        if self.children:
+            self.is_sequence = int(bool(mode))
 
     @osc_property('sequence_index', 'sequence_index')
     def set_sequence_index(self, index):
         """
         currently visible child by index (z-sorted)
         """
-        if index is not None and self.children:
+        if self.is_sequence and self.children:
             for c in self.children:
                 c.set_visible(0)
             index = int(index) % len(self.children)
