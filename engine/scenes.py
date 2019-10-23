@@ -73,16 +73,16 @@ class Scenes(object):
         Recall scene (visible slides/texts/clones/groups' state)
             name: slot name
         """
-        name = str(name).lower()
+        scene_name = str(name).lower()
 
-        if name not in self.scenes:
-            LOGGER.error('scene "%s" not found' % name)
+        if scene_name not in self.scenes:
+            LOGGER.error('scene "%s" not found' % scene_name)
             return
 
         for slide in self.sorted_slides:
             slide.set_visible(0)
 
-        scene = self.scenes[name]
+        scene = self.scenes[scene_name]
 
         if 'clones' in scene:
             for name in scene['clones']:
@@ -94,11 +94,21 @@ class Scenes(object):
 
         if 'slides' in scene:
             for name in scene['slides']:
-                self.slides[name].state_set(scene['slides'][name], reset=True)
+                if name in self.slides:
+                    slide = self.slides[name]
+                    slide.state_set(scene['slides'][name], reset=True)
+                    if slide.parent_slide and ('groups' not in scene or slide.parent_slide.name not in scene['groups']):
+                        slide.quit_group()
+                else:
+                    LOGGER.error('in scene "%s" (slide "%s" not found)' % (scene_name, name))
 
         if 'texts' in scene:
             for name in scene['texts']:
-                self.texts[name].state_set(scene['texts'][name], reset=True)
+                if name in self.texts:
+                    text = self.texts[name]
+                    text.state_set(scene['texts'][name], reset=True)
+                else:
+                    LOGGER.error('in scene "%s" (text "%s" not found)' % (scene_name, name))
 
         if 'post_process' in scene:
             self.post_process.state_set(scene['post_process'], reset=True)
