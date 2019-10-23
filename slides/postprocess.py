@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from pi3d.util.OffScreenTexture import OffScreenTexture
+from offscreen import OffScreenTexture
 
 from perspective import Perspective
 from slide import SlideBase

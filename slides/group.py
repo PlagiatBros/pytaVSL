@@ -43,6 +43,8 @@ class Group(object):
                 self.post_process.buf[0].unib[:] = self.buf[0].unib[:]
                 self.post_process.unif_warp[:] = self.unif_warp[:]
                 # draw
+                if self.pos_z != self.post_process.pos_z:
+                    self.post_process.position(self.post_process.pos_x, self.post_process.pos_y, self.pos_z)
                 self.post_process.draw()
 
     def toggle_effect(self, *args, **kwargs):
