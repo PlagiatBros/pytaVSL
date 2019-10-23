@@ -2,7 +2,6 @@
 Derivated from pi3d.OffScreenTexture
 
 Changes:
-- remove depthbuffer & use GL_RGB instead of GL_DEPTH_COMPONENT16 because we don't need depth
 - add OFFSCREEN_QUEUE to manage nested offscreen drawings
 """
 
@@ -15,9 +14,7 @@ import numpy as np
 import pi3d
 from pi3d.constants import (GL_FRAMEBUFFER, GL_RENDERBUFFER, GL_COLOR_ATTACHMENT0,
                                         GL_TEXTURE_2D, GL_DEPTH_COMPONENT16, GL_DEPTH_ATTACHMENT,
-                                        GL_DEPTH_BUFFER_BIT, GL_COLOR_BUFFER_BIT, GLuint, GLsizei,
-                                        GL_RGB)
-
+                                        GL_DEPTH_BUFFER_BIT, GL_COLOR_BUFFER_BIT, GLuint, GLsizei)
 
 from pi3d.Texture import Texture
 
@@ -42,7 +39,8 @@ class OffScreenTexture(Texture):
         self._tex = GLuint()
         self.framebuffer = (GLuint * 1)()
         pi3d.opengles.glGenFramebuffers(GLsizei(1), self.framebuffer)
-
+        self.depthbuffer = (GLuint * 1)()
+        pi3d.opengles.glGenRenderbuffers(GLsizei(1), self.depthbuffer)
     def _load_disk(self):
         """ have to override this
         """
@@ -60,8 +58,15 @@ class OffScreenTexture(Texture):
         pi3d.opengles.glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer[0])
         pi3d.opengles.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                 GL_TEXTURE_2D, self._tex.value, 0)
+
+        #thanks to PeterO c.o. RPi forum for pointing out missing depth attchmnt
+        pi3d.opengles.glBindRenderbuffer(GL_RENDERBUFFER, self.depthbuffer[0])
+        pi3d.opengles.glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16,
+                                self.ix, self.iy)
+        pi3d.opengles.glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                                GL_RENDERBUFFER, self.depthbuffer[0])
         if clear:
-            pi3d.opengles.glClear(GL_COLOR_BUFFER_BIT)
+            pi3d.opengles.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT)
 
 
     def _end(self):
@@ -79,3 +84,4 @@ class OffScreenTexture(Texture):
 
     def delete_buffers(self):
         pi3d.opengles.glDeleteFramebuffers(GLsizei(1), self.framebuffer)
+        pi3d.opengles.glDeleteRenderbuffers(GLsizei(1), self.depthbuffer)
