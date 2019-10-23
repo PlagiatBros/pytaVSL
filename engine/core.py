@@ -340,10 +340,13 @@ class PytaVSL(Scenes, OscServer):
                 LOGGER.error("could not create group \"%s\" (name taken by a non-group slide)" % name)
                 return
 
-        group = Slide(parent=self, name=name, texture=EMPTY_TEXTURE, width=self.width, height=self.height)
+        children = self.get_children(self.slides, slides)
+
+        group_z = min(map(lambda s: s.pos_z, children))
+        group = Slide(parent=self, name=name, texture=EMPTY_TEXTURE, width=self.width, height=self.height, init_z=group_z)
         group.is_group = True
 
-        for child in self.get_children(self.slides, slides):
+        for child in children:
 
             if child.parent_slide:
                 LOGGER.debug("slide %s moved from group %s to %s" % (child.name, child.parent_slide.name, name))
