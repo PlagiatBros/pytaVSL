@@ -1,4 +1,4 @@
-vec2 charcoalRadius = unif[17][0] / resolution;
+vec2 charcoalRadius = unif[15][2] / resolution;
 
 vec4 c1 = tex2D(tex0, coords);
 vec4 c2 = tex2D(tex0, coords + vec2(charcoalRadius.x, 0));

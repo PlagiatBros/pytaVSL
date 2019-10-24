@@ -23,12 +23,12 @@ class Effect(object):
         ===== ========================================== ==== ==
           12  random, time, unused                        36  38
           13  key_color r, g, b                           39  41
-          14  key_threshold, unused, unused               42  43
-          15  invert, unused, unused                      45  46
-          16  rgbwave, fish, unused                       48  50
-          17  charcoal radius, thresh, strength           51  53
-          18  noise                                       54  56
-          19  mask, mask_hardness, unused                 57  59
+          14  key_threshold, mask_hardness, mask_thresh.  42  44
+          15  invert, noise, charcoal                     45  47
+          16  rgbwave, fish, hue                          48  50
+          17  brightness, contrast, saturation            51  53
+          18  unused, unused, unused                      54  56
+          19  unused, unused, unused                      57  59
         ===== ========================================== ==== ==
         """
 
@@ -63,6 +63,15 @@ class Effect(object):
 
         self.effect_fish = 0.0
         self.set_effect_fish(self.effect_fish)
+
+        self.effect_hue = 0.0
+        self.effect_brightness = 1.0
+        self.effect_contrast = 1.0
+        self.effect_saturation = 1.0
+        self.set_effect_hue(self.effect_hue)
+        self.set_effect_brightness(self.effect_brightness)
+        self.set_effect_contrast(self.effect_contrast)
+        self.set_effect_saturation(self.effect_saturation)
 
     def toggle_effect(self, name, state):
         if state and name not in self.active_effects:
@@ -119,7 +128,7 @@ class Effect(object):
         charcoal effect (size)
         """
         self.effect_charcoal = float(value)
-        self.unif[51] = self.effect_charcoal
+        self.unif[47] = self.effect_charcoal
         self.toggle_effect('CHARCOAL', self.effect_charcoal != 0)
 
     @osc_property('noise', 'effect_noise')
@@ -128,7 +137,7 @@ class Effect(object):
         noise (density)
         """
         self.effect_noise = float(density)
-        self.unif[54] = self.effect_noise
+        self.unif[46] = self.effect_noise
         self.toggle_effect('NOISE', self.effect_noise != 0)
 
 
@@ -164,7 +173,7 @@ class Effect(object):
         mask hardness (0<>1)
         """
         self.effect_mask_hardness = float(strength)
-        self.unif[58] = self.effect_mask_hardness
+        self.unif[43] = self.effect_mask_hardness
 
     @osc_property('mask_threshold', 'effect_mask_threshold')
     def set_effect_mask_threshold(self, thresh):
@@ -172,7 +181,7 @@ class Effect(object):
         mask threshold (0<>1)
         """
         self.effect_mask_threshold = float(thresh)
-        self.unif[59] = self.effect_mask_threshold
+        self.unif[44] = self.effect_mask_threshold
 
     @osc_property('fish', 'effect_fish')
     def set_effect_fish(self, value):
@@ -182,6 +191,47 @@ class Effect(object):
         self.effect_fish = float(value)
         self.unif[49] = self.effect_fish
         self.toggle_effect('FISH', self.effect_fish != 0)
+
+
+    @osc_property('hue', 'effect_hue')
+    def set_effect_hue(self, value):
+        """
+        hue shift (0<>1)
+        """
+        self.effect_hue = float(value)
+        self.unif[50] = self.effect_hue
+        self.toggle_colors_effect()
+
+    @osc_property('brightness', 'effect_brightness')
+    def set_effect_brightness(self, value):
+        """
+        brightness (0<>1)
+        """
+        self.effect_brightness = float(value)
+        self.unif[51] = self.effect_brightness
+        self.toggle_colors_effect()
+
+    @osc_property('contrast', 'effect_contrast')
+    def set_effect_contrast(self, value):
+        """
+        contrast (0<>1)
+        """
+        self.effect_contrast = float(value)
+        self.unif[52] = self.effect_contrast
+        self.toggle_colors_effect()
+
+    @osc_property('saturation', 'effect_saturation')
+    def set_effect_saturation(self, value):
+        """
+        saturation (0<>1)
+        """
+        self.effect_saturation = float(value)
+        self.unif[53] = self.effect_saturation
+        self.toggle_colors_effect()
+
+
+    def toggle_colors_effect(self):
+        self.toggle_effect('COLORS', self.effect_hue != 0.0 or self.effect_brightness != 1.0 or self.effect_contrast != 1.0 or self.effect_saturation != 1.5)
 
     def draw(self, *args, **kwargs):
 

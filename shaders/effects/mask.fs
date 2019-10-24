@@ -1,5 +1,5 @@
-float maskHardness = unif[19][1];
-float maskThresh = unif[19][2];
+float maskHardness = unif[14][1];
+float maskThresh = unif[14][2];
 
 vec4 maskColor = texture2D(tex1, maskCoords);
 float maskAlpha = distance(maskColor, vec4(0.0, 0.0, 0.0, 1.0));
