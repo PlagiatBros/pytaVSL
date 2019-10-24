@@ -231,7 +231,7 @@ class Effect(object):
 
 
     def toggle_colors_effect(self):
-        self.toggle_effect('COLORS', self.effect_hue != 0.0 or self.effect_brightness != 1.0 or self.effect_contrast != 1.0 or self.effect_saturation != 1.5)
+        self.toggle_effect('COLORS', self.effect_hue != 0.0 or self.effect_brightness != 1.0 or self.effect_contrast != 1.0 or self.effect_saturation != 1.0)
 
     def draw(self, *args, **kwargs):
 
