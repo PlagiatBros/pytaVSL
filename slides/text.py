@@ -12,9 +12,6 @@ from config import *
 import logging
 LOGGER = logging.getLogger(__name__)
 
-_NORMALS = [[0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0]]
-GAP = 1
-
 class Text(State, Perspective, SlideBase):
     """
     Dynamic text
@@ -40,6 +37,7 @@ class Text(State, Perspective, SlideBase):
         self.glitch_indices = []
 
         self.letter_spacing = 1.
+        self.line_height = 1.
 
         self.outline = 0.0
         self.outline_color = [1.0, 0.0, 0.0]
@@ -64,7 +62,7 @@ class Text(State, Perspective, SlideBase):
 
     def new_string(self):
         """
-        Update string buffer. Mostly copied from pi3d.String
+        Update string buffer. Derivated from pi3d.String
         """
         size = min(1, self.font.ratio / self.length) if self.size == 'auto' else self.size
         size /= self.font.nominal_height / self.parent.height # relative to screend height
@@ -73,74 +71,87 @@ class Text(State, Perspective, SlideBase):
         string = self.string
         font = self.font
 
-        sy = sx = size
+        vertices = []
+        texcoords = []
+        indices = []
+        tmp_vertices = []
 
-        self.verts = []
-        self.texcoords = []
-        self.norms = []
-        self.inds = []
-        temp_verts = []
+        nlines = 0
 
-        xoff = 0.0
-        yoff = 0.0
-        lines = 0
-        nlines = string.count("\n") + 1
+        pos_x = 0
+        pos_y = 0
 
-        def make_verts(): #local function to justify each line
+        gap = self.font.line_height * self.line_height
+
+        nlines_total = len(self.string.split('\n')) + 1
+        total_height = self.font.line_height + (nlines_total - 1) * self.font.line_height * self.line_height
+
+        def make_line():
+            nonlocal nlines, pos_x, pos_y, tmp_vertices
+
+            nlines += 1
+
             if self.h_align == 'center':
-                cx = xoff / 2.0
+                cx = pos_x / 2.0
             elif self.h_align == 'left':
                 cx = 0.0
             else:
-                cx = xoff
+                cx = pos_x
 
-            for j in temp_verts:
-                self.verts.append([(j[0] - cx) * sx,
-                                 (j[1] + nlines * font.line_height * GAP / 2.0 - yoff) * sy,
-                                 j[2]])
+            for vert in tmp_vertices:
+                vertices.append([
+                    (vert[0] - cx) * size,
+                    (vert[1] + total_height / 2. - gap / 2.  - pos_y) * size,
+                    vert[2]
+                ])
 
-        default = font.glyph_table.get(chr(0), None)
-        for i, c in enumerate(string):
-            if c == '\n':
-                make_verts()
-                yoff += font.line_height * GAP
-                xoff = 0.0
-                temp_verts = []
-                lines += 1
-                continue #don't attempt to draw this character!
+            tmp_vertices = []
+            pos_x = 0
+            pos_y += gap
 
-            glyph = font.glyph_table.get(c, default)
+
+        default_glyph = font.glyph_table.get(chr(0), None)
+
+        for i, char in enumerate(string):
+
+            if char == '\n':
+                make_line()
+                continue
+
+            glyph = font.glyph_table.get(char, default_glyph)
+
             if not glyph:
                 continue
+
             w, h, texc, verts = glyph[0:4]
 
             if self.glitch and not self.font.mono:
                 # use the destination letter's width when glitching
-                w = font.glyph_table.get(self.glitch_to[i], default)[0]
+                w = font.glyph_table.get(self.glitch_to[i], default_glyph)[0]
 
             for j in verts:
                 glitch_offset = 0
                 if self.glitch and not self.font.mono:
                     # center glitching letters
                     glitch_offset += (glyph[0] - w) / 2.0
-                temp_verts.append((j[0] + xoff - glitch_offset, j[1], j[2] - i/1000.)) # "-i/1000." => allow letter overlap
+                tmp_vertices.append((j[0] + pos_x - glitch_offset, j[1], j[2] - i/1000.)) # "-i/1000." => allow letter overlap
 
-            xoff += w * self.letter_spacing
-            for j in texc:
-                self.texcoords.append(j)
-            self.norms.extend(_NORMALS)
+            pos_x += w * self.letter_spacing
+
+            for c in texc:
+                texcoords.append(c)
 
             # Take Into account unprinted \n characters
-            stv = 4 * (i - lines)
-            self.inds.extend([[stv, stv + 2, stv + 1], [stv, stv + 3, stv + 2]])
+            stv = 4 * (i - nlines)
+            indices.extend([[stv, stv + 2, stv + 1], [stv, stv + 3, stv + 2]])
 
-        make_verts()
+        make_line()
 
         tex = self.buf[0].textures
-        self.buf = [pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms)]
+        self.buf = [pi3d.Buffer(self, vertices, texcoords, indices, None)]
         self.buf[0].textures = tex
 
-        self.height = self.font.line_height * (1+self.string.count('\n')) * size
+        self.height = total_height * size
         self.last_draw_align_h = self.h_align
 
 
@@ -294,3 +305,12 @@ class Text(State, Perspective, SlideBase):
         if spacing != self.letter_spacing:
             self.need_regen = True
         self.letter_spacing = float(spacing)
+
+    @osc_property('line_height', 'line_height')
+    def set_text_line_height(self, line_height):
+        """
+        letter spacing
+        """
+        if line_height != self.line_height:
+            self.need_regen = True
+        self.line_height = float(line_height)
