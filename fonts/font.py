@@ -40,6 +40,9 @@ class Font(pi3d.Texture):
 
 
         """
+
+        self.mono = 'mono' in font.lower()
+
         super(Font, self).__init__(font, automatic_resize=False)
 
         self.font = font
@@ -74,6 +77,10 @@ class Font(pi3d.Texture):
         self.ratio = 1.0
         self.nominal_height = 0
 
+        chwidth, chheight = imgfont.getsize('A')
+        self.nominal_height = chheight
+        self.ratio = 1.0 * chheight / chwidth
+
         for i in itertools.chain([0], codepoints):
 
             try:
@@ -84,9 +91,8 @@ class Font(pi3d.Texture):
             chwidth, chheight = imgfont.getsize(ch)
             chwidth += 10
 
-            if ch == 'A':
-                self.nominal_height = chheight
-                self.ratio = 1.0 * chheight / chwidth
+            if self.mono:
+                chwidth = self.nominal_height / self.ratio
 
             curX = xindex * self.line_height
             curY = yindex * self.line_height
