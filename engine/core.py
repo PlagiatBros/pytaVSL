@@ -32,7 +32,7 @@ class PytaVSL(Scenes, OscServer):
     It's also an OSC server which contains the method to control all of its children.
     """
 
-    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='', show_fps=False, memtest=False):
+    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='', show_fps=False, memtest=False, precompile_shaders=False):
 
         super(PytaVSL, self).__init__(name, port)
 
@@ -45,6 +45,9 @@ class PytaVSL(Scenes, OscServer):
         self.CAMERA3D = pi3d.Camera(is_3d=True, eye=(0, 0, -height), scale=0.8465)
         self.CAMERA.was_moved = False
         self.CAMERA3D.was_moved = False
+
+        # shader precompilation switch
+        self.precompile_shaders = precompile_shaders
 
         # enable texture backside
         opengles.glDisable(GL_CULL_FACE)
@@ -126,7 +129,8 @@ class PytaVSL(Scenes, OscServer):
              - draw slides, skip grouped slides (drawn by their parents)
         """
 
-        init_shader_cache()
+        if self.precompile_shaders:
+            init_shader_cache()
 
         ####### upload fonts and post_process to gpu
         for n in self.texts:
