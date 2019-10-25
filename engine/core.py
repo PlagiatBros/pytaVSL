@@ -333,6 +333,8 @@ class PytaVSL(Scenes, OscServer):
         Create slide group
             slides: slide name pattern
             group_name: new group's name (replaces any previously created group with the same name)
+
+        Note: some effects don't work on groups: mask, warp
         """
         name = str(group_name).lower()
         slides = str(slides).lower()
