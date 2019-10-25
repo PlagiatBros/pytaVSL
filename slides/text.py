@@ -39,6 +39,8 @@ class Text(State, Perspective, SlideBase):
         self.glitch_to = None
         self.glitch_indices = []
 
+        self.letter_spacing = 1.
+
         self.outline = 0.0
         self.outline_color = [1.0, 0.0, 0.0]
 
@@ -123,7 +125,7 @@ class Text(State, Perspective, SlideBase):
                     glitch_offset += (glyph[0] - w) / 2.0
                 temp_verts.append((j[0] + xoff - glitch_offset, j[1], j[2] - i/1000.)) # "-i/1000." => allow letter overlap
 
-            xoff += w
+            xoff += w * self.letter_spacing
             for j in texc:
                 self.texcoords.append(j)
             self.norms.extend(_NORMALS)
@@ -283,3 +285,12 @@ class Text(State, Perspective, SlideBase):
         """
         self.outline_color = [float(r), float(g), float(b)]
         self.buf[0].unib[12:15] = self.outline_color
+
+    @osc_property('spacing', 'letter_spacing')
+    def set_text_spacing(self, spacing):
+        """
+        letter spacing
+        """
+        if spacing != self.letter_spacing:
+            self.need_regen = True
+        self.letter_spacing = float(spacing)
