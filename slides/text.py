@@ -71,8 +71,8 @@ class Text(State, Perspective, SlideBase):
 
         sy = sx = size
 
-        sy *= self.sy
-        sx *= self.sx
+        # sy *= self.sy
+        # sx *= self.sx
 
         self.verts = []
         self.texcoords = []
@@ -132,7 +132,7 @@ class Text(State, Perspective, SlideBase):
         # font smoothing
         self.buf[0].unib[8] = size
 
-        self.height = self.font.line_height * self.sy * (1+self.string.count('\n')) * size
+        self.height = self.font.line_height * (1+self.string.count('\n')) * size
         self.last_draw_align_h = self.h_align
 
 
