@@ -27,6 +27,7 @@ class Text(State, Perspective, SlideBase):
         self.length = max(len(self.string), 1)
 
         self.size = 'auto'
+        self.computed_size = 0
 
         self.need_regen = False
         self.last_draw_align_h = 'center'
@@ -65,14 +66,12 @@ class Text(State, Perspective, SlideBase):
         """
         size = min(1, self.font.ratio / self.length) if self.size == 'auto' else self.size
         size /= self.font.nominal_height / self.parent.height # relative to screend height
+        self.computed_size = size
 
         string = self.string
         font = self.font
 
         sy = sx = size
-
-        # sy *= self.sy
-        # sx *= self.sx
 
         self.verts = []
         self.texcoords = []
@@ -129,9 +128,6 @@ class Text(State, Perspective, SlideBase):
         self.buf = [pi3d.Buffer(self, self.verts, self.texcoords, self.inds, self.norms)]
         self.buf[0].textures = tex
 
-        # font smoothing
-        self.buf[0].unib[8] = size
-
         self.height = self.font.line_height * (1+self.string.count('\n')) * size
         self.last_draw_align_h = self.h_align
 
@@ -158,6 +154,9 @@ class Text(State, Perspective, SlideBase):
             if self.need_regen:
                 self.new_string()
                 self.need_regen = False
+
+            # font smoothing
+            self.buf[0].unib[8] = self.computed_size * self.sy
 
             super(Text, self).draw(*args, **kwargs)
 
