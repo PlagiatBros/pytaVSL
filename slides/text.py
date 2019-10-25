@@ -33,11 +33,11 @@ class Text(State, Perspective, SlideBase):
         self.last_draw_align_h = 'center'
 
         # cool
-        self.glitch = False
-        self.glitch_from = None
-        self.glitch_to = None
         self.glitch_duration = 1
         self.glitch_start = 0
+        self.glitch = False
+        self.glitch_to = None
+        self.glitch_indices = []
 
         self.outline = 0.0
         self.outline_color = [1.0, 0.0, 0.0]
@@ -111,8 +111,18 @@ class Text(State, Perspective, SlideBase):
             if not glyph:
                 continue
             w, h, texc, verts = glyph[0:4]
+
+            if self.glitch and not self.font.mono:
+                # use the destination letter's width when glitching
+                w = font.glyph_table.get(self.glitch_to[i], default)[0]
+
             for j in verts:
-                temp_verts.append((j[0]+xoff, j[1], j[2]))
+                glitch_offset = 0
+                if self.glitch and not self.font.mono:
+                    # center glitching letters
+                    glitch_offset += (glyph[0] - w) / 2.0
+                temp_verts.append((j[0] + xoff - glitch_offset, j[1], j[2] - i/1000.)) # "-i/1000." => allow letter overlap
+
             xoff += w
             for j in texc:
                 self.texcoords.append(j)
@@ -204,11 +214,11 @@ class Text(State, Perspective, SlideBase):
             duration (float): glitch duration
         """
         self.glitch = True
-        self.glitch_from = self.string
         self.glitch_to = string
         self.glitch_start = self.parent.time
         if isinstance(duration, (float, int)):
             self.glitch_duration = max(duration, 0.01)
+        self.glitch_next()
 
     def glitch_next(self):
         """
@@ -217,25 +227,24 @@ class Text(State, Perspective, SlideBase):
         progress = min(1, (self.parent.time - self.glitch_start) / self.glitch_duration)
 
         if progress == 1.0:
-            self.set_text(self.glitch_to)
+            self.glitch_indices = []
+            self.glitch = False
+        elif progress == 0.0:
+            self.glitch_indices = list(range(0, len(self.glitch_to)))
+            del self.glitch_indices[random.randint(0, len(self.glitch_indices) -1)]
         else:
-            if random.random()>0.75:
-                return
+            nglitch = int((1-progress) * (len(self.glitch_to) - 1)) + 1
+            while len(self.glitch_indices) > nglitch:
+                del self.glitch_indices[random.randint(0, len(self.glitch_indices) -1)]
 
-            string = ""
+        glitched_text = ''
+        for i in range(len(self.glitch_to)):
+            if i in self.glitch_indices:
+                glitched_text += random.choice(list(self.font.glyph_table.keys()))
+            else:
+                glitched_text += self.glitch_to[i]
 
-            for i in range(len(self.glitch_to)):
-                r = random.random() / 2
-                c = self.glitch_to[i]
-                str_from = self.glitch_from if random.random() > 0.5 else self.string
-                if progress < r:
-                    c = str_from[random.randint(0, len(str_from)-1)] if len(str_from) > 0 else " "
-                if r > 0.48:
-                    c = c.upper()
-
-                string += c
-
-            self.set_text(string, 0, False)
+        self.set_text(glitched_text, 0, False)
 
 
     @osc_property('text', 'string')
