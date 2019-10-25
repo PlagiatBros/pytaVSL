@@ -62,8 +62,11 @@ class Group(object):
 
             self.post_process.toggle_effect(*args, **kwargs)
 
+            # MASK is a bit tricky
             if self.effect_mask != self.post_process.effect_mask:
                 self.post_process.set_effect_mask(self.effect_mask)
+            if len(self.buf[0].textures) == 2:
+                del self.buf[0].textures[1]
 
     @osc_property('sequence_mode', 'is_sequence')
     def set_sequence_mode(self, mode):

@@ -148,9 +148,9 @@ class Effect(object):
         """
         if slide == '':
             if len(self.buf[0].textures) == 2:
-                self.effect_mask = ''
                 del self.buf[0].textures[1]
-                self.toggle_effect('MASK', False)
+            self.effect_mask = ''
+            self.toggle_effect('MASK', False)
             return
 
         target = self.parent.get_children(self.parent.slides, slide)

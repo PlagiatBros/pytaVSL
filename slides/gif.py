@@ -38,7 +38,7 @@ class Gif(object):
         self.gif = []
         for i in range(gif.n_frames):
             gif.seek(i)
-            t = pi3d.Texture(gif, mipmap=False)
+            t = pi3d.Texture(gif, mipmap=False, flip=True)
             d = gif.info['duration'] / 1000.
             if d == 0:
                 d = 1. / self.parent.fps

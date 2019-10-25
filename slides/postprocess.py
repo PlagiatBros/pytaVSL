@@ -18,8 +18,6 @@ class PostProcess(State, Perspective, Warp, SlideBase):
 
         super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture, mesh_size=[1, 1])
 
-        self.active_effects.append('POST_PROCESS')
-
     def capture_start(self):
         self.buf[0].textures[0]._start()
 

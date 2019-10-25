@@ -57,7 +57,7 @@ def init_shader_cache():
     for i in range(len(PRECOMPILED)):
         combos = list(combinations(PRECOMPILED, i))
         for combo in combos:
-            for prefix in [None, 'TEXT', 'VIDEO', 'POST_PROCESS']:
+            for prefix in [None, 'TEXT', 'VIDEO']:
                 c = list(combo)
                 if prefix:
                     c.append(prefix)

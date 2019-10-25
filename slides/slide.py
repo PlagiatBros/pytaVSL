@@ -37,7 +37,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
 
         if type(texture) is str:
 
-            texture = pi3d.Texture(texture)
+            texture = pi3d.Texture(texture, flip=True)
 
         super(SlideBase, self).__init__(w=width if width is not None else texture.ix, h=height if height is not None else texture.iy, mesh_size=mesh_size)
 
