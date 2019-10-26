@@ -28,6 +28,7 @@ class Text(State, Perspective, SlideBase):
 
         self.need_regen = False
         self.last_draw_align_h = 'center'
+        self.last_draw_align_v = 'center'
 
         # cool
         self.glitch_duration = 1
@@ -98,10 +99,17 @@ class Text(State, Perspective, SlideBase):
             else:
                 cx = pos_x
 
+            if self.v_align == 'top':
+                cy = gap / 2.
+            elif self.v_align == 'bottom':
+                cy = -gap / 2.
+            else:
+                cy = 0
+
             for vert in tmp_vertices:
                 vertices.append([
                     (vert[0] - cx) * size,
-                    (vert[1] + total_height / 2. - gap / 2.  - pos_y) * size,
+                    (vert[1] + total_height / 2. - gap / 2.  - pos_y + cy) * size,
                     vert[2]
                 ])
 
@@ -153,6 +161,7 @@ class Text(State, Perspective, SlideBase):
 
         self.height = total_height * size
         self.last_draw_align_h = self.h_align
+        self.last_draw_align_v = self.h_align
 
 
         self.set_v_align(self.v_align)
@@ -196,7 +205,7 @@ class Text(State, Perspective, SlideBase):
         Override Slide.position to trigger string regeneration if h_align has changed
         """
         super(Text, self).position(x, y, z)
-        if self.h_align != self.last_draw_align_h:
+        if self.h_align != self.last_draw_align_h or self.v_align != self.last_draw_align_v:
             self.need_regen = True
 
     def set_text(self, string, duration=0, stop_glitch=True):
