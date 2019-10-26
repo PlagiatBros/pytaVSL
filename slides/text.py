@@ -122,7 +122,7 @@ class Text(State, Perspective, SlideBase):
 
         for i, char in enumerate(string):
 
-            if char == '\n':
+            if char == '\n' or (self.glitch and self.glitch_to[i] == '\n'):
                 make_line()
                 continue
 
