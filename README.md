@@ -3,8 +3,10 @@
 
 pytaVSL is a video-projection and compositing software built on top of [pi3d](https://github.com/tipam/pi3d/). It's designed for the live and has many cool features:
 - fully osc-controllable
-- slides (from image, gif and video files) and texts
-- per slide settings, effects, mapping, animations and states
+- slides (from image, gif and video files)
+- texts (rendered using signed distance fields)
+- per slide/text settings, effects, mapping, animations and states
+- slide groups (with effects, animations, etc)
 - global scenes management
 
 ### Requirements
@@ -21,9 +23,10 @@ pytaVSL is a video-projection and compositing software built on top of [pi3d](ht
 ```
 usage: python3 ./pytaVSL.py [-h] [--namespace NAMESPACE] [--port PORT]
                             [--load FILES [FILES ...]]
-                            [--text NAME:FONT [NAME:FONT ...]] [--fps FPS]
-                            [--max-vram MAX_VRAM] [--memtest] [--fullscreen]
-                            [--api] [--debug] [--show-fps]
+                            [--text NAME:FONT [NAME:FONT ...]]
+                            [--scenes FILES [FILES ...]] [--fps FPS]
+                            [--precompile] [--max-vram MAX_VRAM] [--memtest]
+                            [--fullscreen] [--api] [--debug] [--show-fps]
                             [--resolution WIDTHxHEIGHT] [--title TITLE]
                             [--version]
 
@@ -37,7 +40,10 @@ optional arguments:
   --text NAME:FONT [NAME:FONT ...]
                         text objects to create (default: ['0:sans', '1:sans',
                         '2:mono', '3:mono'])
+  --scenes FILES [FILES ...]
+                        scene files to load (default: None)
   --fps FPS             maximum framerate, 0 for free wheeling (default: 25)
+  --precompile          precompile effect shaders at startup (default: False)
   --max-vram MAX_VRAM   maximum video memory allocation (in MB) (default: 64)
   --memtest             test video memory size (default: False)
   --fullscreen          launch in fullscreen (default: False)
