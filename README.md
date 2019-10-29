@@ -65,7 +65,7 @@ python3 pytaVSL.py --api | less -cr
 
 ###  License
 
-Copyleft © 2019 Plagiat Brother; Original Code © Aurélien Roux; based upon Virtual Stage Light by Gregory David.
+Copyleft © 2019 Plagiat Brother; Original [prototype](https://github.com/PlagiatBros/pytaVSL/blob/58782830260a917a0d4a859507023b4130fd0171/main.py) © Aurélien Roux; based upon Virtual Stage Light by Gregory David.
 This program is a free software released under the [GNU/GPL3](https://github.com/PlagiatBros/pytaVSL/blob/master/LICENSE) license.
 
 **Included Fonts**
