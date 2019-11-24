@@ -62,6 +62,11 @@ class PytaVSL(Scenes, OscServer):
 
         self.post_process = PostProcess(self)
 
+        # post process solid backgrund
+        self.post_process_bg = Slide(parent=self, name='post_process_bg', texture=pi3d.Texture(numpy.ones((1,1,3), dtype='uint8')), width=self.width, height=self.height, init_z=10000-height)
+        self.post_process_bg.set_color(0,0,0)
+        self.post_process_bg.set_visible(1)
+
         # Slides
         self.slides = {}
 
@@ -175,6 +180,7 @@ class PytaVSL(Scenes, OscServer):
 
             if post_processing:
                 self.post_process.capture_start()
+                self.post_process_bg.draw()
 
             if self.slides_need_sorting:
                 self._sort_slides()
