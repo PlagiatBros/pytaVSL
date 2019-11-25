@@ -263,10 +263,7 @@ class Text(State, Perspective, SlideBase):
         glitched_text = ''
         for i in range(len(self.glitch_to)):
             if i in self.glitch_indices:
-                c = self.glitch_to[i]
-                while c == self.glitch_to[i]:
-                    c = random.choice(GLITCH_CHARS)
-                glitched_text += c
+                glitched_text += random.choice(GLITCH_CHARS)
             else:
                 glitched_text += self.glitch_to[i]
 
