@@ -12,6 +12,8 @@ from config import *
 import logging
 LOGGER = logging.getLogger(__name__)
 
+GLITCH_CHARS = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+:;,?!$____***')
+
 class Text(State, Perspective, SlideBase):
     """
     Dynamic text
@@ -253,16 +255,19 @@ class Text(State, Perspective, SlideBase):
             self.glitch = False
         elif progress == 0.0:
             self.glitch_indices = list(range(0, len(self.glitch_to)))
-            del self.glitch_indices[random.randint(0, len(self.glitch_indices) -1)]
         else:
-            nglitch = int((1-progress) * (len(self.glitch_to) - 1)) + 1
+            nglitch = int((1-progress) * len(self.glitch_to)) + 1
             while len(self.glitch_indices) > nglitch:
                 del self.glitch_indices[random.randint(0, len(self.glitch_indices) -1)]
 
         glitched_text = ''
         for i in range(len(self.glitch_to)):
             if i in self.glitch_indices:
-                glitched_text += random.choice(list(self.font.glyph_table.keys()))
+                c = self.glitch_to[i]
+                while c == self.glitch_to[i]:
+                    c = random.choice(GLITCH_CHARS)
+                glitched_text += c
+                # glitched_text += random.choice(list(self.font.glyph_table.keys()))
             else:
                 glitched_text += self.glitch_to[i]
 
