@@ -267,7 +267,6 @@ class Text(State, Perspective, SlideBase):
                 while c == self.glitch_to[i]:
                     c = random.choice(GLITCH_CHARS)
                 glitched_text += c
-                # glitched_text += random.choice(list(self.font.glyph_table.keys()))
             else:
                 glitched_text += self.glitch_to[i]
 
