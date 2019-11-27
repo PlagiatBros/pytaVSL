@@ -19,6 +19,7 @@ from memory import MemoryMonitor
 from osc import osc_method, osc_property
 from server import OscServer
 from scenes import Scenes
+from recorder import Recorder
 from config import *
 
 import logging
@@ -97,6 +98,9 @@ class PytaVSL(Scenes, OscServer):
         self.do_memtest = memtest
         self.monitor = MemoryMonitor(max_gpu_memory if not memtest else 10000, self.flush)
 
+        # Video recorder
+        self.recorder = Recorder(self)
+
         # Signal
         signal(SIGINT, self.stop)
         signal(SIGTERM, self.stop)
@@ -167,7 +171,11 @@ class PytaVSL(Scenes, OscServer):
                 sleep(delta)
 
             # Update clock
-            self.time = time()
+            if self.recorder.recording:
+                # when recording
+                self.time += 1. / self.fps
+            else:
+                self.time = time()
 
             # Process osc messages
             while self.server and self.server.recv(0):
@@ -213,12 +221,14 @@ class PytaVSL(Scenes, OscServer):
             # Debug text always on top
             self.debug_text.draw()
 
+            self.recorder.write()
 
 
     def stop(self, *args):
         """
         Stop main loop and osc server
         """
+        self.recorder.stop()
         self.DISPLAY.stop()
         self.DISPLAY.destroy()
         super(PytaVSL, self).stop()
