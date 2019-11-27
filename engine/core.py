@@ -172,7 +172,7 @@ class PytaVSL(Scenes, OscServer):
 
             # Update clock
             if self.recorder.recording:
-                # when recording
+                # don't skip frames when recording
                 self.time += 1. / self.fps
             else:
                 self.time = time()
@@ -218,10 +218,13 @@ class PytaVSL(Scenes, OscServer):
                 self.debug_text.set_text('fps: %i' % self.measured_fps)
 
 
+            # Save frame to video
+            if self.recorder.recording:
+                self.recorder.write()
+
             # Debug text always on top
             self.debug_text.draw()
 
-            self.recorder.write()
 
 
     def stop(self, *args):
@@ -470,7 +473,6 @@ class PytaVSL(Scenes, OscServer):
         """
         self.stroke_selected = int(bool(stroke))
 
-
     def draw_select_slide(self):
         slide = self.get_children(self.slides, self.selected)
         if len(slide) > 0:
@@ -491,3 +493,18 @@ class PytaVSL(Scenes, OscServer):
         else:
             LOGGER.error('selected slide "%s" does not exist anymore' % self.selected)
             self.selected = None
+
+    @osc_method('record')
+    def record(self, path):
+        """
+        Record output to video file
+            path: video path
+        """
+        self.recorder.start(path)
+
+    @osc_method('record_stop')
+    def record_stop(self):
+        """
+        Stop recording output
+        """
+        self.recorder.stop()

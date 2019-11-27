@@ -1,5 +1,9 @@
 from pi3d.util.Screenshot import screenshot
 
+import logging
+
+LOGGER = logging.getLogger(__name__)
+
 class Recorder(object):
 
     def __init__(self, engine):
@@ -21,23 +25,30 @@ class Recorder(object):
         if self.recording:
             self.stop()
 
+        ext =  path.split('.')[-1].lower()
+        if ext == 'avi':
+            fourcc = ('M', 'J', 'P', 'G')
+        elif ext == 'mp4':
+            fourcc = ('a', 'v', 'c', '1')
+        else:
+            LOGGER.error('no codec preset for video extension "%s"' % ext)
+            return
+
         self.path = path
-        self.writer = cv2.VideoWriter(self.path, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), self.engine.fps, (self.engine.width, self.engine.height))
+        self.writer = cv2.VideoWriter(self.path, cv2.VideoWriter_fourcc(*fourcc), self.engine.fps, (self.engine.width, self.engine.height))
         self.recording = True
 
         LOGGER.info('started video capture to %s' % self.path)
 
     def write(self):
 
-        if self.recording:
-
-            self.writer.write(screenshot())
+        frame = screenshot()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        self.writer.write(frame)
 
     def stop(self):
 
-        if self.recording:
+        self.writer.release()
+        self.recording = False
 
-            self.writer.release()
-            self.recording = False
-
-            LOGGER.info('stopped video capture to %s' % self.path)
+        LOGGER.info('stopped video capture to %s' % self.path)
