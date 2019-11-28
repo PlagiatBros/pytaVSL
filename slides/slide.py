@@ -135,13 +135,13 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         """
         offx = 0
         if self.h_align != 'center':
-            offx = (self.parent.width - self.width * self.sx) / 2.0
+            offx = (self.parent.width - self.width * self.sx * self.init_scale) / 2.0
         if self.h_align == 'left':
             offx *= -1
 
         offy = 0
         if self.v_align != 'center':
-            offy = (self.parent.height - self.height * self.sy) / 2.0
+            offy = (self.parent.height - self.height * self.sy * self.init_scale) / 2.0
         if self.v_align == 'bottom':
             offy *= -1
 
