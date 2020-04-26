@@ -20,7 +20,7 @@ class Video(object):
         self.video_time = 0
 
         if isinstance(texture, str):
-            match = videos_formats.match(texture)
+            match = videos_formats.match(texture.lower())
             if match and match.string:
                 LOGGER.warning('video support is experimental !')
                 try:
