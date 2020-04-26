@@ -177,6 +177,14 @@ class PytaVSL(Scenes, OscServer):
             else:
                 self.time = time()
 
+
+            if self.DISPLAY.was_resized:
+                # bypass pi3d resize event handling
+                self.DISPLAY.width = self.width
+                self.DISPLAY.height = self.height
+                opengles.glViewport(0, 0, self.width, self.height)
+                self.DISPLAY.was_resized = False
+
             # Process osc messages
             while self.server and self.server.recv(0):
                 pass
