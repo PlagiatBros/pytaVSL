@@ -10,11 +10,21 @@ from warp import Warp
 import logging
 LOGGER = logging.getLogger(__name__)
 
+
+class FakeTexImage():
+    def __init__(self, x, y):
+        self.nbytes = x * y * 3
+
+class OffScreenTex(OffScreenTexture):
+    def __init__(self, *args, **kwargs):
+        super(OffScreenTex, self).__init__(*args, **kwargs)
+        self.image = FakeTexImage(self.ix, self.iy)
+
 class PostProcess(State, Perspective, Warp, SlideBase):
 
     def __init__(self, parent):
 
-        texture = OffScreenTexture("post_process")
+        texture = OffScreenTex("post_process")
 
         super(PostProcess, self).__init__(parent=parent, name="post_process", texture=texture, mesh_size=[1, 1])
 

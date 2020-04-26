@@ -5,6 +5,8 @@ from config import *
 import logging
 LOGGER = logging.getLogger(__name__)
 
+from pi3d.util.OffScreenTexture import OffScreenTexture
+
 class MemoryMonitor(object):
 
     def __init__(self, max=512, flush=None):
