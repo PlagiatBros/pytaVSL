@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import pi3d
+from pi3d.constants import (opengles, GL_TEXTURE0, GL_TEXTURE_2D, GL_UNSIGNED_BYTE)
 from osc import osc_property
 
 import logging
@@ -34,6 +35,8 @@ class Video(object):
                 self.video_reader = cv2.VideoCapture(texture)
                 self.video_shape = (int(self.video_reader.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(self.video_reader.get(cv2.CAP_PROP_FRAME_WIDTH)), 3)
                 self.video_texture = pi3d.Texture(numpy.zeros(self.video_shape, dtype='uint8'), mipmap=False)
+                self.frame_format = self.video_texture._get_format_from_array(self.video_texture.image, self.video_texture.i_format)
+
 
                 self.video_frame_duration = 1. / min(self.video_reader.get(cv2.CAP_PROP_FPS), 60)
                 self.video_elapsed_time = 0
@@ -108,4 +111,12 @@ class Video(object):
     def video_load_current_frame(self):
         ok, frame = self.video_reader.retrieve()
         if ok:
-            self.video_texture.update_ndarray(frame, 0)
+            # return self.video_texture.update_ndarray(frame, 0)
+            tex = self.video_texture
+            opengles.glActiveTexture(GL_TEXTURE0)
+            opengles.glBindTexture(GL_TEXTURE_2D, tex._tex)
+            opengles.glTexSubImage2D(GL_TEXTURE_2D, 0,
+                                     0, 0, tex.ix, tex.iy,
+                                     self.frame_format, GL_UNSIGNED_BYTE,
+                                     frame.__array_interface__['data'][0])
+                                     # .ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)))
