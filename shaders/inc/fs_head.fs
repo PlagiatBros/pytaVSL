@@ -22,13 +22,24 @@ const vec2 resolution = vec2({WIDTH}, {HEIGHT});
 
 vec4 tex2D(sampler2D tex, vec2 coords) {
     #ifdef TEXT
-        float smoothing = 0.25 / (25. * sqrt(unib[2][2])); // 0.25 / (spread * scale)
-        float distance = texture2D(tex, coords).r;
-        float outlineFactor = smoothstep(0.5 - smoothing, 0.5 + smoothing, distance);
-        vec3 color = mix(unib[4], vec3(unib[1]), outlineFactor);
-        float outlineWidth = 0.5 + smoothing - unib[3][2] / 4.0;
-        float alpha = smoothstep(outlineWidth - smoothing, outlineWidth + smoothing, distance);
-        return vec4(color, alpha);
+
+        vec3 sample = texture2D(tex, coords).rgb;
+
+        float r = sample.r;
+        float g = sample.g;
+        float b = sample.b;
+
+        float median = max(min(r, g), min(max(r, g), b));
+        float signed_dist = median - 0.5;
+        float d = fwidth(signed_dist);
+
+        float outlineFactor = step(0.0, unib[3][2]) * smoothstep(unib[3][2] - d, unib[3][2] + d, signed_dist);
+
+        vec3 color = mix(unib[4], unib[1], outlineFactor);
+
+        float opacity = smoothstep(-d, d, signed_dist);
+
+        return vec4(color, opacity);
     #else
         return texture2D(tex, coords);
     #endif

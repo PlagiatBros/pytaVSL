@@ -1,8 +1,8 @@
 # encoding: utf-8
 
-from font import SdfFont
+from font import MsdfFont
 
 FONTS = {
-    "sans": SdfFont('fonts/leaguegothic.ttf'),
-    "mono": SdfFont('fonts/freemono.ttf')
+    "sans": MsdfFont('fonts/leaguegothic.png'),
+    "mono": MsdfFont('fonts/freemono.png')
 }

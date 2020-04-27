@@ -5,156 +5,47 @@ import ctypes
 import numpy as np
 import itertools
 import os.path
+import json
 
 from PIL import Image, ImageDraw, ImageFont
 
 from pi3d.constants import *
 import pi3d
 
-from math import sqrt, ceil
+class MsdfFont(pi3d.Texture):
 
-CODEPOINTS = list(range(32, 126)) + list(range(160,255)) + ['ʒ', '~', 'ä']
-TEXTURE_SIZE = 2048
-
-class Font(pi3d.Texture):
-
-    def __init__(self, font, codepoints, size):
+    def __init__(self, font):
         """Arguments:
         *font*:
-            File path/name to a TrueType font file.
-
-        *codepoints*:
-            Iterable list of characters. All these formats will work:
-
-                'ABCDEabcde '
-                [65, 66, 67, 68, 69, 97, 98, 99, 100, 101, 145, 148, 172, 32]
-                [c for c in range(65, 173)]
-
-            Note that Font will ONLY use the codepoints in this list - if you
-            forget to list a codepoint or character here, it won't be displayed.
-
-            If the string version is used then the program file might need to
-            have the coding defined at the top:    # -*- coding: utf-8 -*-
-
-            The default is *codepoints*=range(256).
-
-
+            File path/name to a msdf-bmfont font file.
         """
 
         self.mono = 'mono' in font.lower()
 
-        super(Font, self).__init__(font, automatic_resize=False)
-
-        self.font = font
-
-        if codepoints is not None:
-            codepoints = list(codepoints)
-        else:
-            codepoints = list(range(256))
-
-        ch_per_line = int(ceil(sqrt(len(codepoints))))
-
-        font_size = int(size / ch_per_line / 1.2)
-        imgfont = ImageFont.truetype(font, font_size)
-        ascent, descent = imgfont.getmetrics()
-        self.line_height = int(size / ch_per_line)
-
-        y_correction = 0# (self.line_height-ascent-descent) / 2
-        glyph_img = Image.new("RGBA", (size, size), (0, 0, 0, 255))
-
-
-        self.ix, self.iy = size, size
+        super(MsdfFont, self).__init__(font, automatic_resize=False)
 
         self.glyph_table = {}
 
-        draw = ImageDraw.Draw(glyph_img)
+        font_data = json.loads(open(font.replace('.png', '.json'), 'r').read())
+        self.line_height = font_data['common']['lineHeight']
+        for char in font_data ['chars']:
 
-        curX = 0.0
-        curY = 0.0
-        yindex = 0
-        xindex = 0
+            x = char['x'] / self.ix
+            y = 1 - char['y'] / self.iy
+            w = char['width'] / self.ix
+            h = char['height'] / self.iy
 
-        self.ratio = 1.0
-        self.nominal_height = 0
-
-        chwidth, chheight = imgfont.getsize('A')
-        self.nominal_height = chheight
-        self.ratio = 1.0 * chheight / chwidth
-
-        for i in itertools.chain([0], codepoints):
-
-            try:
-                ch = chr(i)
-            except TypeError:
-                ch = i
-
-            chwidth, chheight = imgfont.getsize(ch)
-            chwidth += 10
-
-            if self.mono:
-                chwidth = self.nominal_height / self.ratio
-
-            curX = xindex * self.line_height
-            curY = yindex * self.line_height
-
-            h_offset = (self.line_height - chwidth) / 2.0
-            draw.text((curX + h_offset, curY), ch, font=imgfont, fill=(255,255,255,255))
-
-            x = float(curX + h_offset) / self.ix
-            y = float(curY + self.line_height - y_correction) / self.iy
-            tw = float(chwidth) / self.ix
-            th = float(self.line_height) / self.iy
-
-            table_entry = [
-                chwidth,
-                chheight,
-                [[x + tw, y - th], [x , y - th], [x, y], [x + tw, y]], # UV texture coordinates
-                [[chwidth, 0, 0], [0, 0, 0], [0, -self.line_height, 0], [chwidth, -self.line_height, 0]], # xyz vertex coordinates of corners
+            self.glyph_table[char['char']] = [
+                char['xadvance'],
+                char['height'],
+                [[x + w, y], [x, y], [x, y - h], [x + w, y - h]], # tex coords
+                [[char['width'] + char['xoffset'], -char['yoffset'], 0], [0, -char['yoffset'], 0], [0, -char['yoffset']-char['height'], 0], [char['width'] + char['xoffset'], -char['yoffset']-char['height'], 0]] # vertex
             ]
 
-            self.glyph_table[ch] = table_entry
-
-            xindex += 1
-            if xindex >= ch_per_line:
-                xindex = 0
-                yindex += 1
-
-        self.image = np.array(glyph_img)
-
-        self._tex = ctypes.c_uint()
+        self.nominal_height = self.glyph_table['A'][1]
+        self.ratio = self.glyph_table['A'][1] / self.glyph_table['A'][0]
 
 
-    def _load_disk(self):
-        """
-        we need to stop the normal file loading by overriding this method
-        """
+    def get_glyph(self, char):
 
-
-class SdfFont(Font):
-
-    def __init__(self, font, codepoints=CODEPOINTS, size=TEXTURE_SIZE):
-
-        super(SdfFont, self).__init__(font, codepoints, size)
-
-        self.sdf_path = '.'.join(self.font.split('.')[0:-1]) + '-sdf.png'
-
-        try:
-            self.load_sdf()
-        except:
-            if 'y' in input('Warning: no signed distance field found for %s, do you want to create it now ?\nYou need a big computer and a compiled sdfgen binary in the fonts folder. (y/N)' % self.font).lower():
-                self.create_sdf(codepoints, size)
-
-    def create_sdf(self, codepoints, size):
-        from subprocess import call
-        print('Generating hi-res font texture for %s' % self.font)
-        tmp = Font(self.font, codepoints, size * 8)
-        image = Image.fromarray(tmp.image)
-        image.save(self.sdf_path)
-        print('Generating signed distance field for %s' % self.font)
-        call(['./fonts/sdfgen', self.sdf_path, self.sdf_path, '--maxdst', '200', '--size', str(size)])
-        self.load_sdf()
-
-
-    def load_sdf(self):
-        tex = pi3d.Texture(self.sdf_path, automatic_resize=False)
-        self.image =  tex.image
+        return self.glyph_table[char] if char in self.glyph_table else self.glyph_table[' ']

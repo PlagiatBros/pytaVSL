@@ -120,24 +120,19 @@ class Text(State, Perspective, SlideBase):
             pos_y += gap
 
 
-        default_glyph = font.glyph_table.get(chr(0), None)
-
         for i, char in enumerate(string):
 
             if char == '\n' or (self.glitch and self.glitch_to[i] == '\n'):
                 make_line()
                 continue
 
-            glyph = font.glyph_table.get(char, default_glyph)
-
-            if not glyph:
-                continue
+            glyph = font.get_glyph(char)
 
             w, h, texc, verts = glyph[0:4]
 
             if self.glitch and not self.font.mono:
                 # use the destination letter's width when glitching
-                w = font.glyph_table.get(self.glitch_to[i], default_glyph)[0]
+                w = font.get_glyph(char)[0]
 
             for j in verts:
                 glitch_offset = 0
