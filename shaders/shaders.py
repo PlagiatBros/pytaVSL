@@ -37,7 +37,11 @@ def get_shader(effects, log=True):
         if log:
             LOGGER.debug('compiling shader "%s"' % name)
 
-        defines = '#extension GL_OES_standard_derivatives : enable\n'
+        defines = ''
+
+        if 'TEXT' in name:
+            defines += '#extension GL_OES_standard_derivatives : enable\n'
+
         for fx in effects:
             defines += '#define %s\n' % fx
 
