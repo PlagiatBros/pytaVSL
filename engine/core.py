@@ -239,7 +239,8 @@ class PytaVSL(Scenes, OscServer):
         """
         Stop main loop and osc server
         """
-        self.recorder.stop()
+        if self.recorder.recording:
+            self.recorder.stop()
         self.DISPLAY.stop()
         self.DISPLAY.destroy()
         super(PytaVSL, self).stop()
