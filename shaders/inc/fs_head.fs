@@ -33,7 +33,7 @@ vec4 tex2D(sampler2D tex, vec2 coords) {
         float signed_dist = median - 0.5;
         float d = fwidth(signed_dist);
 
-        float outlineFactor = step(0.0, unib[3][2]) * smoothstep(unib[3][2] - d, unib[3][2] + d, signed_dist);
+        float outlineFactor = step(unib[3][2], 0.0) + step(0.0, unib[3][2]) * smoothstep(unib[3][2] - d, unib[3][2] + d, signed_dist);
 
         vec3 color = mix(unib[4], unib[1], outlineFactor);
 
