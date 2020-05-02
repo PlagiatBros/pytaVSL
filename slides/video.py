@@ -190,6 +190,8 @@ class Video(object):
                                      self.frame_format, GL_UNSIGNED_BYTE,
                                      # frame.__array_interface__['data'][0])
                                      frame.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)))
+            opengles.glGenerateMipmap(GL_TEXTURE_2D)
+
 
 
     def set_audio_bypass(self, state):
