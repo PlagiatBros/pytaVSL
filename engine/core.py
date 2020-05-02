@@ -20,7 +20,7 @@ from osc import osc_method, osc_property
 from server import OscServer
 from scenes import Scenes
 from recorder import Recorder
-from config import *
+from text import FONTS
 
 import logging
 LOGGER = logging.getLogger(__name__)

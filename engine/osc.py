@@ -135,5 +135,13 @@ class OscNode(object):
 
             method(*value)
 
+            self.property_changed(attribute)
+
         else:
             LOGGER.error('invalid property argument "%s" for %s/set' % (attribute, self.get_osc_path()))
+
+    def property_changed(self, name):
+        """
+        Property changed callback
+        """
+        pass

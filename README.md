@@ -14,8 +14,13 @@ pytaVSL is a video-projection and compositing software built on top of [pi3d](ht
 - python3
 - python3-liblo
 - python3-toml
-- python3-opencv (if video playback is needed)
 - [pi3d](https://github.com/tipam/pi3d/)
+
+Additional requirements for video playback:
+
+- python3-opencv
+- mplayer and mplayer.py (optional, for audio playback)
+- ffmpeg (optional, for audio playback)
 
 
 ### Usage
@@ -38,8 +43,7 @@ optional arguments:
   --load FILES [FILES ...]
                         image files to load (default: None)
   --text NAME:FONT [NAME:FONT ...]
-                        text objects to create (default: ['0:sans', '1:sans',
-                        '2:mono', '3:mono'])
+                        text objects to create (default: ['0:sans', '1:sans', '2:mono', '3:mono'])
   --scenes FILES [FILES ...]
                         scene files to load (default: None)
   --fps FPS             maximum framerate, 0 for free wheeling (default: 25)
@@ -53,6 +57,8 @@ optional arguments:
   --resolution WIDTHxHEIGHT
                         output resolution (default: 800x600)
   --title TITLE         window title (default: pytaVSL)
+  --audio               enable audio playback of video slides (when visible) (default: False)
+  --jack                use jack backend for audio playback (default: False)
   --version             show program's version number and exit
 ```
 
