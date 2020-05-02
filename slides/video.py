@@ -152,6 +152,9 @@ class Video(object):
 
 
     def video_next_frame(self):
+        """
+        Seek to current frame
+        """
 
         time = self.parent.time
 
@@ -179,6 +182,9 @@ class Video(object):
             self.video_load_current_frame()
 
     def video_load_current_frame(self):
+        """
+        Load current frame in texture
+        """
         ok, frame = self.video_reader.retrieve()
         if ok:
             # return self.video_texture.update_ndarray(frame, 0)
@@ -195,12 +201,18 @@ class Video(object):
 
 
     def set_audio_bypass(self, state):
+        """
+        Internal: mute audio playback
+        """
         state = int(bool(state))
         if self.audio_bypass != state:
             self.audio_bypass = state
             self.audio_reader.mute = bool(state)
 
     def set_audio_sync(self):
+        """
+        Sync audio at next frame
+        """
         self.audio_sync = 1
 
     def property_changed(self, name):
