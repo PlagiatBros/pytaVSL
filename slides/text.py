@@ -319,7 +319,7 @@ class Text(State, Perspective, SlideBase):
     @osc_property('line_height', 'line_height')
     def set_text_line_height(self, line_height):
         """
-        letter spacing
+        line height
         """
         if line_height != self.line_height:
             self.need_regen = True
