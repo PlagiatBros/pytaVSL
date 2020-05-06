@@ -202,13 +202,18 @@ class PytaVSL(Scenes, OscServer):
                 self._sort_slides()
 
             for slide in self.sorted_slides:
+
                 if not slide.parent_slide:
                     slide.draw()
+
+                slide.osc_feed_subscribers()
 
             if post_processing:
                 self.post_process.capture_end()
                 self.post_process.draw()
 
+            self.post_process.osc_feed_subscribers()
+            self.osc_feed_subscribers()
 
             if self.selected and self.stroke_selected:
                 self.draw_select_slide()

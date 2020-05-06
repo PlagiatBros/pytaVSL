@@ -43,6 +43,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
 
         self.name = name
         self.parent = parent
+        self.server = parent.server
         self.parent_slide = None
 
         self.is_clone = False

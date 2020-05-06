@@ -1,11 +1,27 @@
 # encoding: utf-8
 
+import liblo
 import logging
 from inspect import getmembers, getargspec
 
 from config import *
 
 LOGGER = logging.getLogger(__name__)
+
+def normalize_osc_port(port):
+
+    if str(port).isdigit():
+        port = 'osc.udp://127.0.0.1:' + str(port)
+    elif type(return_port) is str and '://' not in port:
+        port = 'osc.udp://' + port
+
+    try:
+        test = liblo.Address(port)
+    except:
+        LOGGER.error('invalid osc port %s' % port)
+        port = None
+
+    return port
 
 class osc_method():
     """
@@ -63,6 +79,7 @@ class OscNode(object):
         self.osc_attributes = {}
         self.osc_state = {}
         self.osc_attributes_horthands = []
+        self.osc_subscribes = {}
 
         for name, method in getmembers(self):
 
@@ -140,7 +157,96 @@ class OscNode(object):
         else:
             LOGGER.error('invalid property argument "%s" for %s/set' % (attribute, self.get_osc_path()))
 
-    def property_changed(self, name):
+
+    @osc_method('get')
+    def osc_get(self, property, return_port):
+        """
+        Send property's current value to return_port at /slide_address/get/reply
+            property: exposed osc property
+            return_port: port number, ip:port string, or valid full osc address
+        """
+
+        return_port = normalize_osc_port(return_port)
+
+        if property in self.osc_attributes:
+            address = self.get_osc_path() + '/get/reply'
+            if return_port is not None:
+                self.server.send(return_port, address, property, *self.osc_get_value(property))
+        else:
+            LOGGER.error('invalid property argument "%s" for %s' % (property, address))
+
+
+    @osc_method('subscribe')
+    def osc_subscribe(self, property, return_port):
+        """
+        Subscribe to property's updates and send them to return_port at /slide_address/subscribe/update
+            property: exposed osc property
+            return_port: (optional) port number, ip:port string, or valid full osc address
+        """
+
+        if property not in self.osc_attributes:
+            LOGGER.error('invalid property argument "%s" for %s/subscribe' % (property, self.get_osc_path()))
+            return
+
+        return_port = normalize_osc_port(return_port)
+
+        if return_port is None:
+            LOGGER.error('invalid return_port argument "%s" for %s/subscribe' % (property, self.get_osc_path()))
+            return
+
+        if property not in self.osc_subscribes:
+            self.osc_subscribes[property] = {}
+
+        if return_port not in self.osc_subscribes[property]:
+            value = self.osc_get_value(property)[:]
+            self.osc_subscribes[property][return_port] = value
+            address = self.get_osc_path() + '/subscribe/update'
+            self.server.send(return_port, address, property, *value)
+
+
+    @osc_method('unsubscribe')
+    def osc_unsubscribe(self, property, *return_port):
+        """
+        Unsubscribe from property's updates
+            property: exposed osc property
+            return_port: (optional) port number, ip:port string, or valid full osc address
+                         if omitted, applies to all registered ports
+        """
+
+        if property not in self.osc_attributes:
+            LOGGER.error('invalid property argument "%s" for %s/unsubscribe' % (property, self.get_osc_path()))
+            return
+
+        if len(return_port) == 0 and property in self.osc_subscribes:
+
+            del self.osc_subscribes[property]
+
+        elif len(return_port) > 0 and property in self.osc_subscribes:
+
+            return_port = normalize_osc_port(return_port[0])
+
+            if return_port is None:
+                LOGGER.error('invalid return_port argument "%s" for %s/unsubscribe' % (return_port, self.get_osc_path()))
+                return
+
+            if return_port in self.osc_subscribes[property]:
+                del self.osc_subscribes[property][return_port]
+
+
+
+    def osc_feed_subscribers(self):
+
+        for property in self.osc_subscribes:
+            value = self.osc_get_value(property)[:]
+            address = self.get_osc_path() + '/subscribe/update'
+            for return_port in self.osc_subscribes[property]:
+                if value != self.osc_subscribes[property][return_port]:
+                    self.osc_subscribes[property][return_port] = value
+                    self.server.send(return_port, address, property, *value)
+
+
+
+    def property_changed(self, property):
         """
         Property changed callback
         """
