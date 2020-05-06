@@ -71,7 +71,6 @@ class Video(object):
                     self.audio_reader = Player(args=mplayer_args)
                     self.audio_reader.loadfile(texture + '.wav')
                     self.audio_bypass = 0
-                    self.audio_sync = 0
                     self.set_audio_bypass(1)
 
                 if video_support:
@@ -99,10 +98,6 @@ class Video(object):
 
         if self.video and self.visible:
             self.video_next_frame()
-
-            if self.audio and self.audio_sync:
-                self.audio_reader.seek(self.video_time, 2)
-                self.audio_sync = 0
 
         super(Video, self).draw(*args, **kwargs)
 
@@ -213,7 +208,8 @@ class Video(object):
         """
         Sync audio at next frame
         """
-        self.audio_sync = 1
+        self.audio_reader.seek(self.video_time, 2)
+
 
     def property_changed(self, name):
 
