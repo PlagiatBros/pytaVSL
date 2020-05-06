@@ -220,7 +220,7 @@ class Video(object):
         super(Video, self).property_changed(name)
 
         if self.audio:
-            if name == 'visible':
+            if name == 'visible' and self.video_speed == 1:
                 if self.visible:
                     self.set_audio_sync()
                 self.set_audio_bypass(self.visible == 0)
