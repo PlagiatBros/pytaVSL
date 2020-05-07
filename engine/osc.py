@@ -4,8 +4,6 @@ import liblo
 import logging
 from inspect import getmembers, getargspec
 
-from config import *
-
 LOGGER = logging.getLogger(__name__)
 
 def normalize_osc_port(port):
