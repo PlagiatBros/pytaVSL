@@ -28,6 +28,7 @@ class Video(object):
         self.audio = False
         self.video_speed = 1.0
         self.video_time = 0
+        self.video_loop = 0
 
         if isinstance(texture, str):
             match = videos_formats.match(texture.lower())
@@ -79,7 +80,8 @@ class Video(object):
 
                     self.video_reader = cv2.VideoCapture(texture)
                     self.video_shape = (int(self.video_reader.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(self.video_reader.get(cv2.CAP_PROP_FRAME_WIDTH)), 3)
-                    self.video_texture = pi3d.Texture(numpy.zeros(self.video_shape, dtype='uint8'), mipmap=True)
+                    self.video_blank_frame = numpy.zeros(self.video_shape, dtype='uint8')
+                    self.video_texture = pi3d.Texture(self.video_blank_frame, mipmap=True)
                     self.frame_format = self.video_texture._get_format_from_array(self.video_texture.image, self.video_texture.i_format)
 
                     self.video_frame_duration = 1. / min(self.video_reader.get(cv2.CAP_PROP_FPS), 60)
@@ -114,6 +116,9 @@ class Video(object):
 
         if time > self.video_duration:
             time = 0
+            if self.video_loop == 0:
+                self.set_video_speed(0)
+                self.video_load_frame(self.video_blank_frame)
 
         self.video_reader.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
         self.video_time = time
@@ -146,6 +151,15 @@ class Video(object):
                 self.set_audio_bypass(1)
 
 
+
+    @osc_property('video_loop', 'video_loop')
+    def set_video_loop(self, loop):
+        """
+        video looping state (0|1)
+            if not looping, video_speed will be set to 0 when the video reaches the last frame
+        """
+        self.video_loop = int(bool(loop))
+
     def video_next_frame(self):
         """
         Seek to current frame
@@ -168,30 +182,34 @@ class Video(object):
                 ok = self.video_reader.grab()
                 if not ok:
                     self.set_video_time(0)
+                    if self.video_loop == 0:
+                        self.set_video_speed(0)
+                        self.video_load_frame(self.video_blank_frame)
+                        return
 
             self.video_elapsed_time += frames * (self.video_frame_duration / self.video_speed)
 
             self.video_time += frames * self.video_frame_duration
             # self.video_time = self.video_reader.get(cv2.CAP_PROP_POS_MSEC) / 1000.
 
-            self.video_load_current_frame()
+            ok, frame = self.video_reader.retrieve()
+            if ok:
+                self.video_load_frame(frame)
 
-    def video_load_current_frame(self):
+
+    def video_load_frame(self, frame):
         """
-        Load current frame in texture
+        Load frame (numpy array) in texture
         """
-        ok, frame = self.video_reader.retrieve()
-        if ok:
-            # return self.video_texture.update_ndarray(frame, 0)
-            tex = self.video_texture
-            opengles.glActiveTexture(GL_TEXTURE0)
-            opengles.glBindTexture(GL_TEXTURE_2D, tex._tex)
-            opengles.glTexSubImage2D(GL_TEXTURE_2D, 0,
-                                     0, 0, tex.ix, tex.iy,
-                                     self.frame_format, GL_UNSIGNED_BYTE,
-                                     # frame.__array_interface__['data'][0])
-                                     frame.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)))
-            opengles.glGenerateMipmap(GL_TEXTURE_2D)
+        # return self.video_texture.update_ndarray(frame, 0)
+        tex = self.video_texture
+        opengles.glActiveTexture(GL_TEXTURE0)
+        opengles.glBindTexture(GL_TEXTURE_2D, tex._tex)
+        opengles.glTexSubImage2D(GL_TEXTURE_2D, 0,
+                                 0, 0, tex.ix, tex.iy,
+                                 self.frame_format, GL_UNSIGNED_BYTE,
+                                 frame.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)))
+        opengles.glGenerateMipmap(GL_TEXTURE_2D)
 
 
 
