@@ -101,6 +101,10 @@ class PytaVSL(Scenes, OscServer):
         # Video recorder
         self.recorder = Recorder(self)
 
+        # Status
+        self.status = 'ready'
+        self.loading_threads = 0
+
         # Signal
         signal(SIGINT, self.stop)
         signal(SIGTERM, self.stop)
@@ -273,6 +277,9 @@ class PytaVSL(Scenes, OscServer):
 
         def threaded():
 
+            self.loading_threads += 1
+            self.update_status()
+
             self.debug_text.set_visible(1)
             self.debug_text.set_text('0/' + str(size))
 
@@ -290,6 +297,9 @@ class PytaVSL(Scenes, OscServer):
             self.debug_text.set_visible(0)
 
             LOGGER.info("total slides in memory: %i" % len(self.slides.values()))
+
+            self.loading_threads -= 1
+            self.update_status()
 
         t = Thread(target=threaded)
         t.daemon = True
@@ -522,3 +532,21 @@ class PytaVSL(Scenes, OscServer):
         Stop recording output
         """
         self.recorder.stop()
+
+    @osc_property('status', 'status')
+    def set_status_ro(self):
+        """
+        Status (read-only):
+            - "ready": running
+            - "loading": currently loading slides
+        """
+        pass
+
+    def update_status(self):
+        """
+        Update internal status
+        """
+        if self.loading_threads == 0:
+            self.status = 'ready'
+        else:
+            self.status = 'loading'
