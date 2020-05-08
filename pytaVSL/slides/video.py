@@ -3,7 +3,8 @@
 import pi3d
 import ctypes
 from pi3d.constants import (opengles, GL_TEXTURE0, GL_TEXTURE_2D, GL_UNSIGNED_BYTE)
-from osc import osc_property
+
+from ..engine.osc import osc_property
 
 import logging
 LOGGER = logging.getLogger(__name__)

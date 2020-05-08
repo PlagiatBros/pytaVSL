@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-from config import *
-
 import logging
 LOGGER = logging.getLogger(__name__)
 

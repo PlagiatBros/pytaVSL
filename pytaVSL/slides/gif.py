@@ -3,7 +3,7 @@
 import pi3d
 from PIL.GifImagePlugin import GifImageFile
 
-from osc import osc_property
+from ..engine.osc import osc_property
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ class Gif(object):
 
         now = self.parent.time
 
-        if self.gif_changed_time is 0 or self.gif_speed == 0:
+        if self.gif_changed_time == 0 or self.gif_speed == 0:
             self.gif_changed_time = now
 
         if self.gif_speed == 0:

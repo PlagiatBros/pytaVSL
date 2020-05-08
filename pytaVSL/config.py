@@ -1,9 +1,8 @@
 # encoding: utf-8
 
-VERSION="pytaVSL v0.0.0"
-
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from sys import argv
+from . import __version__
 
 parser = ArgumentParser(prog="python3 %s" % argv[0], formatter_class=ArgumentDefaultsHelpFormatter)
 
@@ -24,6 +23,6 @@ parser.add_argument('--resolution',  help='output resolution', type=str, default
 parser.add_argument('--title',  help='window title', type=str, default='pytaVSL', metavar='TITLE')
 parser.add_argument('--audio',  help='enable audio playback of video slides (when visible)', default=False, action='store_true')
 parser.add_argument('--jack',  help='use jack backend for audio playback', default=False, action='store_true')
-parser.add_argument('--version', action='version', version=VERSION)
+parser.add_argument('--version', action='version', version=__version__)
 
 config = parser.parse_args()

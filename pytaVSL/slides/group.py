@@ -1,4 +1,4 @@
-from osc import osc_property
+from ..engine.osc import osc_property
 
 import logging
 LOGGER = logging.getLogger(__name__)

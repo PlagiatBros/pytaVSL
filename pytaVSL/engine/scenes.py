@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from osc import osc_method
+from ..engine.osc import osc_method
 
 import glob
 import traceback

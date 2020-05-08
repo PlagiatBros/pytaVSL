@@ -2,10 +2,11 @@
 
 from pi3d.util.OffScreenTexture import OffScreenTexture
 
-from perspective import Perspective
-from slide import SlideBase
-from state import State
-from warp import Warp
+
+from ..slides.perspective import Perspective
+from ..slides.slide import SlideBase
+from ..slides.state import State
+from ..slides.warp import Warp
 
 import logging
 LOGGER = logging.getLogger(__name__)

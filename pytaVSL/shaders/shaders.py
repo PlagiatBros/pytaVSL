@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from ..utils import relative_path
+
 from pi3d.Display import Display
 import pi3d
 
@@ -14,15 +16,15 @@ def _load_shader(text):
         for line in text.split('\n'):
             if '#include' in line:
                 inc_file = line.split()[1]
-                new_text += _load_shader(open(inc_file, 'r').read()) + '\n'
+                new_text += _load_shader(open(relative_path(inc_file), 'r').read()) + '\n'
             else:
                 new_text += line + '\n'
     else:
         new_text = text
     return new_text
 
-baseFs = _load_shader(open('shaders/base.fs', 'r').read())
-baseVs = _load_shader(open('shaders/base.vs', 'r').read())
+baseFs = _load_shader(open(relative_path('shaders/base.fs'), 'r').read())
+baseVs = _load_shader(open(relative_path('shaders/base.vs'), 'r').read())
 
 
 SHADER_CACHE = {}

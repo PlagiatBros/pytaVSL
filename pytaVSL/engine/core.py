@@ -11,16 +11,16 @@ import traceback
 from time import time, sleep
 import numpy
 
-from shaders import init_shader_cache
-from text import Text
-from postprocess import PostProcess
-from slide import Slide
-from memory import MemoryMonitor
-from osc import osc_method, osc_property
-from server import OscServer
-from scenes import Scenes
-from recorder import Recorder
-from text import FONTS
+from ..shaders.shaders import init_shader_cache
+from ..slides.text import Text
+from ..slides.postprocess import PostProcess
+from ..slides.slide import Slide
+from ..engine.memory import MemoryMonitor
+from ..engine.osc import osc_method, osc_property
+from ..engine.server import OscServer
+from ..engine.scenes import Scenes
+from ..engine.recorder import Recorder
+from ..slides.text import FONTS
 
 import logging
 LOGGER = logging.getLogger(__name__)

@@ -4,17 +4,16 @@ import pi3d
 import colorsys
 import random
 
-from state import State
-from effect import Effect
-from animation import Animable
-from perspective import Perspective
-from gif import Gif
-from video import Video
-from osc import OscNode, osc_property
-from config import *
-from mesh import Mesh
-from warp import Warp
-from group import Group
+from ..slides.state import State
+from ..slides.effect import Effect
+from ..slides.animation import Animable
+from ..slides.perspective import Perspective
+from ..slides.gif import Gif
+from ..slides.video import Video
+from ..slides.mesh import Mesh
+from ..slides.warp import Warp
+from ..slides.group import Group
+from ..engine.osc import OscNode, osc_property
 
 import logging
 LOGGER = logging.getLogger(__name__)

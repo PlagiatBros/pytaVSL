@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from osc import *
+from ..engine.osc import *
 
 import liblo
 import re

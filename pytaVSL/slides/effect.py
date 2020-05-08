@@ -2,8 +2,8 @@
 
 import random
 
-from shaders import get_shader
-from osc import osc_property
+from ..shaders.shaders import get_shader
+from ..engine.osc import osc_property
 
 import logging
 LOGGER = logging.getLogger(__name__)

@@ -3,11 +3,13 @@
 import pi3d
 import random
 
-from state import State
-from slide import SlideBase
-from perspective import Perspective
-from osc import osc_property
-from font import MsdfFont
+from ..slides.state import State
+from ..slides.slide import SlideBase
+from ..slides.perspective import Perspective
+from ..engine.osc import osc_property
+from ..fonts.font import MsdfFont
+from ..utils import relative_path
+
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -15,8 +17,8 @@ LOGGER = logging.getLogger(__name__)
 GLITCH_CHARS = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+:;,?!$____***')
 
 FONTS = {
-    "sans": MsdfFont('fonts/leaguegothic.png'),
-    "mono": MsdfFont('fonts/freemono.png')
+    "sans": MsdfFont(relative_path('fonts/leaguegothic.png')),
+    "mono": MsdfFont(relative_path('fonts/freemono.png'))
 }
 
 class Text(State, Perspective, SlideBase):

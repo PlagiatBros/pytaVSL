@@ -1,7 +1,7 @@
 # encoding: utf-8
 
-from osc import osc_method
-from scenes import tomlencoder
+from ..engine.osc import osc_method
+from ..engine.scenes import tomlencoder
 
 import toml
 import logging

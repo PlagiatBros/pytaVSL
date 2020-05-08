@@ -7,17 +7,18 @@ if version_info[0] != 3:
     print('Error: Python 3 is required to run pytaVSL')
     exit(0)
 
-path.append('fonts')
-path.append('engine')
-path.append('slides')
-path.append('shaders')
 
-from config import config
+if __package__ == '':
+    # load local package
+    path.insert(0, './')
+
+from pytaVSL.engine.core import PytaVSL
+from pytaVSL.config import config
+
 
 from pi3d import Log
 Log(name=None, level='DEBUG' if config.debug else 'WARNING')
 
-from engine import PytaVSL
 geometry = [int(x) for x in config.resolution.split('x')]
 
 audio = False

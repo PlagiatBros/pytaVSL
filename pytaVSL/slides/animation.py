@@ -1,13 +1,12 @@
 # encoding: utf-8
 
-from osc import osc_method
+from ..engine.osc import osc_method
+from ..slides import easing_functions
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
-
 from inspect import getmembers
-import easing_functions
 
 EASING_NAMES = [
     "linear",
@@ -138,7 +137,7 @@ class Animable(object):
         """
         Animate a property
             property: exposed osc property
-            args: [from ...] [to ...] duration loop=0 easing="linear"
+            args: [from ..] [to ...] duration loop=0 easing="linear"
                 from: initial value(s) (items with default values must be omitted)
                 to: destination value(s) (items with default values must be omitted)
                 duration: animation duration in seconds
@@ -212,7 +211,7 @@ class Animable(object):
         """
         Strobe a property
             property: exposed osc property
-            args: [from ...] [to ...] period ratio
+            args: [from ..] [to ...] period ratio
                 from: initial value(s) (items with default values must be omitted)
                 to: destination value(s) (items with default values must be omitted)
                 duration: strobe period in seconds

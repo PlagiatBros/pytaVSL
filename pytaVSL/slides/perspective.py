@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from osc import osc_property
+from ..engine.osc import osc_property
 
 class Perspective(object):
 
