@@ -19,6 +19,13 @@ Log(name=None, level='DEBUG' if config.debug else 'WARNING')
 
 from engine import PytaVSL
 geometry = [int(x) for x in config.resolution.split('x')]
+
+audio = False
+if config.audio:
+    audio = True
+    if config.jack:
+        audio = 'jack'
+
 pyta = PytaVSL(
     name=config.namespace,
     port=config.port,
@@ -30,7 +37,8 @@ pyta = PytaVSL(
     max_gpu_memory=config.max_vram,
     show_fps=config.show_fps,
     memtest=config.memtest,
-    precompile_shaders=config.precompile
+    precompile_shaders=config.precompile,
+    audio=audio
 )
 
 if config.memtest and 'y' not in input('Warning: the memory test may freeze/crash your system, continue ? (y/N)').lower():

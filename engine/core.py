@@ -33,7 +33,7 @@ class PytaVSL(Scenes, OscServer):
     It's also an OSC server which contains the method to control all of its children.
     """
 
-    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='', show_fps=False, memtest=False, precompile_shaders=False):
+    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='', show_fps=False, memtest=False, precompile_shaders=False, audio=False):
 
         super(PytaVSL, self).__init__(name, port)
 
@@ -100,6 +100,9 @@ class PytaVSL(Scenes, OscServer):
 
         # Video recorder
         self.recorder = Recorder(self)
+
+        # Audio backend flag
+        self.audio = audio
 
         # Status
         self.status = 'ready'
@@ -357,7 +360,7 @@ class PytaVSL(Scenes, OscServer):
         """
         Create text object
             name: text name
-            font: font name (as defined in config.py)
+            font: font name (as defined in text.py)
         """
         name = str(name)
         font = str(font)

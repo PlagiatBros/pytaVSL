@@ -4,7 +4,6 @@ import pi3d
 import ctypes
 from pi3d.constants import (opengles, GL_TEXTURE0, GL_TEXTURE_2D, GL_UNSIGNED_BYTE)
 from osc import osc_property
-from config import config
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -41,7 +40,7 @@ class Video(object):
                 except:
                     LOGGER.error('python-opencv is required to play videos')
 
-                if config.audio:
+                if self.parent.audio:
                     try:
                         global Player, audio_support
                         from mplayer import Player, CmdPrefix
@@ -62,7 +61,7 @@ class Video(object):
 
                     mplayer_args = ['-vo', 'null']
 
-                    if config.jack:
+                    if self.parent.audio == 'jack':
                         jackname = parent.name + '/' + name
                         if len(jackname) > 63:
                             jackname = jackname[0:62]
