@@ -355,7 +355,7 @@ class PytaVSL(Scenes, OscServer):
         del self.slides[slide.name]
         self.sort_slides()
 
-    @osc_method('text')
+    @osc_method('create_text')
     def create_text(self, name, font):
         """
         Create text object
