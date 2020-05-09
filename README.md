@@ -61,7 +61,7 @@ optional arguments:
 
 The osc api can be read by running the following command:
 ```
-python3 pytaVSL.py --api | less -cr
+python3 -m pytaVSL --api | less -cr
 ```
 
 ###  License
