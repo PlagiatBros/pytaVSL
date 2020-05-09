@@ -26,14 +26,9 @@ Additional requirements for video playback:
 ### Usage
 
 ```
-usage: python3 ./pytaVSL.py [-h] [--namespace NAMESPACE] [--port PORT]
-                            [--load FILES [FILES ...]]
-                            [--text NAME:FONT [NAME:FONT ...]]
-                            [--scenes FILES [FILES ...]] [--fps FPS]
-                            [--precompile] [--max-vram MAX_VRAM] [--memtest]
-                            [--fullscreen] [--api] [--debug] [--show-fps]
-                            [--resolution WIDTHxHEIGHT] [--title TITLE]
-                            [--version]
+usage: python3 -m pytaVSL [-h] [--namespace NAMESPACE] [--port PORT] [--load FILES [FILES ...]] [--text NAME:FONT [NAME:FONT ...]]
+                          [--scenes FILES [FILES ...]] [--fps FPS] [--precompile] [--max-vram MAX_VRAM] [--memtest] [--fullscreen] [--api]
+                          [--debug] [--show-fps] [--resolution WIDTHxHEIGHT] [--title TITLE] [--audio] [--jack] [--version]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -64,7 +59,7 @@ optional arguments:
 
 ### Documentation
 
-The osc api can be read [here](https://github.com/PlagiatBros/pytaVSL/blob/master/API) or by running the following command:
+The osc api can be read by running the following command:
 ```
 python3 pytaVSL.py --api | less -cr
 ```

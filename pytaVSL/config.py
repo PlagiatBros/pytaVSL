@@ -4,7 +4,7 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from sys import argv
 from . import __version__
 
-parser = ArgumentParser(prog="python3 %s" % argv[0], formatter_class=ArgumentDefaultsHelpFormatter)
+parser = ArgumentParser(prog='python3 -m pytaVSL', formatter_class=ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('--namespace', help='osc namespace', default='pyta')
 parser.add_argument('--port', help='udp port or unix socket path', default=5555)
