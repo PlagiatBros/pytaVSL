@@ -33,7 +33,7 @@ class PytaVSL(Scenes, OscServer):
     It's also an OSC server which contains the method to control all of its children.
     """
 
-    def __init__(self, name, port, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='', show_fps=False, memtest=False, precompile_shaders=False, audio=False):
+    def __init__(self, name='pyta', port=5555, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='pytaVSL', show_fps=False, memtest=False, precompile_shaders=False, audio=False):
 
         super(PytaVSL, self).__init__(name, port)
 
