@@ -16,6 +16,14 @@ setup(
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'
     ],
-    python_requires='>=3'
-
+    python_requires='>=3',
+    install_requires=[
+        'pi3d==2.36',
+        'toml==0.10',
+        'liblo==0.10'
+    ],
+    extras_require={
+        'video': ['opencv-python'],
+        'video_audio': ['opencv-python', 'mplayer.py']
+    }
 )
