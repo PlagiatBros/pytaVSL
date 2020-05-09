@@ -14,7 +14,7 @@ class PostInstallCommand(install):
         print('==========')
         print('For video playback support you need to install the following:')
         print('- opencv (pip: opencv-python / debian: python3-opencv)')
-        print('- mplayer.py (pip: player.py)')
+        print('- mplayer.py (pip: mplayer.py)')
         print('- mplayer')
         print('- ffmpeg')
         print('==========')
