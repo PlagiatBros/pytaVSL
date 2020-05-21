@@ -41,7 +41,7 @@ class Video(object):
                 except:
                     LOGGER.error('python-opencv is required to play videos')
 
-                if self.parent.audio:
+                if parent.audio:
                     try:
                         global Player, audio_support
                         from mplayer import Player, CmdPrefix
@@ -62,7 +62,7 @@ class Video(object):
 
                     mplayer_args = ['-vo', 'null']
 
-                    if self.parent.audio == 'jack':
+                    if parent.audio == 'jack':
                         jackname = parent.name + '/' + name
                         if len(jackname) > 63:
                             jackname = jackname[0:62]
