@@ -10,7 +10,7 @@ def normalize_osc_port(port):
 
     if str(port).isdigit():
         port = 'osc.udp://127.0.0.1:' + str(port)
-    elif type(return_port) is str and '://' not in port:
+    elif type(port) is str and '://' not in port:
         port = 'osc.udp://' + port
 
     try:
