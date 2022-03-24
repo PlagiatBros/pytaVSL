@@ -20,6 +20,7 @@ from ..engine.osc import osc_method, osc_property
 from ..engine.server import OscServer
 from ..engine.scenes import Scenes
 from ..engine.recorder import Recorder
+from ..engine.camera import Camera
 from ..slides.text import FONTS
 
 import logging
@@ -46,6 +47,7 @@ class PytaVSL(Scenes, OscServer):
         self.CAMERA3D = pi3d.Camera(is_3d=True, eye=(0, 0, -height), scale=0.8465)
         self.CAMERA.was_moved = False
         self.CAMERA3D.was_moved = False
+        self.camera = Camera('camera', self)
 
         # shader precompilation switch
         self.precompile_shaders = precompile_shaders
@@ -200,6 +202,8 @@ class PytaVSL(Scenes, OscServer):
             # Draw slides
 
             post_processing = self.post_process.visible
+
+            self.camera.update()
 
             if post_processing:
                 self.post_process.capture_start()

@@ -107,6 +107,9 @@ class OscServer(OscNode):
         elif path[0] == 'post_process':
             target = [self.post_process]
             cmd = path[1]
+        elif path[0] == 'camera':
+            target = [self.camera]
+            cmd = path[1]
         elif path[0] == 'text':
             target = self.get_children(self.texts, path[1])
             cmd = path[2]
@@ -252,6 +255,9 @@ class OscServer(OscNode):
         print_methods('  /%s/' % self.name, self)
         print_properties(self)
 
+        print('\nCamera')
+        print_methods('  /%s/camera/' % self.name, self.camera)
+        print_properties(self.camera)
 
         print('\nPost Processing')
         print_methods('  /%s/post_process/' % self.name, self.post_process)
