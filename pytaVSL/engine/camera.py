@@ -40,6 +40,12 @@ class Camera(State,OscNode,Animable,FakeSlide):
             cam.rotate(self.rx, self.ry, self.rz)
             cam.reset(scale=cam.scale)
             cam.was_moved = True
+        self.parent.post_process_bg.set_position_x(self.pos_x / self.parent.width)
+        self.parent.post_process_bg.set_position_y(self.pos_y / self.parent.height)
+        # self.parent.post_process_bg.set_position_z(10000 - self.parent.height + self.pos_z)
+        self.parent.post_process.set_position_x(self.pos_x / self.parent.width)
+        self.parent.post_process.set_position_y(self.pos_y / self.parent.height)
+        # self.parent.post_process.set_position_z(self.pos_z+0.00001)
 
     @osc_property('position', 'pos_x', 'pos_y', 'pos_z')
     def set_position(self, x, y, z):
