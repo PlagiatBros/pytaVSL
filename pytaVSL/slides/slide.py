@@ -13,7 +13,7 @@ from ..slides.video import Video
 from ..slides.mesh import Mesh
 from ..slides.warp import Warp
 from ..slides.group import Group
-from ..engine.osc import OscNode, osc_property
+from ..engine.osc import OscNode, osc_property, osc_method
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -373,3 +373,17 @@ class Slide(State, Group, Perspective, Video, Gif, Warp, SlideBase):
 
     def get_osc_path(self):
         return '/%s/slide/%s' % (self.parent.name, self.name)
+
+    @osc_method('unload')
+    def osc_unload(self):
+        """
+        Unload slide from memory
+        """
+        self.unload()
+
+    @osc_method('remove')
+    def osc_remove(self):
+        """
+        Remove slide object and all its children
+        """
+        self.parent.remove_slide(self)
