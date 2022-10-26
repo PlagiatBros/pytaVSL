@@ -29,6 +29,7 @@ class Video(object):
         self.video_speed = 1.0
         self.video_time = 0
         self.video_loop = 0
+        self.video_end = 0
 
         if isinstance(texture, str):
             match = videos_formats.match(texture.lower())
@@ -86,6 +87,7 @@ class Video(object):
 
                     self.video_frame_duration = 1. / min(self.video_reader.get(cv2.CAP_PROP_FPS), 60)
                     self.video_duration = self.video_frame_duration * self.video_reader.get(cv2.CAP_PROP_FRAME_COUNT)
+                    self.video_end = self.video_duration
 
                     self.video_elapsed_time = 0
 
@@ -114,7 +116,7 @@ class Video(object):
 
         time = float(time)
 
-        if time > self.video_duration:
+        if time > self.video_end:
             time = 0
             if self.video_loop == 0:
                 self.set_video_speed(0)
@@ -159,6 +161,10 @@ class Video(object):
             if not looping, video_speed will be set to 0 when the video reaches the last frame
         """
         self.video_loop = int(bool(loop))
+
+    @osc_property('video_end', 'video_end')
+    def set_video_duration(self, end):
+        self.video_end = end
 
     def video_next_frame(self):
         """
