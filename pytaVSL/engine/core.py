@@ -398,7 +398,7 @@ class PytaVSL(Scenes, OscServer):
 
         children = self.get_children(self.slides, slides) +  self.get_children(self.texts, slides)
 
-        group_z = min(map(lambda s: s.pos_z, children)) if len(children) else 0
+        group_z = max(map(lambda s: s.pos_z, children)) if len(children) else 0
         group = Slide(parent=self, name=name, texture=EMPTY_TEXTURE, width=self.width, height=self.height, init_z=group_z)
         group.is_group = True
 
