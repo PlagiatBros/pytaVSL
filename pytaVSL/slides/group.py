@@ -56,26 +56,26 @@ class Group(object):
         if self.is_group and (self.active_effects or self.post_process):
 
             if not self.post_process:
-                from postprocess import PostProcess
+                from ..slides.postprocess import PostProcess
                 self.post_process = PostProcess(self.parent)
                 self.post_process.set_visible(1)
 
             self.post_process.toggle_effect(*args, **kwargs)
 
             # MASK is a bit tricky
-            # Disabled because mask doesn't scale
-            # if self.effect_mask != self.post_process.effect_mask:
-            #     self.post_process.set_effect_mask(self.effect_mask)
-            # if len(self.buf[0].textures) == 2:
-            #     del self.buf[0].textures[1]
+            #it has issues with scale
+            if self.effect_mask != self.post_process.effect_mask:
+                self.post_process.set_effect_mask(self.effect_mask)
+            if len(self.buf[0].textures) == 2:
+                del self.buf[0].textures[1]
 
             # same for warp
-            # if self.warp != self.post_process.warp or (self.post_process.warp_1 != self.warp_1 or self.post_process.warp_2 != self.warp_2 or self.post_process.warp_3 != self.warp_3 or self.post_process.warp_4 != self.warp_4):
-            #     self.post_process.warp_1 = self.warp_1
-            #     self.post_process.warp_2 = self.warp_2
-            #     self.post_process.warp_3 = self.warp_3
-            #     self.post_process.warp_4 = self.warp_4
-            #     self.post_process.toggle_warp_effect()
+            if self.warp != self.post_process.warp or (self.post_process.warp_1 != self.warp_1 or self.post_process.warp_2 != self.warp_2 or self.post_process.warp_3 != self.warp_3 or self.post_process.warp_4 != self.warp_4):
+                self.post_process.warp_1 = self.warp_1
+                self.post_process.warp_2 = self.warp_2
+                self.post_process.warp_3 = self.warp_3
+                self.post_process.warp_4 = self.warp_4
+                self.post_process.toggle_warp_effect()
 
     def add_child(self, child):
         """

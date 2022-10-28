@@ -160,13 +160,16 @@ class OscNode(object):
     def osc_get(self, property, return_port):
         """
         Send property's current value to return_port at /slide_address/get/reply
-            property: exposed osc property
+            property: exposed osc property, '*' for all properties
             return_port: port number, ip:port string, or valid full osc address
         """
 
         return_port = normalize_osc_port(return_port)
 
-        if property in self.osc_attributes:
+        if property == '*':
+            for p in self.osc_attributes:
+                self.osc_get(p, return_port)
+        elif property in self.osc_attributes:
             address = self.get_osc_path() + '/get/reply'
             if return_port is not None:
                 self.server.send(return_port, address, property, *self.osc_get_value(property))
