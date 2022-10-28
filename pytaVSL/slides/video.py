@@ -29,6 +29,7 @@ class Video(object):
         self.video_speed = 1.0
         self.video_time = 0
         self.video_loop = 0
+        self.video_duration = 0
         self.video_end = 0
 
         if isinstance(texture, str):
@@ -162,8 +163,18 @@ class Video(object):
         """
         self.video_loop = int(bool(loop))
 
+    @osc_property('video_duration', 'video_duration')
+    def set_video_duration(self):
+        """
+        Video duration (read-only)
+        """
+        pass
+
     @osc_property('video_end', 'video_end')
-    def set_video_duration(self, end):
+    def set_video_end(self, end):
+        """
+        Video end time (s)
+        """
         self.video_end = end
 
     def video_next_frame(self):
