@@ -359,12 +359,6 @@ class PytaVSL(Scenes, OscServer):
         del self.slides[slide.name]
         self.sort_slides()
 
-    @osc_method('unload')
-    def unload_slide(self, name):
-        for slide in self.sorted_slides:
-            if slide.name == name:
-                self.remove_slide(slide)
-
     @osc_method('create_text')
     def create_text(self, name, font):
         """
