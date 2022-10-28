@@ -82,6 +82,7 @@ class Group(object):
         Override add_child to handle z-sorting
         """
         super(Group, self).add_child(child)
+        child.set_position_z(child.z() - self.z())
         self.children_need_sorting = True
 
     @osc_property('sequence_mode', 'is_sequence')
