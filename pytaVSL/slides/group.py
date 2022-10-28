@@ -77,6 +77,13 @@ class Group(object):
             #     self.post_process.warp_4 = self.warp_4
             #     self.post_process.toggle_warp_effect()
 
+    def add_child(self, child):
+        """
+        Override add_child to handle z-sorting
+        """
+        super(Group).add_child(child)
+        self.children_need_sorting = True
+
     @osc_property('sequence_mode', 'is_sequence')
     def set_sequence_mode(self, mode):
         """
