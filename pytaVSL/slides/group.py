@@ -23,7 +23,7 @@ class Group(object):
         if self.visible:
 
             if self.children_need_sorting:
-                self.children = sorted(self.children, key=lambda slide: slide.z(), reverse=True)
+                self.children = sorted(self.children, key=lambda slide: slide.pos_z, reverse=True)
                 self.children_need_sorting = False
 
                 if self.is_sequence:
@@ -82,7 +82,7 @@ class Group(object):
         Override add_child to handle z-sorting
         """
         super(Group, self).add_child(child)
-        child.set_position_z(child.z() - self.z())
+        child.set_position_z(child.pos_z - self.pos_z)
         self.children_need_sorting = True
 
     @osc_property('sequence_mode', 'is_sequence')

@@ -319,7 +319,7 @@ class PytaVSL(Scenes, OscServer):
         self.slides_need_sorting = True
 
     def _sort_slides(self):
-        self.sorted_slides = sorted(list(self.slides.values()) + list(self.texts.values()), key=lambda slide: slide.z(), reverse=True)
+        self.sorted_slides = sorted(list(self.slides.values()) + list(self.texts.values()), key=lambda slide: slide.pos_z, reverse=True)
         self.slides_need_sorting = False
 
     def flush(self, added_slide=None):
