@@ -61,8 +61,12 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         # Position
         self.pos_x = 0.0
         self.pos_y = 0.0
-        self.pos_z = init_z
-        self.init_z = init_z
+        self.pos_z = self.init_z = self.last_z = init_z
+
+        # Position offest
+        self.offset_x = 0.0
+        self.offset_y = 0.0
+        self.offset_z = 0.0
 
         # Alignment
         self.h_align = 'center'
@@ -80,7 +84,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
 
         # texture tiling
         self.tiles = [1.0, 1.0]
-        self.offset= [0.0, 0.0]
+        self.texture_offset= [0.0, 0.0]
 
         self.loaded = False
         self.grouped = False
@@ -180,18 +184,19 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
             b.unib[6] = self.tiles[0]
             b.unib[7] = self.tiles[1]
 
-        self.set_offset(None, None)
+        self.set_texture_offset(None, None)
 
-    @osc_property('offset', 'offset')
-    def set_offset(self, x, y):
+    @osc_property('texture_offset', 'texture_offset')
+    def set_texture_offset(self, x, y):
         """
         texture offset (normalized)
         """
         if x is not None:
-            self.offset[0] = float(x)
+            self.texture_offset[0] = float(x)
         if y is not None:
-            self.offset[1] = float(y)
-        super(SlideBase, self).set_offset((self.offset[0] + (1-self.tiles[0])/2, self.offset[1] + (1-self.tiles[1])/2.))
+            self.texture_offset[1] = float(y)
+        # call pi3d set_offset, not to be confused with our position offset
+        super(SlideBase, self).set_offset((self.texture_offset[0] + (1-self.tiles[0])/2, self.texture_offset[1] + (1-self.tiles[1])/2.))
 
     @osc_property('visible', 'visible')
     def set_visible(self, visible):
@@ -276,7 +281,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
     @osc_property('position', 'pos_x', 'pos_y', 'pos_z')
     def set_position(self, x, y, z):
         """
-        object xyz offset to alignment (0<>1)
+        object xyz position, relative to alignment (0<>1)
         """
         sort_parent = False
         if x is not None:
@@ -284,33 +289,73 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         if y is not None:
             self.pos_y = float(y)
         if z is not None:
-            sort_parent = self.pos_z != float(z)
             self.pos_z = float(z)
-        self.position(self.pos_x, self.pos_y, self.pos_z)
-        if sort_parent:
+
+        z_changed = self.last_z != self.pos_z + self.offset_z
+
+        self.position(self.pos_x + self.offset_x, self.pos_y + self.offset_y, self.pos_z + self.offset_z)
+
+        if z_changed:
+            self.last_z = self.pos_z + self.offset_z
             parent = self.parent_slide if self.parent_slide is not None else self.parent
             parent.sort_slides()
 
     @osc_property('position_x', 'pos_x', shorthand=True)
     def set_position_x(self, x):
         """
-        object x-offset (0<>1, bottom to top)
+        object x position (0<>1, bottom to top)
         """
         self.set_position(x, None, None)
 
     @osc_property('position_y', 'pos_y', shorthand=True)
     def set_position_y(self, y):
         """
-        object y-offset (0<>1, left to right)
+        object y position (0<>1, left to right)
         """
         self.set_position(None, y, None)
 
     @osc_property('position_z', 'pos_z', shorthand=True)
     def set_position_z(self, z):
         """
-        object z-axis offset (near to far)
+        object z position (near to far)
         """
         self.set_position(None, None, z)
+
+    @osc_property('offset', 'offset_x', 'offset_y', 'offset_z')
+    def set_position_offset(self, x, y, z):
+        """
+        object xyz offset relative to position (0<>1)
+        """
+        if x is not None:
+            self.offset_x = float(x)
+        if y is not None:
+            self.offset_y = float(y)
+        if z is not None:
+            self.offset_z = float(z)
+
+        self.set_position(None, None, None)
+
+    @osc_property('offset_x', 'offset_x', shorthand=True)
+    def set_position_offset_x(self, x):
+        """
+        object x-axis offset (0<>1, bottom to top)
+        """
+        self.set_position_offset(x, None, None)
+
+    @osc_property('offset_y', 'offset_y', shorthand=True)
+    def set_position_offset_y(self, y):
+        """
+        object y-axis offset (0<>1, left to right)
+        """
+        self.set_position_offset(None, y, None)
+
+    @osc_property('offset_z', 'offset_z', shorthand=True)
+    def set_position_offset_z(self, z):
+        """
+        object z-axis offset (near to far)
+        """
+        self.set_position_offset(None, None, z)
+
 
     @osc_property('scale', 'sx', 'sy')
     def set_scale(self, sx, sy):
