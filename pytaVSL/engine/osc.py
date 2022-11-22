@@ -166,13 +166,17 @@ class OscNode(object):
 
         return_port = normalize_osc_port(return_port)
 
+        if return_port is None:
+            LOGGER.error('invalid return_port argument "%s" for %s/subscribe' % (property, self.get_osc_path()))
+            return
+
         if property == '*':
             for p in self.osc_attributes:
                 self.osc_get(p, return_port)
+            self.server.send(return_port, self.get_osc_path() + '/get/reply/end')
         elif property in self.osc_attributes:
             address = self.get_osc_path() + '/get/reply'
-            if return_port is not None:
-                self.server.send(return_port, address, property, *self.osc_get_value(property))
+            self.server.send(return_port, address, property, *self.osc_get_value(property))
         else:
             LOGGER.error('invalid property argument "%s" for %s' % (property, address))
 
