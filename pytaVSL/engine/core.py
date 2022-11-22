@@ -439,6 +439,10 @@ class PytaVSL(Scenes, OscServer):
             LOGGER.error('could not create clone "%s" (target "%s" matches %i slides)' % (clone_name, target_name, len(target)))
             return
 
+        if not target:
+            LOGGER.error('no slide to clone (%s)' % (target_name))
+            return
+            
         target = target[0]
 
         if target.is_group:
@@ -447,10 +451,6 @@ class PytaVSL(Scenes, OscServer):
 
         if target.is_clone:
             LOGGER.error('could not create clone "%s" (target "%s" is a clone' % (clone_name, target.name))
-            return
-
-        if not target:
-            LOGGER.error('no slide to clone (%s)' % (target_name))
             return
 
         if clone_name in self.slides:
