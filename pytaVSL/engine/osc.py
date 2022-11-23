@@ -136,8 +136,12 @@ class OscNode(object):
             argcount = method.osc_argcount
             argcount_min = method.osc_argcount_min
 
+
             if len(value) > argcount or len(value) < argcount_min:
-                if method.osc_argcount_min == argcount:
+                if argcount == 0:
+                    # read-only
+                    pass
+                elif method.osc_argcount_min == argcount:
                     LOGGER.error('bad number of argument for %s/set %s (%i expected, %i provided)' % (self.get_osc_path(), attribute, argcount, len(value)))
                 else:
                     LOGGER.error('bad number of argument for %s/set %s (%i to %i, expected, %i provided)' % (self.get_osc_path(), attribute, argcount_min, argcount, len(value)))
