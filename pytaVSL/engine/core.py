@@ -34,6 +34,23 @@ class PytaVSL(Scenes, OscServer):
     It's also an OSC server which contains the method to control all of its children.
     """
 
+    class Loading(object):
+        """
+        Context for methods that should increment the engine's loading state
+        """
+        def __init__(self, engine):
+            self.engine = engine
+
+        def __enter__(self):
+            self.engine.loading_count += 1
+            self.engine.status = 'loading'
+
+        def __exit__(self, *args):
+            self.engine.loading_count -= 1
+            if self.engine.loading_count == 0:
+                self.engine.status = 'ready'
+
+
     def __init__(self, name='pyta', port=5555, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='pytaVSL', show_fps=False, memtest=False, precompile_shaders=False, audio=False):
 
         super(PytaVSL, self).__init__(name, port)
@@ -108,7 +125,7 @@ class PytaVSL(Scenes, OscServer):
 
         # Status
         self.status = 'ready'
-        self.loading_threads = 0
+        self.loading_count = 0
 
         # Signal
         signal(SIGINT, self.stop)
@@ -284,29 +301,25 @@ class PytaVSL(Scenes, OscServer):
 
         def threaded():
 
-            self.loading_threads += 1
-            self.update_status()
+            with PytaVSL.Loading(self):
 
-            self.debug_text.set_visible(1)
-            self.debug_text.set_text('0/' + str(size))
+                self.debug_text.set_visible(1)
+                self.debug_text.set_text('0/' + str(size))
 
-            for i in range(size):
-                try:
-                    path = paths[i]
-                    name = path.split('/')[-1].split('.')[0].lower()
-                    slide = Slide(parent=self, name=name, texture=path, init_z=len(self.slides) / 1000.)
-                    self.add_slide(slide)
-                except Exception as e:
-                    LOGGER.error('could not load file %s' % path)
-                    print(traceback.format_exc())
-                self.debug_text.set_text(str(i + 1) + '/' + str(size))
+                for i in range(size):
+                    try:
+                        path = paths[i]
+                        name = path.split('/')[-1].split('.')[0].lower()
+                        slide = Slide(parent=self, name=name, texture=path, init_z=len(self.slides) / 1000.)
+                        self.add_slide(slide)
+                    except Exception as e:
+                        LOGGER.error('could not load file %s' % path)
+                        print(traceback.format_exc())
+                    self.debug_text.set_text(str(i + 1) + '/' + str(size))
 
-            self.debug_text.set_visible(0)
+                self.debug_text.set_visible(0)
 
-            LOGGER.info("total slides in memory: %i" % len(self.slides.values()))
-
-            self.loading_threads -= 1
-            self.update_status()
+                LOGGER.info("total slides in memory: %i" % len(self.slides.values()))
 
         t = Thread(target=threaded)
         t.daemon = True
@@ -386,32 +399,33 @@ class PytaVSL(Scenes, OscServer):
 
         Note: some effects don't work on groups: mask, warp
         """
-        name = str(group_name).lower()
-        slides = str(slides).lower()
+        with PytaVSL.Loading(self):
+            name = str(group_name).lower()
+            slides = str(slides).lower()
 
-        if name in self.slides:
-            if self.slides[name].is_group:
-                self.remove_group(name)
-            else:
-                LOGGER.error("could not create group \"%s\" (name taken by a non-group slide)" % name)
-                return
+            if name in self.slides:
+                if self.slides[name].is_group:
+                    self.remove_group(name)
+                else:
+                    LOGGER.error("could not create group \"%s\" (name taken by a non-group slide)" % name)
+                    return
 
-        children = self.get_children(self.slides, slides) +  self.get_children(self.texts, slides)
+            children = self.get_children(self.slides, slides) +  self.get_children(self.texts, slides)
 
-        group_z = max(map(lambda s: s.pos_z, children)) if len(children) else 0
-        group = Slide(parent=self, name=name, texture=EMPTY_TEXTURE, width=self.width, height=self.height, init_z=group_z)
-        group.is_group = True
+            group_z = max(map(lambda s: s.pos_z, children)) if len(children) else 0
+            group = Slide(parent=self, name=name, texture=EMPTY_TEXTURE, width=self.width, height=self.height, init_z=group_z)
+            group.is_group = True
 
-        for child in children:
+            for child in children:
 
-            if child.parent_slide:
-                LOGGER.debug("slide %s moved from group %s to %s" % (child.name, child.parent_slide.name, name))
-                child.quit_group()
+                if child.parent_slide:
+                    LOGGER.debug("slide %s moved from group %s to %s" % (child.name, child.parent_slide.name, name))
+                    child.quit_group()
 
-            child.parent_slide = group
-            group.add_child(child)
+                child.parent_slide = group
+                group.add_child(child)
 
-        self.add_slide(group)
+            self.add_slide(group)
 
     @osc_method('ungroup')
     def remove_group(self, group_name):
@@ -431,53 +445,54 @@ class PytaVSL(Scenes, OscServer):
             slide: target slide name (can't be a clone nor a group)
             clone_name: new clone name (replaces any previously created clone with the same name)
         """
-        clone_name = str(clone_name).lower()
-        target_name = str(slide).lower()
+        with PytaVSL.Loading(self):
+            clone_name = str(clone_name).lower()
+            target_name = str(slide).lower()
 
-        target = self.get_children(self.slides, target_name)
-        if len(target) > 1:
-            LOGGER.error('could not create clone "%s" (target "%s" matches %i slides)' % (clone_name, target_name, len(target)))
-            return
-
-        if not target:
-            LOGGER.error('no slide to clone (%s)' % (target_name))
-            return
-            
-        target = target[0]
-
-        if target.is_group:
-            LOGGER.error('could not create clone "%s" (target "%s" is a group' % (clone_name, target.name))
-            return
-
-        if target.is_clone:
-            LOGGER.error('could not create clone "%s" (target "%s" is a clone' % (clone_name, target.name))
-            return
-
-        if clone_name in self.slides:
-            if self.slides[clone_name].is_clone:
-                self.remove_slide(self.slides[clone_name])
-            else:
-                LOGGER.error("could not create clone \"%s\" (name taken by a non-clone slide)" % clone_name)
+            target = self.get_children(self.slides, target_name)
+            if len(target) > 1:
+                LOGGER.error('could not create clone "%s" (target "%s" matches %i slides)' % (clone_name, target_name, len(target)))
                 return
 
-        clone_z = target.pos_z - 0.001
-        clone = Slide(parent=self, name=clone_name, texture=pi3d.Texture(target.buf[0].textures[0].image), width=target.width, height=target.height, init_z=clone_z)
+            if not target:
+                LOGGER.error('no slide to clone (%s)' % (target_name))
+                return
 
-        if target.gif:
-            clone.gif = target.gif
-            clone.gif_length = target.gif_length
+            target = target[0]
 
-        clone.state_set(target.state_get())
-        clone.set_position_z(clone_z)
+            if target.is_group:
+                LOGGER.error('could not create clone "%s" (target "%s" is a group' % (clone_name, target.name))
+                return
 
-        if target.gif:
-            # sync gif
-            clone.gif_changed_time = target.gif_changed_time
+            if target.is_clone:
+                LOGGER.error('could not create clone "%s" (target "%s" is a clone' % (clone_name, target.name))
+                return
 
-        clone.is_clone = True
-        clone.clone_target = target.name
+            if clone_name in self.slides:
+                if self.slides[clone_name].is_clone:
+                    self.remove_slide(self.slides[clone_name])
+                else:
+                    LOGGER.error("could not create clone \"%s\" (name taken by a non-clone slide)" % clone_name)
+                    return
 
-        self.add_slide(clone)
+            clone_z = target.pos_z - 0.001
+            clone = Slide(parent=self, name=clone_name, texture=pi3d.Texture(target.buf[0].textures[0].image), width=target.width, height=target.height, init_z=clone_z)
+
+            if target.gif:
+                clone.gif = target.gif
+                clone.gif_length = target.gif_length
+
+            clone.state_set(target.state_get())
+            clone.set_position_z(clone_z)
+
+            if target.gif:
+                # sync gif
+                clone.gif_changed_time = target.gif_changed_time
+
+            clone.is_clone = True
+            clone.clone_target = target.name
+
+            self.add_slide(clone)
 
     @osc_method('unclone')
     def remove_clone(self, clone_name):
@@ -548,12 +563,3 @@ class PytaVSL(Scenes, OscServer):
             - "loading": currently loading slides
         """
         pass
-
-    def update_status(self):
-        """
-        Update internal status
-        """
-        if self.loading_threads == 0:
-            self.status = 'ready'
-        else:
-            self.status = 'loading'
