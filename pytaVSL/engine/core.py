@@ -555,9 +555,12 @@ class PytaVSL(Scenes, OscServer):
         """
         try:
             self.loading_count += 1
-            self.status = 'loading'
+            if self.loading_count == 1:
+                self.status = 'loading'
+                self.osc_feed_subscribers()
             yield True
         finally:
             self.loading_count -= 1
             if self.loading_count == 0:
                 self.status = 'ready'
+                self.osc_feed_subscribers()
