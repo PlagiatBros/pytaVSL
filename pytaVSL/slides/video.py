@@ -99,6 +99,13 @@ class Video(object):
         if self.video:
             self.active_effects.append('VIDEO')
 
+    def __del__(self):
+
+        if self.video:
+            self.video_reader.release()
+
+        super(Video, self).__del__()
+
     def draw(self, *args, **kwargs):
 
         if self.video and self.visible:
