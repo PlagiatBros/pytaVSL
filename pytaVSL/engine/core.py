@@ -10,6 +10,7 @@ from signal import signal, SIGINT, SIGTERM
 import traceback
 from time import time, sleep
 import numpy
+from contextlib import contextmanager
 
 from ..shaders.shaders import init_shader_cache
 from ..slides.text import Text
@@ -33,23 +34,6 @@ class PytaVSL(Scenes, OscServer):
     Main object, contains the screen and the slides.
     It's also an OSC server which contains the method to control all of its children.
     """
-
-    class Loading(object):
-        """
-        Context for methods that should increment the engine's loading state
-        """
-        def __init__(self, engine):
-            self.engine = engine
-
-        def __enter__(self):
-            self.engine.loading_count += 1
-            self.engine.status = 'loading'
-
-        def __exit__(self, *args):
-            self.engine.loading_count -= 1
-            if self.engine.loading_count == 0:
-                self.engine.status = 'ready'
-
 
     def __init__(self, name='pyta', port=5555, fps=25, fullscreen=False, max_gpu_memory=64, width=800, height=600, window_title='pytaVSL', show_fps=False, memtest=False, precompile_shaders=False, audio=False):
 
@@ -301,7 +285,7 @@ class PytaVSL(Scenes, OscServer):
 
         def threaded():
 
-            with PytaVSL.Loading(self):
+            with self.loading():
 
                 self.debug_text.set_visible(1)
                 self.debug_text.set_text('0/' + str(size))
@@ -399,7 +383,7 @@ class PytaVSL(Scenes, OscServer):
 
         Note: some effects don't work on groups: mask, warp
         """
-        with PytaVSL.Loading(self):
+        with self.loading():
             name = str(group_name).lower()
             slides = str(slides).lower()
 
@@ -445,7 +429,7 @@ class PytaVSL(Scenes, OscServer):
             slide: target slide name (can't be a clone nor a group)
             clone_name: new clone name (replaces any previously created clone with the same name)
         """
-        with PytaVSL.Loading(self):
+        with self.loading():
             clone_name = str(clone_name).lower()
             target_name = str(slide).lower()
 
@@ -563,3 +547,17 @@ class PytaVSL(Scenes, OscServer):
             - "loading": currently loading slides
         """
         pass
+
+    @contextmanager
+    def loading(self):
+        """
+        Context for methods that should increment the engine's loading state
+        """
+        try:
+            self.loading_count += 1
+            self.status = 'loading'
+            yield True
+        finally:
+            self.loading_count -= 1
+            if self.loading_count == 0:
+                self.status = 'ready'
