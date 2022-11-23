@@ -246,12 +246,17 @@ class OscNode(object):
     def osc_feed_subscribers(self):
 
         for property in self.osc_subscribes:
-            value = self.osc_get_value(property)[:]
-            address = self.get_osc_path() + '/subscribe/update'
-            for return_port in self.osc_subscribes[property]:
-                if value != self.osc_subscribes[property][return_port]:
-                    self.osc_subscribes[property][return_port] = value
-                    self.server.send(return_port, address, property, *value)
+            self.osc_feed_subscribers_property(property)
+
+    def osc_feed_subscribers_property(self, property):
+
+        value = self.osc_get_value(property)[:]
+        address = self.get_osc_path() + '/subscribe/update'
+        for return_port in self.osc_subscribes[property]:
+            if value != self.osc_subscribes[property][return_port]:
+                self.osc_subscribes[property][return_port] = value
+                self.server.send(return_port, address, property, *value)
+
 
 
 
