@@ -54,3 +54,8 @@ vec4 tex2D(sampler2D tex, vec2 coords) {
 #ifdef COLORS
 #include shaders/effects/colors.fs
 #endif
+
+
+#ifdef BLUR
+#include shaders/effects/blur.fs
+#endif

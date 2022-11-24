@@ -21,6 +21,9 @@ gl_FragColor.a = gl_FragColor.a * unif[5][2];
 #include shaders/effects/charcoal.fs
 #endif
 
+#ifdef BLUR
+gl_FragColor.rgb = add_blur(gl_FragColor.rgb, unif[18][0]);
+#endif
 
 #ifdef VIDEO
 gl_FragColor.rgb = gl_FragColor.bgr;

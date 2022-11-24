@@ -58,7 +58,7 @@ def get_shader(effects, log=True):
 def init_shader_cache():
     print('precompiling shaders...')
 
-    PRECOMPILED = ['KEY', 'CHARCOAL', 'RGBWAVE', 'INVERT', 'MASK', 'NOISE', 'COLORS']
+    PRECOMPILED = ['KEY', 'CHARCOAL', 'RGBWAVE', 'INVERT', 'MASK', 'NOISE', 'COLORS', 'BLUR']
 
     for i in range(len(PRECOMPILED)):
         combos = list(combinations(PRECOMPILED, i))

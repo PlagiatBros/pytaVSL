@@ -27,7 +27,7 @@ class Effect(object):
           15  invert, noise, charcoal                     45  47
           16  rgbwave, fish, hue                          48  50
           17  brightness, contrast, saturation            51  53
-          18  unused, unused, unused                      54  56
+          18  blur, unused, unused                        54  56
           19  unused, unused, unused                      57  59
         ===== ========================================== ==== ==
         """
@@ -72,6 +72,9 @@ class Effect(object):
         self.set_effect_brightness(self.effect_brightness)
         self.set_effect_contrast(self.effect_contrast)
         self.set_effect_saturation(self.effect_saturation)
+
+        self.effect_blur = 0.0
+        self.set_effect_blur(self.effect_blur)
 
     def toggle_effect(self, name, state):
         if state and name not in self.active_effects:
@@ -228,6 +231,16 @@ class Effect(object):
         self.effect_saturation = float(value)
         self.unif[53] = self.effect_saturation
         self.toggle_colors_effect()
+
+    @osc_property('blur', 'effect_blur')
+    def set_effect_blur(self, value):
+        """
+        blur (0<>1)
+        """
+        self.effect_blur = float(value)
+        self.unif[54] = self.effect_blur
+        self.toggle_effect('BLUR', self.effect_blur != 0)
+
 
 
     def toggle_colors_effect(self):
