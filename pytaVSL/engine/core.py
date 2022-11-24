@@ -11,6 +11,7 @@ import traceback
 from time import time, sleep
 import numpy
 from contextlib import contextmanager
+import gc
 
 from ..shaders.shaders import init_shader_cache
 from ..slides.text import Text
@@ -96,6 +97,9 @@ class PytaVSL(Scenes, OscServer):
         self.sorted_slides = []
         self.slides_need_sorting = False
         self._sort_slides()
+
+        # GC
+        self.need_gc = False
 
         # Memory
         self.do_memtest = memtest
@@ -250,6 +254,10 @@ class PytaVSL(Scenes, OscServer):
             # Debug text always on top
             self.debug_text.draw()
 
+            # GC
+            if self.need_gc:
+                gc.collect()
+                self.need_gc = False
 
 
     def stop(self, *args):
@@ -355,6 +363,7 @@ class PytaVSL(Scenes, OscServer):
         slide.unload()
         del self.slides[slide.name]
         self.sort_slides()
+        self.need_gc = True
 
     @osc_method('create_text')
     def create_text(self, name, font):
