@@ -171,7 +171,7 @@ class OscNode(object):
         return_port = normalize_osc_port(return_port)
 
         if return_port is None:
-            LOGGER.error('invalid return_port argument "%s" for %s/subscribe' % (property, self.get_osc_path()))
+            LOGGER.error('invalid return_port argument "%s" for %s/subscribe' % (return_port, self.get_osc_path()))
             return
 
         if property == '*':
@@ -184,6 +184,20 @@ class OscNode(object):
         else:
             LOGGER.error('invalid property argument "%s" for %s' % (property, address))
 
+    @osc_method('ping')
+    def osc_ping(self,  return_port):
+        """
+        Reply to return_port at /slide_address/ping/reply
+        """
+
+        return_port = normalize_osc_port(return_port)
+
+        if return_port is None:
+            LOGGER.error('invalid return_port argument "%s" for %s/ping' % (return_port, self.get_osc_path()))
+            return
+
+        address = self.get_osc_path() + '/ping/reply'
+        self.server.send(return_port, address)
 
     @osc_method('subscribe')
     def osc_subscribe(self, property, return_port):
@@ -241,8 +255,6 @@ class OscNode(object):
             if return_port in self.osc_subscribes[property]:
                 del self.osc_subscribes[property][return_port]
 
-
-
     def osc_feed_subscribers(self):
 
         for property in self.osc_subscribes:
@@ -250,15 +262,13 @@ class OscNode(object):
 
     def osc_feed_subscribers_property(self, property):
 
-        value = self.osc_get_value(property)[:]
-        address = self.get_osc_path() + '/subscribe/update'
-        for return_port in self.osc_subscribes[property]:
-            if value != self.osc_subscribes[property][return_port]:
-                self.osc_subscribes[property][return_port] = value
-                self.server.send(return_port, address, property, *value)
-
-
-
+        if property in self.osc_subscribes:
+            value = self.osc_get_value(property)[:]
+            address = self.get_osc_path() + '/subscribe/update'
+            for return_port in self.osc_subscribes[property]:
+                if value != self.osc_subscribes[property][return_port]:
+                    self.osc_subscribes[property][return_port] = value
+                    self.server.send(return_port, address, property, *value)
 
     def property_changed(self, property):
         """

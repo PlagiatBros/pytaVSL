@@ -120,7 +120,7 @@ class OscServer(OscNode):
             target = [self]
             cmd = path[0]
 
-        if not target:
+        if not target and cmd != 'ping':
             LOGGER.error("no target match for %s" % address)
 
         for t in target:
