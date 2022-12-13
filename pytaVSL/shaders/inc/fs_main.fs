@@ -9,10 +9,6 @@
 // Assign texture coords to output
 gl_FragColor = tex2D(tex0, coords);
 
-// Apply alpha
-gl_FragColor.a = gl_FragColor.a * unif[5][2];
-
-
 #ifdef RGBWAVE
 #include shaders/effects/rgbwave.fs
 #endif
@@ -53,3 +49,6 @@ gl_FragColor.rgb = adjustHue(gl_FragColor.rgb, unif[16][2]);
 #ifdef MASK
 #include shaders/effects/mask.fs
 #endif
+
+// Apply alpha
+gl_FragColor.a = gl_FragColor.a * unif[5][2];
