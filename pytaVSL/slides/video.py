@@ -49,9 +49,10 @@ class Video(object):
                     self.audio = True
 
                     audiopath = texture + '.wav'
-                    if not os.path.isfile(audiopath):
-                        print('extracting audio stream to ' + audiopath)
-                        subprocess.run(['ffmpeg', '-i', texture, '-acodec', 'pcm_s16le', '-ac', '2', audiopath])
+                    if not os.path.isfile(audiopath) or os.path.getmtime(audiopath) < os.path.getctime(texture):
+                        LOGGER.info('extracting audio stream to ' + audiopath)
+                        subprocess.run(['ffmpeg', '-hide_banner','-loglevel','error','-y','-i', texture, '-acodec', 'pcm_s16le', '-ac', '2', audiopath])
+                        LOGGER.info('done')
 
                     parent.audio_server.stop()
                     self.audio_data = pyo.SndTable(audiopath)
