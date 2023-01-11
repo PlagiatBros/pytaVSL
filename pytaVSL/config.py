@@ -21,8 +21,7 @@ parser.add_argument('--debug',  help='print debug logs', default=False, action='
 parser.add_argument('--show-fps',  help='show fps', default=False, action='store_true')
 parser.add_argument('--resolution',  help='output resolution', type=str, default='800x600', metavar='WIDTHxHEIGHT')
 parser.add_argument('--title',  help='window title', type=str, default='pytaVSL', metavar='TITLE')
-parser.add_argument('--audio',  help='enable audio playback of video slides (when visible)', default=False, action='store_true')
-parser.add_argument('--jack',  help='use jack backend for audio playback', default=False, action='store_true')
+parser.add_argument('--audio',  help='enable audio playback of video slides (when visible), requires jack to be running', default=False, action='store_true')
 parser.add_argument('--version', action='version', version=__version__)
 
 config = parser.parse_args()

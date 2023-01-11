@@ -24,8 +24,6 @@ geometry = [int(x) for x in config.resolution.split('x')]
 audio = False
 if config.audio:
     audio = True
-    if config.jack:
-        audio = 'jack'
 
 pyta = PytaVSL(
     name=config.namespace,
