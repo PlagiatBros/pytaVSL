@@ -20,7 +20,7 @@ class Group(object):
 
     def draw(self, *args, **kwargs):
 
-        if self.visible:
+        if self.get_is_visible():
 
             if self.children_need_sorting:
                 self.children = sorted(self.children, key=lambda slide: slide.pos_z, reverse=True)

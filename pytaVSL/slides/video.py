@@ -98,10 +98,19 @@ class Video(object):
 
     def draw(self, *args, **kwargs):
 
-        if self.video and self.visible:
+        if self.video and self.get_is_visible():
             self.video_next_frame()
 
         super(Video, self).draw(*args, **kwargs)
+
+    def audio_post_draw(self):
+
+        if self.get_is_visible():
+            if self.audio and not self.audio_reader.isOutputting():
+                 self.audio_reader.out()
+        else:
+            if self.audio and self.audio_reader.isOutputting():
+                 self.audio_reader.stop()
 
 
     @osc_property('video_time', 'video_time')

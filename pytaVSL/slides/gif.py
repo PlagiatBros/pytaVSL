@@ -93,7 +93,7 @@ class Gif(object):
 
     def draw(self, *args, **kwargs):
 
-        if self.gif and self.visible:
+        if self.gif and self.get_is_visible():
             self.gif_next_frame()
 
         super(Gif, self).draw(*args, **kwargs)

@@ -94,8 +94,11 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         self.set_position_z(self.pos_z)
 
     def draw(self, *args, **kwargs):
+        """
+        Main drawing function
+        """
 
-        if self.visible:
+        if self.get_is_visible():
 
             if self.color_strobe > 0:
                 rgb = list(colorsys.hsv_to_rgb(random.random(), 1.0, 1.0))
@@ -108,7 +111,6 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
                     return
 
             super(SlideBase, self).draw(*args, **kwargs)
-
 
     def quit_group(self):
         if self.parent_slide:
@@ -204,6 +206,19 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
         object visibility (0|1)
         """
         self.visible = int(bool(visible))
+
+    def get_is_visible(self):
+        """
+        return True if slide is actually visible
+        checks parent slides (groups) visiblity
+        """
+        if not self.visible:
+            return False
+
+        if self.parent_slide is not None and not self.parent_slide.get_is_visible():
+            return False
+
+        return True
 
     @osc_property('color', 'color')
     def set_color(self, r, g, b):
