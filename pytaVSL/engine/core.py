@@ -6,6 +6,8 @@ import ctypes
 
 import glob
 from threading import Thread
+import subprocess
+import sys
 from signal import signal, SIGINT, SIGTERM
 import traceback
 from time import time, sleep
@@ -109,7 +111,37 @@ class PytaVSL(Scenes, OscServer):
         self.recorder = Recorder(self)
 
         # Audio backend flag
-        self.audio = audio
+        self.audio_server = None
+        if audio:
+            pyo_found = False
+            try:
+                import pyo
+                pyo_found = True
+            except:
+                LOGGER.warning('python3-pyo not found, could not enable audio (videos will play without audio)')
+            if pyo_found:
+                try:
+                    jack_test = subprocess.Popen(['jack_wait','-c'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT).stdout.read()
+                    if 'not running' in str(jack_test):
+                        LOGGER.error('jack is not running, it must be launched before pyta to enable audio')
+                        sys.exit()
+                except:
+                    LOGGER.error('could not test if jack is running with jack_wait')
+                    sys.exit()
+
+                try:
+                    self.audio_server = pyo.Server(
+                        jackname=self.name,
+                        audio='jack',
+                        duplex=0,
+                    )
+                    self.audio_server.setVerbosity(1)
+                    self.audio_server.deactivateMidi()
+                    self.audio_server.boot()
+                    assert self.audio_server.getIsBooted()
+                except:
+                    self.audio_server = None
+                    LOGGER.warning('could not boot audio server (videos will play without audio)')
 
         # Status
         self.status = 'ready'
@@ -266,6 +298,8 @@ class PytaVSL(Scenes, OscServer):
         """
         if self.recorder.recording:
             self.recorder.stop()
+        if self.audio_server:
+            self.audio_server.stop()
         self.DISPLAY.stop()
         self.DISPLAY.destroy()
         super(PytaVSL, self).stop()
