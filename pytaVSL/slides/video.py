@@ -225,6 +225,7 @@ class Video(object):
         Video audio volume (0.0<>1.0, muted when not visible)
         """
         self.audio_volume = min(max(float(volume), 0.0), 1.0)
+        self.set_audio_volume_internal()
 
     def set_audio_volume_internal(self):
         """
