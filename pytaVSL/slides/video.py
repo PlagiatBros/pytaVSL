@@ -46,7 +46,6 @@ class Video(object):
                 if parent.audio_server:
 
                     import pyo
-                    self.audio = True
 
                     audiopath = texture + '.wav'
                     if not os.path.isfile(audiopath) or os.path.getmtime(audiopath) < os.path.getctime(texture):
@@ -59,6 +58,8 @@ class Video(object):
                     self.audio_reader = pyo.Osc(table=self.audio_data, freq=self.audio_data.getRate(), phase=0, mul=0.0).out()
                     parent.audio_server.start()
 
+                    self.audio = True
+                    
                 if video_support:
 
                     self.video = True
