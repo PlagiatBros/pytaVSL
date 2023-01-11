@@ -232,6 +232,9 @@ class Video(object):
         """
         Internal: update audio volume (volume property * visible state)
         """
+        if not self.audio:
+            return
+
         self.audio_reader.setMul(self.audio_volume * int(self.visible))
 
     def set_audio_sync(self):
