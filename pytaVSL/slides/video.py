@@ -57,7 +57,6 @@ class Video(object):
                         self.audio_reader = pyo.Osc(table=self.audio_data, freq=self.audio_data.getRate(), phase=0, mul=0.0).out()
                         parent.audio_server.start()
                         self.audio = True
-                        LOGGER.info('done')
 
                     else:
                         LOGGER.info('no audio stream created for ' + texture )
@@ -121,8 +120,14 @@ class Video(object):
                 self.set_video_speed(0)
                 self.video_load_frame(self.video_blank_frame)
 
-        self.video_reader.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
         self.video_time = time
+
+        if self.visible:
+            self.set_video_time_internal()
+
+    def set_video_time_internal(self):
+
+        self.video_reader.set(cv2.CAP_PROP_POS_MSEC, self.video_time * 1000)
         # self.video_reader.get(cv2.CAP_PROP_POS_MSEC) / 1000.
 
         if self.video_time > 0:
@@ -225,7 +230,7 @@ class Video(object):
 
 
     @osc_property('audio_volume', 'audio_volume')
-    def set_video_end(self, volume):
+    def set_audio_volume(self, volume):
         """
         Video audio volume (0.0<>1.0, muted when not visible)
         """
@@ -250,8 +255,7 @@ class Video(object):
 
         if self.visible and self.video_speed == 1:
             self.audio_reader.reset()
-            phase = (self.video_time - 1 / self.parent.fps) / self.video_duration
-            self.audio_reader.setPhase(phase % 1.0)
+            self.audio_reader.setPhase(min(max(self.video_time / self.video_duration, 0.0), 1.0))
             self.audio_reader.out()
         else:
             self.audio_reader.stop()
@@ -259,6 +263,10 @@ class Video(object):
     def property_changed(self, name):
 
         super(Video, self).property_changed(name)
+
+        if self.video:
+            if name == 'visible' and self.visible:
+                self.set_video_time_internal()
 
         if self.audio:
             if name == 'visible':
