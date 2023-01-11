@@ -86,7 +86,7 @@ class Video(object):
 
         if self.video:
             self.video_reader.release()
-            if self.audio_reader:
+            if self.audio:
                 self.audio_reader.stop()
                 self.audio_reader = None
                 self.audio_data = None
