@@ -17,7 +17,7 @@ from pytaVSL.config import config
 
 
 from pi3d import Log
-Log(name=None, level='DEBUG' if config.debug else 'WARNING')
+Log(name=None, level='DEBUG' if config.debug else 'INFO')
 
 geometry = [int(x) for x in config.resolution.split('x')]
 
