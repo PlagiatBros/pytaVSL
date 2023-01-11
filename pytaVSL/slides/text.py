@@ -59,6 +59,7 @@ class Text(State, Perspective, SlideBase):
 
         # fix alignment (handled in new_string())
         self.width = 0
+        self.video = False
 
         # disable mesh feature
         del self.osc_attributes['mesh_size']

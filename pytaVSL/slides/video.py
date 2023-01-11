@@ -32,6 +32,8 @@ class Video(object):
         self.video_end = 0
         self.audio_volume = 1.0
 
+        self.last_visible = False
+
         if isinstance(texture, str):
             match = videos_formats.match(texture.lower())
             if match and match.string:
@@ -103,15 +105,18 @@ class Video(object):
 
         super(Video, self).draw(*args, **kwargs)
 
-    def audio_post_draw(self):
+    def video_pre_draw(self):
 
-        if self.get_is_visible():
-            if self.audio and not self.audio_reader.isOutputting():
-                 self.audio_reader.out()
-        else:
-            if self.audio and self.audio_reader.isOutputting():
-                 self.audio_reader.stop()
+        visible = self.get_is_visible()
 
+        if visible != self.last_visible:
+            if self.video and visible:
+                self.set_video_time_internal()
+            if self.audio:
+                self.set_audio_sync()
+                self.set_audio_volume_internal()
+
+        self.last_visible = visible
 
     @osc_property('video_time', 'video_time')
     def set_video_time(self, time):
@@ -131,7 +136,7 @@ class Video(object):
 
         self.video_time = time
 
-        if self.visible:
+        if self.get_is_visible():
             self.set_video_time_internal()
         else:
             self.video_load_frame(self.video_blank_frame)
@@ -256,7 +261,7 @@ class Video(object):
         if not self.audio:
             return
 
-        self.audio_reader.setMul(self.audio_volume * int(self.visible))
+        self.audio_reader.setMul(self.audio_volume * int(self.get_is_visible()))
 
     def set_audio_sync(self):
         """
@@ -265,22 +270,9 @@ class Video(object):
         if not self.audio:
             return
 
-        if self.visible and self.video_speed == 1:
+        if self.get_is_visible() and self.video_speed == 1:
             self.audio_reader.reset()
             self.audio_reader.setPhase(min(max(self.video_time / self.video_duration, 0.0), 1.0))
             self.audio_reader.out()
         else:
             self.audio_reader.stop()
-
-    def property_changed(self, name):
-
-        super(Video, self).property_changed(name)
-
-        if self.video:
-            if name == 'visible' and self.visible:
-                self.set_video_time_internal()
-
-        if self.audio:
-            if name == 'visible':
-                self.set_audio_sync()
-                self.set_audio_volume_internal()

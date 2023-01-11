@@ -251,14 +251,11 @@ class PytaVSL(Scenes, OscServer):
 
             for slide in self.sorted_slides:
 
+                if slide.video:
+                    slide.video_pre_draw()
+
                 if not slide.parent_slide:
                     slide.draw()
-
-                elif slide.audio:
-                    # we need to stop audio
-                    # on videos in invisible groups
-                    slide.audio_post_draw()
-
 
                 slide.osc_feed_subscribers()
 
