@@ -250,7 +250,7 @@ class Video(object):
 
         if self.visible and self.video_speed == 1:
             self.audio_reader.reset()
-            self.audio_reader.setPhase(self.video_time / self.video_duration)
+            self.audio_reader.setPhase((self.video_time + 1 / self.parent.fps) / self.video_duration)
             self.audio_reader.out()
         else:
             self.audio_reader.stop()
