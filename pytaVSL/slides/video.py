@@ -50,16 +50,19 @@ class Video(object):
                     audiopath = texture + '.wav'
                     if not os.path.isfile(audiopath) or os.path.getmtime(audiopath) < os.path.getctime(texture):
                         LOGGER.info('extracting audio stream to ' + audiopath)
-                        subprocess.run(['ffmpeg', '-hide_banner','-loglevel','error','-y','-i', texture, '-acodec', 'pcm_s16le', '-ac', '2', audiopath])
+                        subprocess.run(['ffmpeg', '-hide_banner','-loglevel','quiet','-y','-i', texture, '-acodec', 'pcm_s16le', '-ac', '2', audiopath])
+                    if os.path.isfile(audiopath):
+                        parent.audio_server.stop()
+                        self.audio_data = pyo.SndTable(audiopath)
+                        self.audio_reader = pyo.Osc(table=self.audio_data, freq=self.audio_data.getRate(), phase=0, mul=0.0).out()
+                        parent.audio_server.start()
+                        self.audio = True
                         LOGGER.info('done')
 
-                    parent.audio_server.stop()
-                    self.audio_data = pyo.SndTable(audiopath)
-                    self.audio_reader = pyo.Osc(table=self.audio_data, freq=self.audio_data.getRate(), phase=0, mul=0.0).out()
-                    parent.audio_server.start()
+                    else:
+                        LOGGER.info('no audio stream created for ' + texture )
 
-                    self.audio = True
-                    
+
                 if video_support:
 
                     self.video = True
