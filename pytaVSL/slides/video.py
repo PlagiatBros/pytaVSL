@@ -124,14 +124,17 @@ class Video(object):
 
         if self.visible:
             self.set_video_time_internal()
+        else:
+            self.video_load_frame(self.video_blank_frame)
+
 
     def set_video_time_internal(self):
 
         self.video_reader.set(cv2.CAP_PROP_POS_MSEC, self.video_time * 1000)
         # self.video_reader.get(cv2.CAP_PROP_POS_MSEC) / 1000.
 
-        if self.video_time > 0:
-            self.video_elapsed_time = self.parent.time
+        # if self.video_time > 0:
+        self.video_elapsed_time = self.parent.time
 
         if self.audio:
             self.set_audio_sync()
