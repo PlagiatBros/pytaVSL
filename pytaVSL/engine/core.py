@@ -558,13 +558,16 @@ class PytaVSL(Scenes, OscServer):
                 del state['animations']
             if 'strobes' in state:
                 del state['strobes']
-            self.select_slide.width = slide.width
-            self.select_slide.height = slide.height
+            # self.select_slide.width = slide.width
+            # self.select_slide.height = slide.height
             self.select_slide.state_set(state)
             self.select_slide.set_alpha(1)
-            self.select_slide.set_color(-1, 2, -1)
+            self.select_slide.set_visible(1)
+            self.select_slide.set_color(0.0, 1.0, 0.0)
+            self.select_slide.set_effect_blur(0.4)
             self.select_slide.set_position_z(-self.select_slide.pos_z - 1)
             self.select_slide.set_mesh_wireframe(1)
+            self.select_slide.set_mesh_size(4, 4)
             self.select_slide.draw()
         else:
             LOGGER.error('selected slide "%s" does not exist anymore' % self.selected)
