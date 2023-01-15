@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 import random
+import ctypes
+from pi3d.constants import opengles, GLsizei
 
 from ..shaders.shaders import get_shader
 from ..engine.osc import osc_property
@@ -57,6 +59,9 @@ class Effect(object):
         self.effect_mask = ''
         self.effect_mask_hardness = 0.0
         self.effect_mask_threshold = 1.0
+        self.effect_mask_transform_loc = 0
+        self.effect_mask_transform = (ctypes.c_float * 4) (0.0, 0.0, 0.0, 0.0)
+
         self.set_effect_mask(self.effect_mask)
         self.set_effect_mask_hardness(self.effect_mask_hardness)
         self.set_effect_mask_threshold(self.effect_mask_threshold)
@@ -87,6 +92,9 @@ class Effect(object):
     def apply_effect_changes(self):
         self.set_shader(get_shader(self.active_effects))
         self.active_effects_changed = False
+        if self.effect_mask:
+            self.effect_mask_transform_loc = opengles.glGetUniformLocation(self.shader.program, b'mask_transform')
+
 
     @osc_property('key_color', 'effect_key_color')
     def set_effect_key_color(self, r, g, b):
@@ -252,5 +260,15 @@ class Effect(object):
         self.unif[37] = self.parent.time - origin
         if self.active_effects_changed:
             self.apply_effect_changes()
+
+        if self.effect_mask:
+            slides = self.parent.get_children(self.parent.slides, self.effect_mask)
+            if slides:
+                mask = slides[0]
+                self.effect_mask_transform[0] = mask.xyz[0]
+                self.effect_mask_transform[1] = mask.xyz[1]
+                self.effect_mask_transform[2] = mask.sx
+                self.effect_mask_transform[3] = mask.sy
+                opengles.glUniform4fv(self.effect_mask_transform_loc, GLsizei(1), self.effect_mask_transform)
 
         super(Effect, self).draw(*args, **kwargs)

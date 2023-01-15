@@ -13,6 +13,7 @@ varying vec2 coords;
 varying vec3 umaskCoords;
 varying vec2 maskCoords;
 
+uniform vec4 mask_transform;
 
 const vec2 resolution = vec2({WIDTH}, {HEIGHT});
 
