@@ -263,6 +263,10 @@ class Animable(object):
         """
         Compute current state of animations
         """
+        self.update_animations()
+        super(Animable, self).draw(*args, **kwargs)
+
+    def update_animations(self):
         if self.animations:
             anims = list(self.animations.values())
             for anim in anims:
@@ -276,5 +280,3 @@ class Animable(object):
         if self.strobes:
             for name in self.strobes:
                 self.strobes[name].play()
-
-        super(Animable, self).draw(*args, **kwargs)

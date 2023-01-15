@@ -265,6 +265,8 @@ class Effect(object):
             slides = self.parent.get_children(self.parent.slides, self.effect_mask)
             if slides:
                 mask = slides[0]
+                if not mask.visible:
+                    mask.update_animations()
                 self.effect_mask_transform[0] = mask.xyz[0]
                 self.effect_mask_transform[1] = mask.xyz[1]
                 self.effect_mask_transform[2] = mask.sx
