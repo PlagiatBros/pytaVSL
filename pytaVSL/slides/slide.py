@@ -115,7 +115,7 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
     def quit_group(self):
         if self.parent_slide:
             self.parent_slide.children.remove(self)
-            self.set_position_z(self.pos_z + self.parent_slide.pos_z)
+            self.set_position_z(self.pos_z + self.parent_slide.init_z)
             self.parent_slide.sort_slides()
             self.parent_slide = None
 
