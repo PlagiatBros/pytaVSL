@@ -112,7 +112,11 @@ class SlideBase(OscNode, Effect, Animable, Mesh):
 
             super(SlideBase, self).draw(*args, **kwargs)
 
+    @osc_method('quit_group')
     def quit_group(self):
+        """
+        Quit current group (if part of one)
+        """
         if self.parent_slide:
             self.parent_slide.children.remove(self)
             self.set_position_z(self.pos_z + self.parent_slide.init_z)
