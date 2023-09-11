@@ -2,7 +2,7 @@
 
 import liblo
 import logging
-from inspect import getmembers, getargspec
+from inspect import getmembers, getfullargspec
 
 LOGGER = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class osc_method():
         method.osc_method_aliases.append(self.alias)
         method.osc_argcount = method.__code__.co_argcount - 1
         method.osc_argcount_min = method.osc_argcount if not method.__defaults__ else method.osc_argcount - len(method.__defaults__)
-        method.osc_varargs = getargspec(method).varargs
+        method.osc_varargs = getfullargspec(method).varargs
 
         return method
 
