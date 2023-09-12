@@ -208,7 +208,7 @@ class OscServer(OscNode):
 
                 for name in methods[c]:
                     method = obj.osc_methods[name]
-                    spec = getargspec(method)
+                    spec = getfullargspec(method)
                     args = spec.args[1:]
                     if spec.defaults:
                         l = len(spec.defaults)
@@ -236,7 +236,7 @@ class OscServer(OscNode):
 
                 for name in methods[c]:
                     method = obj.osc_attributes[name]
-                    spec = getargspec(method)
+                    spec = getfullargspec(method)
                     args = spec.args[1:]
                     if spec.defaults:
                         l = len(spec.defaults)
