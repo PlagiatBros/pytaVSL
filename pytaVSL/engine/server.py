@@ -2,7 +2,7 @@
 
 from ..engine.osc import *
 
-import liblo
+import pyliblo3 as liblo
 import re
 import logging
 LOGGER = logging.getLogger(__name__)

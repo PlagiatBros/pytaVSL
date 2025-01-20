@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-import liblo
+import pyliblo3 as liblo
 import logging
 from inspect import getmembers, getfullargspec
 
