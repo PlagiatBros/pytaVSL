@@ -1,3 +1,5 @@
+Moved to Framagit, see: https://framagit.org/orlammd/pytaVSL
+
 ## pytaVSL
 *python tiny approximative Virtual Stage Light*
 
